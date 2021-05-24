@@ -37,7 +37,7 @@ zindle：基于go-zero开发的bookstore "kindle"
 
 |                                                              |
 | ------------------------------------------------------------ |
-| ![image-20210524175216643](images/image-20210524175216643.png) |
+| ![image-20210524175216643](https://user-images.githubusercontent.com/20268389/119350501-005a3d00-bcd2-11eb-80a7-1bc83d1dd8c8.png) |
 
 
 
@@ -130,10 +130,6 @@ https://org.modao.cc/app/aa11e8c03777a7653d18145be11b7f3e70eb1a13#screen=skow3pw
 
 ### 10.3. 个人wx（备注zindle）
 ![image-20210524151130130](https://user-images.githubusercontent.com/20268389/119350257-b3766680-bcd1-11eb-8c20-56ad40a03803.png)
-
-
-
-
 
 ### 10.4. 欢迎star
 
