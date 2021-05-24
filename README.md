@@ -71,7 +71,7 @@ https://org.modao.cc/app/aa11e8c03777a7653d18145be11b7f3e70eb1a13#screen=skow3pw
 
 请提前准备数据库，并导入script目录中的sql
 
-1. app直接用hbuild打开
+1. app直接用hbuilder打开
    1. 开启模拟器调度
 2. backend用goland打开
    1. k8s
