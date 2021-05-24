@@ -10,8 +10,7 @@ zindle：基于go-zero开发的bookstore "kindle"
 
 企业级：框架支持日活千万，适合大部分中小型企业的业务需求了。
 
-| ![image-20210524161004117](images/image-20210524161004117.png) |
-| ------------------------------------------------------------ |
+![image-20210524161004117](https://user-images.githubusercontent.com/20268389/119350328-c5f0a000-bcd1-11eb-8ee8-56137177e1c9.png)
 
 本系统的客户端有web,App(ios,android)
 
@@ -126,12 +125,13 @@ https://org.modao.cc/app/aa11e8c03777a7653d18145be11b7f3e70eb1a13#screen=skow3pw
 1. go-zero微服务框架 https://github.com/tal-tech/go-zero
 
 2. gin-vue-admin 全栈开发框架 https://github.com/flipped-aurora/gin-vue-admin
+
 3. ElementUI vue相关组件 https://element.eleme.cn
 
 ### 10.3. 个人wx（备注zindle）
+![image-20210524151130130](https://user-images.githubusercontent.com/20268389/119350257-b3766680-bcd1-11eb-8c20-56ad40a03803.png)
 
-| ![image-20210524151130130](images/image-20210524151130130.png) |
-| ------------------------------------------------------------ |
+
 
 
 
