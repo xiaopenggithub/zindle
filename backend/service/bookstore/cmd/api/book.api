@@ -1,0 +1,87 @@
+syntax = "v1"
+
+info(
+	title: "图书管理"
+	desc: "图书管理"
+	author: "qin"
+	email: "361018729@qq.com"
+)
+import "bookOrder.api"
+import "reader.api"
+import "verifyCode.api"
+type (
+	BookPostReq {
+		Id          int64  `db:"id" form:"id,optional"`                        // ID
+		Title       string `db:"title" form:"title,optional"`                  // 标题
+		Description string `db:"description" form:"description,default="`      // 简介
+		Cover       string `db:"cover" form:"cover,optional,default="`         // 封面
+		Sort        int64  `db:"sort" form:"sort,default=0"`                   // 排序
+		Quantity    int64  `db:"quantity" form:"quantity,optional,default=0"`  // 数量
+		CreateBy    string `db:"create_by" form:"create_by,optional,default="` // 创建者
+		UpdateBy    string `db:"update_by" form:"update_by,optional,default="` // 更新者
+	}
+	BookReply {
+		Id   int64  `json:"id"`
+		Name string `json:"name"`
+	}
+
+	BookListReq {
+		Page     int64  `json:"page,optional,default=1" form:"page,optional,default=1"`
+		PageSize int64  `json:"pageSize,optional,default=10" form:"pageSize,optional,default=10"`
+		Keyword  string `json:"keyword,optional" form:"pageSize,optional"`
+	}
+	BookDelReq {
+		Id int64 `json:"id"`
+	}
+	BookDelBatchReq {
+		Ids string `json:"ids"`
+	}
+)
+
+@server(
+	group: book
+	jwt: Auth
+	middleware: CheckLogin // 路由中间件声明
+)
+service books-api {
+	//	列表
+	@handler BookList
+	post /book/list(BookListReq) returns (BookReply)
+	
+	//	删除
+	@handler BookDelete
+	delete /book/delete(BookDelReq) returns (BookReply)
+	
+	//	删除批量
+	@handler BookDeleteBatch
+	delete /book/deleteBatch(BookDelBatchReq) returns (BookReply)
+	
+	//	查询数据
+	@handler BookFindOne
+	post /book/find(BookDelReq) returns (BookReply)
+	
+	// 添加
+	@handler BookAdd
+	post /book/add (BookPostReq) returns (BookReply)
+	
+	// 更新
+	@handler BookUpdate
+	put /book/update (BookPostReq) returns (BookReply)
+}
+
+@server(
+	group: book
+)
+service books-api {
+	//	列表
+	@handler BookAppList
+	post /book/appList(BookListReq) returns (BookReply)
+	
+	//	查询数据
+	@handler BookAppFindOne
+	post /book/appFind(BookDelReq) returns (BookReply)
+	
+	// 统计
+	@handler Counts
+	post /book/counts(BookDelReq) returns (BookReply)
+}

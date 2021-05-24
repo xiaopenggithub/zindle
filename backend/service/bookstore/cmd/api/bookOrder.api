@@ -1,0 +1,88 @@
+syntax = "v1"
+
+info(
+	title: "图书订单"
+	desc: "图书订单"
+	author: "qin"
+	email: "361018729@qq.com"
+)
+
+type(
+BookOrderPostReq {
+	Id      int64    `db:"id" json:"id,optional"`             // ID
+MemberId      int64    `db:"member_id" json:"member_id,default=0"`             // 用户ID
+BookId      int64    `db:"book_id" json:"book_id,default=0"`             // 书ID
+ReturnDate      string    `db:"return_date" json:"return_date,default=2006-01-02 15:04:05"`             // 还书日期
+
+	}
+BookOrderReply {
+		Id       int64  `json:"id"`
+		Name string `json:"name"`
+	}
+
+BookOrderListReq {
+		Page     int64  `json:"page,optional,default=1" form:"page,optional,default=1"`
+		PageSize int64  `json:"pageSize,optional,default=10" form:"pageSize,optional,default=10"`
+		Keyword  string `json:"keyword,optional" form:"pageSize,optional"`
+	}
+BookOrderDelReq {
+		Id int64 `json:"id"`
+	}
+BookOrderDelBatchReq {
+		Ids string `json:"ids"`
+	}
+)
+
+@server(
+	group: bookOrder
+	jwt: Auth
+	middleware: CheckLogin // 路由中间件声明
+)
+service books-api {
+	//	列表
+	@handler BookOrderList
+	post /bookOrder/list(BookOrderListReq) returns (BookOrderReply)
+
+	//	删除
+	@handler BookOrderDelete
+	delete /bookOrder/delete(BookOrderDelReq) returns (BookOrderReply)
+
+	//	删除批量
+	@handler BookOrderDeleteBatch
+	delete /bookOrder/deleteBatch(BookOrderDelBatchReq) returns (BookOrderReply)
+
+	//	查询数据
+	@handler BookOrderFindOne
+	post /bookOrder/find(BookOrderDelReq) returns (BookOrderReply)
+
+	// 添加
+	@handler BookOrderAdd
+	post /bookOrder/add (BookOrderPostReq) returns (BookOrderReply)
+
+	// 更新
+	@handler BookOrderUpdate
+	put /bookOrder/update (BookOrderPostReq) returns (BookOrderReply)
+}
+
+
+@server(
+	group: bookOrder
+	jwt: Auth
+)
+service books-api{
+	// 归还
+	@handler ReturnBook
+	put /bookOrder/returnBook(BookOrderDelReq) returns (BookOrderReply)
+	// 检查借阅
+	@handler CheckBorrow
+	post /bookOrder/checkBorrow(BookOrderDelReq) returns (BookOrderReply)
+	// 借阅
+	@handler BorrowBook
+	post /bookOrder/borrowBook(BookOrderDelReq) returns (BookOrderReply)
+	// 借阅列表
+	@handler BorrowList
+	post /bookOrder/borrowList(BookOrderListReq) returns (BookOrderReply)
+	// 借阅详情
+	@handler BorrowDetail
+	post /bookOrder/borrowDetail(BookOrderDelReq) returns (BookOrderReply)
+}

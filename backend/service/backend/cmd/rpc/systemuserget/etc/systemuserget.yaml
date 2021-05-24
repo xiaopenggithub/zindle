@@ -1,0 +1,11 @@
+Name: systemuserget.rpc
+ListenOn: 0.0.0.0:8891
+Etcd:
+  Hosts:
+  - 192.168.1.2:2379
+  Key: systemuserget.rpc
+Mysql:
+  DataSource: root:123456@tcp(192.168.1.2:3306)/db_zeromicro?charset=utf8mb4&loc=Asia%2FShanghai&parseTime=true
+CacheRedis:
+  - Host: 192.168.1.2:6379
+    Pass: "123456"

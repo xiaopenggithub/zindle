@@ -1,0 +1,11 @@
+Name: books-api
+Host: 0.0.0.0
+Port: 8892
+Mysql:
+  DataSource: root:123456@tcp(192.168.1.2:3306)/db_zeromicro?charset=utf8mb4&loc=Asia%2FShanghai&parseTime=true
+CacheRedis:
+  - Host: 192.168.1.2:6379
+    Pass: "123456"
+Auth:
+  AccessSecret: "go-zero-90909090"
+  AccessExpire: 72000

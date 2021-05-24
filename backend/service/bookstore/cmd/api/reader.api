@@ -1,0 +1,122 @@
+syntax = "v1"
+
+info(
+	title: "读者"
+	desc: "读者"
+	author: "qin"
+	email: "361018729@qq.com"
+)
+
+type(
+	ReaderPostReq {
+		Id      int64    `db:"id" json:"id,optional"`             // 用户ID
+		Username      string    `db:"username" json:"username,optional"`             // 用户账号
+		Password      string    `db:"password" json:"password,default="`             // 密码
+		Nickname      string    `db:"nickname" json:"nickname,optional"`             // 用户昵称
+		Phone      string    `db:"phone" json:"phone,default=0"`             // 手机
+		Email      string    `db:"email" json:"email,default="`             // 用户邮箱
+		Status      int64    `db:"status" json:"status,default=0"`             // 帐号状态（0正常 1停用）
+		LoginIp      string    `db:"login_ip" json:"login_ip,default="`             // 最后登录IP
+		LoginDate      string    `db:"login_date" json:"login_date,optional,default=2006-01-02 15:04:05"`             // 最后登录时间
+		Remark      string    `db:"remark" json:"remark,default=Empty string"`             // 备注
+
+	}
+	RegisterReq{
+		Username      string    `db:"username" json:"username"`             // 用户账号
+		Password      string    `db:"password" json:"password,default="`             // 密码
+		Email      string    `db:"email" json:"email,default="`             // 用户邮箱
+		VerificationCode      string    `db:"verificationCode" json:"verificationCode,optional,default="`             // 验证码
+	}
+	LoginReq{
+		Username      string    `db:"username" json:"username"`             // 用户账号
+		Password      string    `db:"password" json:"password,default="`             // 密码
+	}
+	UpdatePwdReq {
+		OldPassword string `json:"oldPassword"`
+		Password    string `json:"password"`
+	}
+	VerifyReq{
+		Account string  `db:"account" json:"account"`
+		Type int64  `db:"type" json:"type"`
+	}
+	FindPasswordReq{
+		Password      string    `db:"password" json:"password,default="`             // 密码
+		Email      string    `db:"email" json:"email,default="`             // 用户邮箱
+		VerificationCode      string    `db:"verificationCode" json:"verificationCode,optional,default="`             // 验证码
+	}
+	ReaderReply {
+		Id       int64  `json:"id"`
+		Name string `json:"name"`
+	}
+
+	ReaderListReq {
+		Page     int64  `json:"page,optional,default=1" form:"page,optional,default=1"`
+		PageSize int64  `json:"pageSize,optional,default=10" form:"pageSize,optional,default=10"`
+		Keyword  string `json:"keyword,optional" form:"pageSize,optional"`
+	}
+	ReaderDelReq {
+		Id int64 `json:"id"`
+	}
+	ReaderDelBatchReq {
+		Ids string `json:"ids"`
+	}
+)
+@server(
+	group: reader
+	jwt: Auth
+)
+service books-api {
+	// 修改密码
+	@handler UpdatePwd
+	put /reader/updatePwd(UpdatePwdReq) returns (ReaderReply)
+}
+// todo
+@server(
+	group: reader
+)
+service books-api {
+	// 登录
+	@handler Login
+	post /reader/login(LoginReq) returns (ReaderReply)
+	// 注册
+	@handler Register
+	post /reader/register(RegisterReq) returns (ReaderReply)
+	// 发验证码
+	@handler SendVerifyCode
+	post /reader/sendVerifyCode(VerifyReq) returns (ReaderReply)
+	// 找回密码
+	@handler FindPassword
+	post /reader/findPassword(FindPasswordReq) returns (ReaderReply)
+}
+
+
+@server(
+	group: reader
+	jwt: Auth
+	middleware: CheckLogin // 路由中间件声明
+)
+service books-api {
+	//	列表
+	@handler ReaderList
+	post /reader/list(ReaderListReq) returns (ReaderReply)
+
+	//	删除
+	@handler ReaderDelete
+	delete /reader/delete(ReaderDelReq) returns (ReaderReply)
+
+	//	删除批量
+	@handler ReaderDeleteBatch
+	delete /reader/deleteBatch(ReaderDelBatchReq) returns (ReaderReply)
+
+	//	查询数据
+	@handler ReaderFindOne
+	post /reader/find(ReaderDelReq) returns (ReaderReply)
+
+	// 添加
+	@handler ReaderAdd
+	post /reader/add (ReaderPostReq) returns (ReaderReply)
+
+	// 更新
+	@handler ReaderUpdate
+	put /reader/update (ReaderPostReq) returns (ReaderReply)
+}

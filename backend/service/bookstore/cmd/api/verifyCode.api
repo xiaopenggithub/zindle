@@ -1,0 +1,66 @@
+syntax = "v1"
+
+info(
+	title: "验证码"
+	desc: "验证码"
+	author: "qin"
+	email: "361018729@qq.com"
+)
+
+type(
+VerifyCodePostReq {
+	Id      int64    `db:"id" json:"id,optional"`             // 
+Account      string    `db:"account" json:"account,optional"`             // 号码(手机或邮箱)
+Code      string    `db:"code" json:"code,optional"`             // 验证码
+Type      int64    `db:"type" json:"type,default=0"`             // 类型0手机1邮箱
+Status      int64    `db:"status" json:"status,default=0"`             // 状态0未验证1已验证2验证错误
+
+	}
+VerifyCodeReply {
+		Id       int64  `json:"id"`
+		Name string `json:"name"`
+	}
+
+VerifyCodeListReq {
+		Page     int64  `json:"page,optional,default=1" form:"page,optional,default=1"`
+		PageSize int64  `json:"pageSize,optional,default=10" form:"pageSize,optional,default=10"`
+		Keyword  string `json:"keyword,optional" form:"pageSize,optional"`
+	}
+VerifyCodeDelReq {
+		Id int64 `json:"id"`
+	}
+VerifyCodeDelBatchReq {
+		Ids string `json:"ids"`
+	}
+)
+
+@server(
+	group: verifyCode
+	jwt: Auth
+	middleware: CheckLogin // 路由中间件声明
+)
+service books-api {
+	//	列表
+	@handler VerifyCodeList
+	post /verifyCode/list(VerifyCodeListReq) returns (VerifyCodeReply)
+
+	//	删除
+	@handler VerifyCodeDelete
+	delete /verifyCode/delete(VerifyCodeDelReq) returns (VerifyCodeReply)
+
+	//	删除批量
+	@handler VerifyCodeDeleteBatch
+	delete /verifyCode/deleteBatch(VerifyCodeDelBatchReq) returns (VerifyCodeReply)
+
+	//	查询数据
+	@handler VerifyCodeFindOne
+	post /verifyCode/find(VerifyCodeDelReq) returns (VerifyCodeReply)
+
+	// 添加
+	@handler VerifyCodeAdd
+	post /verifyCode/add (VerifyCodePostReq) returns (VerifyCodeReply)
+
+	// 更新
+	@handler VerifyCodeUpdate
+	put /verifyCode/update (VerifyCodePostReq) returns (VerifyCodeReply)
+}
