@@ -33,7 +33,6 @@ func (m *CheckLoginMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		roleIdNumber := json.Number(fmt.Sprintf("%v", r.Context().Value("roleId")))
 		roleId, err := roleIdNumber.Int64()
-		fmt.Println(roleId, r.RequestURI, r.Method)
 
 		if err != nil {
 			httpx.Error(w, errorx.NewCodeError(401, fmt.Sprintf("%v", err), ""))

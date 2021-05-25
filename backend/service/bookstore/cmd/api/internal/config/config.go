@@ -15,4 +15,12 @@ type Config struct {
 		DataSource string
 	}
 	CacheRedis cache.CacheConf
+	Email      struct {
+		From     string
+		Nickname string
+		Secret   string
+		Host     string
+		Port     int64
+		IsSSL    bool
+	}
 }

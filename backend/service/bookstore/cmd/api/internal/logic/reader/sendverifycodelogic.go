@@ -2,6 +2,7 @@ package logic
 
 import (
 	"backend/common/errorx"
+	"backend/service/bookstore/cmd/api/internal/config"
 	"backend/service/bookstore/cmd/api/internal/svc"
 	"backend/service/bookstore/cmd/api/internal/types"
 	"backend/service/bookstore/model"
@@ -37,7 +38,7 @@ func (l *SendVerifyCodeLogic) SendVerifyCode(req types.VerifyReq) (*types.Reader
 	subject := "邮箱验证"
 	code := createRandomNumber(4)
 	body := fmt.Sprintf("您的验证码是%v,有效期5分钟", code)
-	err := send(to, subject, body)
+	err := send(to, subject, body, l.svcCtx.Config)
 	if err != nil {
 		return nil, errorx.NewCodeError(201, fmt.Sprintf("%v", err), "")
 	}
@@ -56,13 +57,13 @@ func (l *SendVerifyCodeLogic) SendVerifyCode(req types.VerifyReq) (*types.Reader
 
 	return nil, errorx.NewCodeError(200, "发送成功", "")
 }
-func send(to []string, subject string, body string) error {
-	from := "your email"
-	nickname := "your email nickname"
-	secret := "your email secret "
-	host := "your email smtp host"
-	port := 465 // smtp  port
-	isSSL := true
+func send(to []string, subject string, body string, c config.Config) error {
+	from := c.Email.From
+	nickname := c.Email.Nickname
+	secret := c.Email.Secret
+	host := c.Email.Host
+	port := c.Email.Port
+	isSSL := c.Email.IsSSL
 
 	auth := smtp.PlainAuth("", from, secret, host)
 	e := email.NewEmail()

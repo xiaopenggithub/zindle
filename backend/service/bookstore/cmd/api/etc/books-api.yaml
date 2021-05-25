@@ -9,3 +9,11 @@ CacheRedis:
 Auth:
   AccessSecret: "go-zero-90909090"
   AccessExpire: 72000
+# email config
+Email:
+  From: your email
+  Nickname: your email nickname
+  Secret: your email secret
+  Host: your email smtp host
+  Port: your email port
+  IsSSL: ssl type(true or false)
