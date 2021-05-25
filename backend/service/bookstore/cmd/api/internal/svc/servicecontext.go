@@ -21,7 +21,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	conn := sqlx.NewMysql(c.Mysql.DataSource)
 	return &ServiceContext{
 		Config:           c,
-		CheckLogin:       middleware.NewCheckLoginMiddleware().Handle,
+		CheckLogin:       middleware.NewCheckLoginMiddleware(c.Mysql.DataSource).Handle,
 		BooksModel:       model.NewBooksModel(conn, c.CacheRedis),
 		BookOrdersModel:  model.NewBookOrdersModel(conn, c.CacheRedis),
 		ReadersModel:     model.NewReadersModel(conn, c.CacheRedis),

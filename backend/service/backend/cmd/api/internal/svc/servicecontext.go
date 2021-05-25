@@ -35,7 +35,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		SystemDepartmentsModel: model.NewSystemDepartmentsModel(conn, c.CacheRedis),
 		SystemRoleMenusModel:   model.NewSystemRoleMenusModel(conn, c.CacheRedis),
 		SystemRoleApisModel:    model.NewSystemRoleApisModel(conn, c.CacheRedis),
-		CheckLogin:             middleware.NewCheckLoginMiddleware().Handle,
+		CheckLogin:             middleware.NewCheckLoginMiddleware(c.Mysql.DataSource).Handle,
 		//rpc
 		Systemusergeter: systemusergeter.NewSystemusergeter(zrpc.MustNewClient(c.GetsystemuserRpc)),
 	}

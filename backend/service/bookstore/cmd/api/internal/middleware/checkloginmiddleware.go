@@ -20,24 +20,26 @@ import (
 )
 
 type CheckLoginMiddleware struct {
+	DataSource string
 }
 
-func NewCheckLoginMiddleware() *CheckLoginMiddleware {
-	return &CheckLoginMiddleware{}
+func NewCheckLoginMiddleware(dataSource string) *CheckLoginMiddleware {
+	return &CheckLoginMiddleware{
+		DataSource: dataSource,
+	}
 }
 
 func (m *CheckLoginMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		roleIdNumber := json.Number(fmt.Sprintf("%v", r.Context().Value("roleId")))
 		roleId, err := roleIdNumber.Int64()
-		fmt.Println(roleId, r.RequestURI, r.Method)
 
 		if err != nil {
 			httpx.Error(w, errorx.NewCodeError(401, fmt.Sprintf("%v", err), ""))
 			return
 		}
 		// todo: 权限放到redis
-		if ok, err := check(strconv.Itoa(int(roleId)), r.RequestURI, r.Method); ok == true {
+		if ok, err := check(strconv.Itoa(int(roleId)), r.RequestURI, r.Method, m.DataSource); ok == true {
 			next(w, r)
 		} else {
 			httpx.Error(w, errorx.NewCodeError(403, fmt.Sprintf("%v", err), ""))
@@ -53,7 +55,7 @@ func finalizer(db *sqlx.DB) {
 		panic(err)
 	}
 }
-func check(sub, obj, act string) (bool, error) {
+func check(sub, obj, act string, dataSource string) (bool, error) {
 	m, err := model.NewModelFromString(`
 											[request_definition]
 											r = sub, obj, act
@@ -75,8 +77,7 @@ func check(sub, obj, act string) (bool, error) {
 		logx.Infof("error: model: %s", err)
 		return false, errors.New("model-err")
 	}
-	//todo: 如何直接引用配置中的信息
-	db, err := sqlx.Connect("mysql", "root:123456@tcp(192.168.1.2:3306)/db_zeromicro?charset=utf8mb4&loc=Asia%2FShanghai&parseTime=true")
+	db, err := sqlx.Connect("mysql", dataSource)
 	db.SetMaxIdleConns(20)
 	db.SetMaxIdleConns(10)
 	runtime.SetFinalizer(db, finalizer)
@@ -104,24 +105,19 @@ func check(sub, obj, act string) (bool, error) {
 
 	if ok == true {
 		// permit alice to read data1
-		//fmt.Println("-------check permit--------")
 		return true, nil
 	} else {
 		// deny the request, show an error
-		//fmt.Println("-------check deny--------")
 		return false, errors.New("未授权访问")
 	}
 }
 func ParamsMatchFunc(args ...interface{}) (interface{}, error) {
-	//fmt.Println("---------ParamsMatchFunc----------")
 	name1 := args[0].(string)
 	name2 := args[1].(string)
-	//fmt.Println(name1, name2)
 
 	return ParamsMatch(name1, name2), nil
 }
 func ParamsMatch(fullNameKey1 string, key2 string) bool {
-	//fmt.Println(fullNameKey1, key2)
 	key1 := strings.Split(fullNameKey1, "?")[0]
 	// 剥离路径后再使用casbin的keyMatch2
 	return util.KeyMatch2(key1, key2)
