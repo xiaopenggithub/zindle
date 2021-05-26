@@ -123,10 +123,17 @@ https://org.modao.cc/app/aa11e8c03777a7653d18145be11b7f3e70eb1a13#screen=skow3pw
 参考到的开源库都非常优秀，欢迎大家下载本地体验并给作者star以支持
 
 1. go-zero微服务框架 https://github.com/tal-tech/go-zero
+   
+   系统内核,前后端接口使用go-zero制作
+
 
 2. gin-vue-admin 全栈开发框架 https://github.com/flipped-aurora/gin-vue-admin
 
+   后台界面基于此源码库制作
+
 3. ElementUI vue相关组件 https://element.eleme.cn
+   
+   后台界面相关组件参考此源码库官方文档
 
 ### 10.3. 个人wx（备注zindle）
 ![image-20210524151130130](https://user-images.githubusercontent.com/20268389/119350257-b3766680-bcd1-11eb-8c20-56ad40a03803.png)
