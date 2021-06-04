@@ -138,6 +138,11 @@ https://org.modao.cc/app/aa11e8c03777a7653d18145be11b7f3e70eb1a13#screen=skow3pw
 ### 10.3. 个人wx（备注zindle）
 ![image-20210524151130130](https://user-images.githubusercontent.com/20268389/119350257-b3766680-bcd1-11eb-8c20-56ad40a03803.png)
 
-### 10.4. 欢迎star
+
+### 10.4. zindle交流群（不要闲聊）
+![zindle交流群](https://user-images.githubusercontent.com/20268389/120781070-49748180-c55b-11eb-8607-3a6bbbd066a4.jpeg)
+
+
+### 10.5. 欢迎star
 
 如果本系统能给你带来帮助，麻烦给我一个star。
