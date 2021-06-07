@@ -36,6 +36,7 @@ type (
 		CheckDuplicate(fieldname string) (BookOrders, error)
 		ReturnBook(data BookOrders) error
 		BorrowBook(bookId int64, readerId int64) error
+		NearReturnBook(nearTime string) ([]*BookOrders, error)
 	}
 
 	defaultBookOrdersModel struct {
@@ -236,6 +237,21 @@ func (m *defaultBookOrdersModel) CheckDuplicate(fieldname string) (BookOrders, e
 	}
 }
 
+func (m *defaultBookOrdersModel) NearReturnBook(nearTime string) ([]*BookOrders, error) {
+	items := make([]*BookOrders, 0)
+	whereCondition := "where " + softDeleteFlag
+	whereCondition += " and `created_at`< ? "
+	orderBy := "order by id desc"
+	query := fmt.Sprintf("SELECT %s FROM %s %s %s", bookOrdersRows, m.table, whereCondition, orderBy)
+	err := m.CachedConn.QueryRowsNoCache(&items, query, nearTime)
+	if err != nil {
+		if err == sqlx.ErrNotFound {
+			return nil, model.ErrNotFound
+		}
+		return nil, err
+	}
+	return items, nil
+}
 func (m *defaultBookOrdersModel) ReturnBook(data BookOrders) error {
 	bookOrdersIdKey := fmt.Sprintf("%s%v", cacheBookOrdersIdPrefix, data.Id)
 	booksIdKey := fmt.Sprintf("%s%v", cacheBooksIdPrefix, data.BookId)

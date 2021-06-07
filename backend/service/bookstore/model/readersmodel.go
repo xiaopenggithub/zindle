@@ -33,6 +33,7 @@ type (
 		CheckDuplicate(fieldname string, email string) (Readers, error)
 		FindOneByUserName(username string) (Readers, error)
 		FindOneByUserEmail(email string) (Readers, error)
+		FindByIds(ids string) ([]*Readers, error)
 	}
 
 	defaultReadersModel struct {
@@ -147,6 +148,26 @@ func (m *defaultReadersModel) List(req utils.ListReq) ([]*Readers, int, error) {
 
 	return items, total, nil
 }
+func (m *defaultReadersModel) FindByIds(ids string) ([]*Readers, error) {
+	// 条件处理
+	whereCondition := "where " + softDeleteFlag
+	whereCondition += "and `id` in (?)"
+
+	orderBy := "order by id desc"
+	items := make([]*Readers, 0)
+	query := fmt.Sprintf("SELECT %s FROM %s %s %s ", readersRows, m.table, whereCondition, orderBy)
+
+	//获取记录
+	err := m.CachedConn.QueryRowsNoCache(&items, query, ids)
+	if err != nil {
+		if err == sqlx.ErrNotFound {
+			return nil, model.ErrNotFound
+		}
+		return nil, err
+	}
+	return items, nil
+}
+
 func (m *defaultReadersModel) DeleteBatch(ids string) error {
 	query := fmt.Sprintf("update %s set `deleted_at`=? where `id` in (%s)", m.table, ids)
 	_, err := m.ExecNoCache(query, time.Now().Format("2006-01-02 15:04:05"))

@@ -2,6 +2,7 @@ package main
 
 import (
 	"backend/common/errorx"
+	logic "backend/service/bookstore/cmd/api/internal/logic/bookOrder"
 	"flag"
 	"fmt"
 	"github.com/tal-tech/go-zero/rest/httpx"
@@ -26,6 +27,9 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
+
+	// 开启定时任务,发送还书提醒邮件
+	logic.CronInit(ctx)
 
 	handler.RegisterHandlers(server, ctx)
 

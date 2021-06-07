@@ -38,7 +38,7 @@ func (l *SendVerifyCodeLogic) SendVerifyCode(req types.VerifyReq) (*types.Reader
 	subject := "邮箱验证"
 	code := createRandomNumber(4)
 	body := fmt.Sprintf("您的验证码是%v,有效期5分钟", code)
-	err := send(to, subject, body, l.svcCtx.Config)
+	err := Send(to, subject, body, l.svcCtx.Config)
 	if err != nil {
 		return nil, errorx.NewCodeError(201, fmt.Sprintf("%v", err), "")
 	}
@@ -57,7 +57,7 @@ func (l *SendVerifyCodeLogic) SendVerifyCode(req types.VerifyReq) (*types.Reader
 
 	return nil, errorx.NewCodeError(200, "发送成功", "")
 }
-func send(to []string, subject string, body string, c config.Config) error {
+func Send(to []string, subject string, body string, c config.Config) error {
 	from := c.Email.From
 	nickname := c.Email.Nickname
 	secret := c.Email.Secret

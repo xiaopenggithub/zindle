@@ -13,6 +13,7 @@ require (
 	github.com/jinzhu/copier v0.2.9
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
+	github.com/robfig/cron v1.2.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/tal-tech/go-zero v1.1.6
 	google.golang.org/grpc v1.29.1
