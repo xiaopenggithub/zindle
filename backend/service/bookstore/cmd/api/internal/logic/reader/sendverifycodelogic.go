@@ -12,7 +12,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/jordan-wright/email"
-	"github.com/tal-tech/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/logx"
 	"math/big"
 	"net/smtp"
 )

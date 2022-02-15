@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/robfig/cron"
-	"github.com/tal-tech/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/logx"
 	"time"
 )
 

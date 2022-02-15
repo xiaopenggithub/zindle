@@ -6,9 +6,10 @@ import (
 	"backend/service/bookstore/cmd/api/internal/svc"
 	"backend/service/bookstore/cmd/api/internal/types"
 	"fmt"
-	"github.com/tal-tech/go-zero/rest/httpx"
+	"github.com/zeromicro/go-zero/rest/httpx"
 	"net/http"
 )
+
 // 读者 delete
 func ReaderDeleteHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

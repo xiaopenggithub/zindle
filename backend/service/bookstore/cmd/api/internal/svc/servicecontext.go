@@ -4,8 +4,8 @@ import (
 	"backend/service/bookstore/cmd/api/internal/config"
 	"backend/service/bookstore/cmd/api/internal/middleware"
 	"backend/service/bookstore/model"
-	"github.com/tal-tech/go-zero/core/stores/sqlx"
-	"github.com/tal-tech/go-zero/rest"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"github.com/zeromicro/go-zero/rest"
 )
 
 type ServiceContext struct {

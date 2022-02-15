@@ -5,15 +5,15 @@ import (
 	logic "backend/service/bookstore/cmd/api/internal/logic/bookOrder"
 	"flag"
 	"fmt"
-	"github.com/tal-tech/go-zero/rest/httpx"
+	"github.com/zeromicro/go-zero/rest/httpx"
 	"net/http"
 
 	"backend/service/bookstore/cmd/api/internal/config"
 	"backend/service/bookstore/cmd/api/internal/handler"
 	"backend/service/bookstore/cmd/api/internal/svc"
 
-	"github.com/tal-tech/go-zero/core/conf"
-	"github.com/tal-tech/go-zero/rest"
+	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/rest"
 )
 
 var configFile = flag.String("f", "etc/books-api.yaml", "the config file")

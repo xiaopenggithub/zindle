@@ -7,7 +7,7 @@ import (
 	"backend/service/bookstore/cmd/api/internal/svc"
 	"backend/service/bookstore/cmd/api/internal/types"
 
-	"github.com/tal-tech/go-zero/rest/httpx"
+	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 func UpdatePwdHandler(ctx *svc.ServiceContext) http.HandlerFunc {

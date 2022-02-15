@@ -6,9 +6,10 @@ import (
 	"backend/service/bookstore/cmd/api/internal/svc"
 	"backend/service/bookstore/cmd/api/internal/types"
 	"fmt"
-	"github.com/tal-tech/go-zero/rest/httpx"
+	"github.com/zeromicro/go-zero/rest/httpx"
 	"net/http"
 )
+
 // 验证码 list
 func VerifyCodeListHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
