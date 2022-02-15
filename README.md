@@ -122,7 +122,7 @@ https://org.modao.cc/app/aa11e8c03777a7653d18145be11b7f3e70eb1a13#screen=skow3pw
 
 参考到的开源库都非常优秀，欢迎大家下载本地体验并给作者star以支持
 
-1. go-zero微服务框架 https://github.com/tal-tech/go-zero
+1. go-zero微服务框架 https://github.com/zeromicro/go-zero
    
    系统内核,前后端接口使用go-zero制作
 

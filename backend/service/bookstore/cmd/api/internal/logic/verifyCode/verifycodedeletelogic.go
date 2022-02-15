@@ -6,7 +6,7 @@ import (
 	"backend/service/bookstore/cmd/api/internal/types"
 	"context"
 	"fmt"
-	"github.com/tal-tech/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type VerifyCodeDeleteLogic struct {
@@ -14,6 +14,7 @@ type VerifyCodeDeleteLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
+
 // 验证码 delete
 func NewVerifyCodeDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) VerifyCodeDeleteLogic {
 	return VerifyCodeDeleteLogic{
