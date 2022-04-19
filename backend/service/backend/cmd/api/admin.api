@@ -93,6 +93,12 @@ service admin-api {
 	// todo:后续取消此接口，登录直接返回信息
 	@handler AdminInfo
 	get /admin/info() returns (AdminReply)
+	
+	@handler getUserInfo
+	get /admin/getUserInfo() returns (AdminReply)
+	
+	@handler getMenu
+	get /admin/getMenu() returns (AdminReply)
 }
 
 //需要授权检查

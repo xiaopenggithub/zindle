@@ -35,5 +35,6 @@ func (l *GetSystemuserLogic) GetSystemuser(in *systemuserget.Request) (*systemus
 
 	return &systemuserget.Response{
 		NickName: one.NickName + ":rpc",
+		Avatar:   one.Avatar,
 	}, nil
 }

@@ -3,7 +3,7 @@
     <warning-bar title="在资源权限中将此角色的资源权限清空 或者不包含创建者的角色 即可屏蔽此客户资源的显示" />
     <div class="gva-table-box">
       <div class="gva-btn-list">
-        <el-button size="small" type="primary" icon="plus" @click="openDialog">新增</el-button>
+        <el-button size="small" type="primary" icon="plus" @click="openDialog">{{ t('general.add') }}</el-button>
       </div>
       <el-table
         ref="multipleTable"
@@ -21,17 +21,17 @@
         <el-table-column align="left" label="姓名" prop="customerName" width="120" />
         <el-table-column align="left" label="电话" prop="customerPhoneData" width="120" />
         <el-table-column align="left" label="接入人ID" prop="sysUserId" width="120" />
-        <el-table-column align="left" label="按钮组" min-width="160">
+        <el-table-column align="left" :label="t('general.operations')" min-width="160">
           <template #default="scope">
-            <el-button size="small" type="text" icon="edit" @click="updateCustomer(scope.row)">变更</el-button>
+            <el-button size="small" type="text" icon="edit" @click="updateCustomer(scope.row)">{{ t('general.change') }}</el-button>
             <el-popover v-model:visible="scope.row.visible" placement="top" width="160">
-              <p>确定要删除吗？</p>
+              <p>{{ t('general.deleteConfirm') }}</p>
               <div style="text-align: right; margin-top: 8px;">
-                <el-button size="small" type="text" @click="scope.row.visible = false">取消</el-button>
-                <el-button type="primary" size="small" @click="deleteCustomer(scope.row)">确定</el-button>
+                <el-button size="small" type="text" @click="scope.row.visible = false">{{ t('general.cancel') }}</el-button>
+                <el-button type="primary" size="small" @click="deleteCustomer(scope.row)">{{ t('general.confirm') }}</el-button>
               </div>
               <template #reference>
-                <el-button type="text" icon="delete" size="small" @click="scope.row.visible = true">删除</el-button>
+                <el-button type="text" icon="delete" size="small" @click="scope.row.visible = true">{{ t('general.delete') }}</el-button>
               </template>
             </el-popover>
           </template>
@@ -60,8 +60,8 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button size="small" @click="closeDialog">取 消</el-button>
-          <el-button size="small" type="primary" @click="enterDialog">确 定</el-button>
+          <el-button size="small" @click="closeDialog">{{ t('general.close') }}</el-button>
+          <el-button size="small" type="primary" @click="enterDialog">{{ t('general.confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -80,6 +80,9 @@ import warningBar from '@/components/warningBar/warningBar.vue'
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { formatDate } from '@/utils/format'
+import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
+
+const { t } = useI18n() // added by mohamed hassan to support multilanguage
 
 const form = ref({
   customerName: '',
@@ -138,7 +141,7 @@ const deleteCustomer = async(row) => {
   if (res.code === 0) {
     ElMessage({
       type: 'success',
-      message: '删除成功'
+      message: t('general.deleteSuccess')
     })
     if (tableData.value.length === 1 && page.value > 1) {
       page.value--

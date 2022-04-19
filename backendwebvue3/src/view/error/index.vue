@@ -3,8 +3,8 @@
     <div class="big">
       <div class="inner">
         <img src="../../assets/notFound.png">
-        <p>页面被神秘力量吸走了（如果您是开源版请联系我们修复）</p>
-        <p style="font-size:18px;line-height:40px;">常见问题为当前此角色无当前路由，如果确定要使用本路由，请到角色管理进行分配</p>
+        <p>{{ t('error.message1') }}</p>
+        <p style="font-size:18px;line-height:40px;">{{ t('error.message2') }}</p>
         <p>↓</p>
         <img src="../../assets/qm.png" class="leftPic">
       </div>
@@ -17,6 +17,12 @@ export default {
   name: 'Error'
 
 }
+</script>
+
+<script setup>
+import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
+
+const { t } = useI18n() // added by mohamed hassan to support multilanguage
 </script>
 
 <style lang="scss">

@@ -1,25 +1,37 @@
 <template>
   <div>
-    <warning-bar title="注：右上角头像下拉可切换角色" />
+    <warning-bar :title="t('authority.authorityNote')" />
     <div class="gva-table-box">
       <div class="gva-btn-list">
-        <el-button size="small" type="primary" icon="plus" @click="addUser">新增用户</el-button>
+        <el-button size="mini" type="primary" icon="plus" @click="addUser">{{ t('user.addUser') }}</el-button>
       </div>
-      <el-table
-        :data="tableData"
-        row-key="ID"
-      >
-        <el-table-column align="left" label="头像" min-width="75">
+      <el-table :data="tableData">
+        <el-table-column align="left" :label="t('user.avatar')" min-width="50">
           <template #default="scope">
             <CustomPic style="margin-top:8px" :pic-src="scope.row.headerImg" />
           </template>
         </el-table-column>
-        <el-table-column align="left" label="ID" min-width="50" prop="ID" />
-        <el-table-column align="left" label="用户名" min-width="150" prop="userName" />
-        <el-table-column align="left" label="昵称" min-width="150" prop="nickName" />
-        <el-table-column align="left" label="手机号" min-width="180" prop="phone" />
-        <el-table-column align="left" label="邮箱" min-width="180" prop="email" />
-        <el-table-column align="left" label="用户角色" min-width="200">
+        <el-table-column align="left" label="UUID" min-width="250" prop="uuid" />
+        <el-table-column align="left" :label="t('user.userName')" min-width="150" prop="userName" />
+        <el-table-column align="left" :label="t('user.nickName')" min-width="100" prop="nickName">
+          <template #default="scope">
+            <p v-if="!scope.row.editFlag" class="nickName">{{ scope.row.nickName }}
+              <el-icon class="pointer" color="#66b1ff" @click="openEidt(scope.row)">
+                <edit />
+              </el-icon>
+            </p>
+            <p v-if="scope.row.editFlag" class="nickName">
+              <el-input v-model="scope.row.nickName" />
+              <el-icon class="pointer" color="#67c23a" @click="enterEdit(scope.row)">
+                <check />
+              </el-icon>
+              <el-icon class="pointer" color="#f23c3c" @click="closeEdit(scope.row)">
+                <close />
+              </el-icon>
+            </p>
+          </template>
+        </el-table-column>
+        <el-table-column align="left" :label="t('user.userRole')" min-width="150">
           <template #default="scope">
             <el-cascader
               v-model="scope.row.authorityIds"
@@ -33,24 +45,21 @@
             />
           </template>
         </el-table-column>
-
-        <el-table-column label="操作" min-width="250" fixed="right">
+        <el-table-column align="left" :label="t('general.operations')" min-width="150">
           <template #default="scope">
             <el-popover v-model:visible="scope.row.visible" placement="top" width="160">
-              <p>确定要删除此用户吗</p>
+              <p>{{ t('user.deleteUserConfrim') }}</p>
               <div style="text-align: right; margin-top: 8px;">
-                <el-button size="small" type="text" @click="scope.row.visible = false">取消</el-button>
-                <el-button type="primary" size="small" @click="deleteUserFunc(scope.row)">确定</el-button>
+                <el-button size="mini" type="text" @click="scope.row.visible = false">>{{ t('general.cancel') }}</el-button>
+                <el-button type="primary" size="mini" @click="deleteUserFunc(scope.row)">{{ t('general.confirm') }}</el-button>
               </div>
               <template #reference>
-                <el-button type="text" icon="delete" size="small">删除</el-button>
+                <el-button type="text" icon="delete" size="mini">{{ t('general.delete') }}</el-button>
               </template>
             </el-popover>
-            <el-button type="text" icon="edit" size="small" @click="openEdit(scope.row)">编辑</el-button>
-            <el-button type="text" icon="magic-stick" size="small" @click="resetPasswordFunc(scope.row)">重置密码</el-button>
+            <el-button type="text" icon="magic-stick" size="mini" @click="resetPasswordFunc(scope.row)">{{ t('user.resetPassword') }}</el-button>
           </template>
         </el-table-column>
-
       </el-table>
       <div class="gva-pagination">
         <el-pagination
@@ -64,56 +73,39 @@
         />
       </div>
     </div>
-    <el-dialog
-      v-model="addUserDialog"
-      custom-class="user-dialog"
-      title="用户"
-      :show-close="false"
-      :close-on-press-escape="false"
-      :close-on-click-modal="false"
-    >
-      <div style="height:60vh;overflow:auto;padding:0 12px;">
-        <el-form ref="userForm" :rules="rules" :model="userInfo" label-width="80px">
-          <el-form-item v-if="dialogFlag === 'add'" label="用户名" prop="userName">
-            <el-input v-model="userInfo.userName" />
-          </el-form-item>
-          <el-form-item v-if="dialogFlag === 'add'" label="密码" prop="password">
-            <el-input v-model="userInfo.password" />
-          </el-form-item>
-          <el-form-item label="昵称" prop="nickName">
-            <el-input v-model="userInfo.nickName" />
-          </el-form-item>
-          <el-form-item label="手机号" prop="phone">
-            <el-input v-model="userInfo.phone" />
-          </el-form-item>
-          <el-form-item label="邮箱" prop="email">
-            <el-input v-model="userInfo.email" />
-          </el-form-item>
-          <el-form-item label="用户角色" prop="authorityId">
-            <el-cascader
-              v-model="userInfo.authorityIds"
-              style="width:100%"
-              :options="authOptions"
-              :show-all-levels="false"
-              :props="{ multiple:true,checkStrictly: true,label:'authorityName',value:'authorityId',disabled:'disabled',emitPath:false}"
-              :clearable="false"
-            />
-          </el-form-item>
-          <el-form-item label="头像" label-width="80px">
-            <div style="display:inline-block" @click="openHeaderChange">
-              <img v-if="userInfo.headerImg" class="header-img-box" :src="(userInfo.headerImg && userInfo.headerImg.slice(0, 4) !== 'http')?path+userInfo.headerImg:userInfo.headerImg">
-              <div v-else class="header-img-box">从媒体库选择</div>
-            </div>
-          </el-form-item>
+    <el-dialog v-model="addUserDialog" custom-class="user-dialog" :title="t('user.addUser')">
+      <el-form ref="userForm" :rules="rules" :model="userInfo" label-width="90px">
+        <el-form-item :label="t('user.userName')" prop="username">
+          <el-input v-model="userInfo.username" />
+        </el-form-item>
+        <el-form-item :label="t('user.password')" prop="password">
+          <el-input v-model="userInfo.password" />
+        </el-form-item>
+        <el-form-item :label="t('user.nickName')" prop="nickName">
+          <el-input v-model="userInfo.nickName" />
+        </el-form-item>
+        <el-form-item :label="t('user.userRole')" prop="authorityId">
+          <el-cascader
+            v-model="userInfo.authorityIds"
+            style="width:100%"
+            :options="authOptions"
+            :show-all-levels="false"
+            :props="{ multiple:true,checkStrictly: true,label:'authorityName',value:'authorityId',disabled:'disabled',emitPath:false}"
+            :clearable="false"
+          />
+        </el-form-item>
+        <el-form-item :label="t('user.avatar')" label-width="80px">
+          <div style="display:inline-block" @click="openHeaderChange">
+            <img v-if="userInfo.headerImg" class="header-img-box" :src="(userInfo.headerImg && userInfo.headerImg.slice(0, 4) !== 'http')?path+userInfo.headerImg:userInfo.headerImg">
+            <div v-else class="header-img-box">{{ t('user.mediaLibrary') }}</div>
+          </div>
+        </el-form-item>
 
-        </el-form>
-
-      </div>
-
+      </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button size="small" @click="closeAddUserDialog">取 消</el-button>
-          <el-button size="small" type="primary" @click="enterAddUserDialog">确 定</el-button>
+          <el-button size="small" @click="closeAddUserDialog">{{ t('general.close') }}</el-button>
+          <el-button size="small" type="primary" @click="enterAddUserDialog">{{ t('general.confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -128,7 +120,6 @@ export default {
 </script>
 
 <script setup>
-
 import {
   getUserList,
   setUserAuthorities,
@@ -144,6 +135,10 @@ import { setUserInfo, resetPassword } from '@/api/user.js'
 
 import { nextTick, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
+
+const { t } = useI18n() // added by mohamed hassan to support multilanguage
+
 const path = ref(import.meta.env.VITE_BASE_API)
 // 初始化相关
 const setAuthorityOptions = (AuthorityData, optionsData) => {
@@ -207,11 +202,11 @@ initPage()
 
 const resetPasswordFunc = (row) => {
   ElMessageBox.confirm(
-    '是否将此用户密码重置为123456?',
-    '警告',
+    t('user.resetPasswordConfrim'),
+    t('general.warning'),
     {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+      confirmButtonText: t('general.confirm'),
+      cancelButtonText: t('general.cancel'),
       type: 'warning',
     }
   ).then(async() => {
@@ -251,12 +246,40 @@ const setOptions = (authData) => {
   setAuthorityOptions(authData, authOptions.value)
 }
 
+const backNickName = ref('')
+const openEidt = (row) => {
+  if (tableData.value.some(item => item.editFlag)) {
+    ElMessage(t('user.anotherUserEdit'))
+    return
+  }
+  backNickName.value = row.nickName
+  row.editFlag = true
+}
+
+const enterEdit = async(row) => {
+  const res = await setUserInfo({ nickName: row.nickName, ID: row.ID })
+  if (res.code === 0) {
+    ElMessage({
+      type: 'success',
+      message: t('general.setupSuccess')
+    })
+  }
+  backNickName.value = ref('')
+  row.editFlag = false
+}
+
+const closeEdit = (row) => {
+  row.nickName = backNickName.value
+  backNickName.value = ''
+  row.editFlag = false
+}
+
 const deleteUserFunc = async(row) => {
   const res = await deleteUser({ id: row.ID })
   if (res.code === 0) {
-    ElMessage.success('删除成功')
-    row.visible = false
+    ElMessage.success(t('general.deleteSuccess'))
     await getTableData()
+    row.visible = false
   }
 }
 
@@ -267,23 +290,23 @@ const userInfo = ref({
   nickName: '',
   headerImg: '',
   authorityId: '',
-  authorityIds: [],
+  authorityIds: []
 })
 
 const rules = ref({
-  userName: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 5, message: '最低5位字符', trigger: 'blur' }
+  username: [
+    { required: true, message: t('user.userNameNote'), trigger: 'blur' },
+    { min: 5, message: t('user.userNameLenNote'), trigger: 'blur' }
   ],
   password: [
-    { required: true, message: '请输入用户密码', trigger: 'blur' },
-    { min: 6, message: '最低6位字符', trigger: 'blur' }
+    { required: true, message: t('user.passwordNote'), trigger: 'blur' },
+    { min: 6, message: t('user.passwordLenNote'), trigger: 'blur' }
   ],
   nickName: [
-    { required: true, message: '请输入用户昵称', trigger: 'blur' }
+    { required: true, message: t('user.nickNameNote'), trigger: 'blur' }
   ],
   authorityId: [
-    { required: true, message: '请选择用户角色', trigger: 'blur' }
+    { required: true, message: t('user.userRoleNote'), trigger: 'blur' }
   ]
 })
 const userForm = ref(null)
@@ -291,25 +314,12 @@ const enterAddUserDialog = async() => {
   userInfo.value.authorityId = userInfo.value.authorityIds[0]
   userForm.value.validate(async valid => {
     if (valid) {
-      const req = {
-        ...userInfo.value
+      const res = await register(userInfo.value)
+      if (res.code === 0) {
+        ElMessage({ type: 'success', message: t('user.userAddedNote') })
       }
-      if (dialogFlag.value === 'add') {
-        const res = await register(req)
-        if (res.code === 0) {
-          ElMessage({ type: 'success', message: '创建成功' })
-          await getTableData()
-          closeAddUserDialog()
-        }
-      }
-      if (dialogFlag.value === 'edit') {
-        const res = await setUserInfo(req)
-        if (res.code === 0) {
-          ElMessage({ type: 'success', message: '编辑成功' })
-          await getTableData()
-          closeAddUserDialog()
-        }
-      }
+      await getTableData()
+      closeAddUserDialog()
     }
   })
 }
@@ -321,11 +331,7 @@ const closeAddUserDialog = () => {
   userInfo.value.authorityIds = []
   addUserDialog.value = false
 }
-
-const dialogFlag = ref('add')
-
 const addUser = () => {
-  dialogFlag.value = 'add'
   addUserDialog.value = true
 }
 const changeAuthority = async(row, flag) => {
@@ -339,16 +345,9 @@ const changeAuthority = async(row, flag) => {
     authorityIds: row.authorityIds
   })
   if (res.code === 0) {
-    ElMessage({ type: 'success', message: '角色设置成功' })
+    ElMessage({ type: 'success', message: t('user.roleSetNote') })
   }
 }
-
-const openEdit = (row) => {
-  dialogFlag.value = 'edit'
-  userInfo.value = JSON.parse(JSON.stringify(row))
-  addUserDialog.value = true
-}
-
 </script>
 
 <style lang="scss">

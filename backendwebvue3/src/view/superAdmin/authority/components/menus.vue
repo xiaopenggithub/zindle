@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="clearflex">
-      <el-button class="fl-right" size="small" type="primary" @click="relation">确 定</el-button>
+      <el-button class="fl-right" size="mini" type="primary" @click="relation">{{ t('general.confirm') }}</el-button>
     </div>
     <el-tree
       ref="menuTree"
@@ -20,12 +20,12 @@
           <span>
             <el-button
               type="text"
-              size="small"
+              size="mini"
               :style="{color:row.defaultRouter === data.name?'#E6A23C':'#85ce61'}"
               :disabled="!node.checked"
               @click="() => setDefault(data)"
             >
-              {{ row.defaultRouter === data.name?"首页":"设为首页" }}
+              {{ row.defaultRouter === data.name? t('menus.home') : t('menus.setAsHome') }}
             </el-button>
           </span>
           <span v-if="data.menuBtn.length">
@@ -54,8 +54,8 @@
       </el-table>
       <template #footer>
         <div class="dialog-footer">
-          <el-button size="small" @click="closeDialog">取 消</el-button>
-          <el-button size="small" type="primary" @click="enterDialog">确 定</el-button>
+          <el-button size="small" @click="closeDialog">{{ t('general.close') }}</el-button>
+          <el-button size="small" type="primary" @click="enterDialog">{{ t('general.confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -70,6 +70,10 @@ import {
 import { getAuthorityBtnApi, setAuthorityBtnApi } from '@/api/authorityBtn'
 import { nextTick, ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
+
+const { t } = useI18n() // added by mohamed hassan to support multilanguage
+
 const props = defineProps({
   row: {
     default: function() {
@@ -84,6 +88,7 @@ const emit = defineEmits(['changeRow'])
 const menuTreeData = ref([])
 const menuTreeIds = ref([])
 const needConfirm = ref(false)
+
 const menuDefaultProps = ref({
   children: 'children',
   label: function(data) {
@@ -112,7 +117,7 @@ init()
 const setDefault = async(data) => {
   const res = await updateAuthority({ authorityId: props.row.authorityId, AuthorityName: props.row.authorityName, parentId: props.row.parentId, defaultRouter: data.name })
   if (res.code === 0) {
-    ElMessage({ type: 'success', message: '设置成功' })
+    ElMessage({ type: 'success', message: t('general.setupSuccess') })
     emit('changeRow', 'defaultRouter', res.data.authority.defaultRouter)
   }
 }
@@ -134,7 +139,7 @@ const relation = async() => {
   if (res.code === 0) {
     ElMessage({
       type: 'success',
-      message: '菜单设置成功!'
+      message: t('menus.menuSetupSuccess')
     })
   }
 }

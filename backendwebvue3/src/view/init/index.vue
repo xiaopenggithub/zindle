@@ -3,51 +3,60 @@
     <div class="init_page_panle">
       <div v-if="hello < 2" id="hello" :class="[hello < 1 ? 'slide-in-fwd-top' : 'slide-out-right']" class="hello  ">
         <div>
-          <div class="hello_title">GIN-VUE-ADMIN</div>
-          <p class="in-two a-fadeinT">初始化须知</p>
-          <p class="init_p">1.您需有用一定的VUE和GOLANG基础</p>
-          <p class="init_p">2.请您确认是否已经阅读过官方文档</p>
-          <p class="init_p">3.请您确认是否了解后续的配置流程</p>
-          <p class="init_p">注：开发组不为文档中书写过的内容提供无偿服务</p>
+          <div class="hello_title">{{ $GIN_VUE_ADMIN.appName }}</div>
+          <p class="in-two a-fadeinT">{{ t('init.note') }}</p>
+          <p class="init_p">{{ t('init.note1') }}</p>
+          <p class="init_p">{{ t('init.note2') }}</p>
+          <p class="init_p">{{ t('init.note3') }}</p>
+          <p class="init_p">{{ t('init.note4') }}</p>
           <p class="init_btn">
             <el-button type="primary" @click="goDoc">
-              阅读文档
+              {{ t('init.readDocs') }}
             </el-button>
             <el-button type="primary" @click="showNext">
-              我已确认
+              {{ t('init.confirm') }}
             </el-button>
           </p>
         </div>
       </div>
       <div v-if="hello > 0 " :class="[(hello > 0 && !out)? 'slide-in-left' : '' , out ? 'slide-out-right' : '']" class=" form">
-        <el-form ref="formRef" :model="form" label-width="100px">
-          <el-form-item label="数据库类型">
-            <el-select v-model="form.dbType" placeholder="请选择" @change="changeDB">
-              <el-option key="mysql" label="mysql" value="mysql" />
-              <el-option key="pgsql" label="pgsql(测试版)" value="pgsql" />
+        <el-form ref="formRef" :model="form" label-width="130px">
+          <!-- added by mohamed hassan to support multilangauge -->
+          <el-form-item :label="t('init.language')">
+            <el-select v-model="form.language" :placeholder="t('general.pleaseSelect')" @change="changeLanguage">
+              <el-option key="en" label="English" value="en"><img src="@/assets/flags/en.svg" class="img">English</el-option>
+              <el-option key="zh" label="中文" value="zh"><img src="@/assets/flags/zh.svg" class="img">中文</el-option>
+              <el-option key="ar" label="العربية" value="ar"><img src="@/assets/flags/ar.svg" class="img">العربية</el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="host">
-            <el-input v-model="form.host" placeholder="请输入数据库链接" />
+          <!-- end of adding -->
+          <el-form-item :label="t('init.dbType')">
+            <el-select v-model="form.dbType" :placeholder="t('general.pleaseSelect')" @change="changeDB">
+              <el-option key="mysql" label="MySQL" value="mysql" />
+              <el-option key="pgsql" :label="'PostgreSQL (' + t('init.beta') + ')'" value="pgsql" />
+            </el-select>
           </el-form-item>
-          <el-form-item label="port">
-            <el-input v-model="form.port" placeholder="请输入数据库端口" />
+          <el-form-item :label="t('init.dbHost')">
+            <el-input v-model="form.host" :placeholder="t('init.enterDBHost')" />
           </el-form-item>
-          <el-form-item label="userName">
-            <el-input v-model="form.userName" placeholder="请输入数据库用户名" />
+          <el-form-item :label="t('init.dbPort')">
+            <el-input v-model="form.port" :placeholder="t('init.enterDBPort')" />
           </el-form-item>
-          <el-form-item label="password">
+          <el-form-item :label="t('init.dbUsername')">
+            <el-input v-model="form.userName" :placeholder="t('init.enterDBUsername')" />
+          </el-form-item>
+          <el-form-item :label="t('init.dbPassword')">
             <el-input
               v-model="form.password"
-              placeholder="请输入数据库密码（没有则为空）"
+              :placeholder="t('init.enterDBPassword')"
             />
           </el-form-item>
-          <el-form-item label="dbName">
-            <el-input v-model="form.dbName" placeholder="请输入数据库名称" />
+          <el-form-item :label="t('init.dbName')">
+            <el-input v-model="form.dbName" :placeholder="t('init.enterDBName')" />
           </el-form-item>
           <el-form-item>
             <div style="text-align: right">
-              <el-button type="primary" @click="onSubmit">立即初始化</el-button>
+              <el-button type="primary" @click="onSubmit">{{ t('init.initNow') }}</el-button>
             </div>
           </el-form-item>
         </el-form>
@@ -67,6 +76,11 @@ import { initDB } from '@/api/initdb'
 import { reactive, ref } from 'vue'
 import { ElLoading, ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
+
+const i18n = useI18n() // added by mohamed hassan to support multilanguage
+
+const { t } = useI18n() // added by mohamed hassan to support multilanguage
 
 const router = useRouter()
 
@@ -87,7 +101,8 @@ const form = reactive({
   port: '3306',
   userName: 'root',
   password: '',
-  dbName: 'gva'
+  dbName: 'gva',
+  language: 'en', // added by mohamed hassan to support multilanguage
 })
 const changeDB = (val) => {
   switch (val) {
@@ -125,7 +140,7 @@ const changeDB = (val) => {
 const onSubmit = async() => {
   const loading = ElLoading.service({
     lock: true,
-    text: '正在初始化数据库，请稍候',
+    text: t('init.pleaseWait'),
     spinner: 'loading',
     background: 'rgba(0, 0, 0, 0.7)'
   })
@@ -144,9 +159,19 @@ const onSubmit = async() => {
     loading.close()
   }
 }
+// added by mohamed hassan to support multilanguage
+const changeLanguage = (val) => {
+  i18n.locale.value = val
+}
 </script>
 
 <style lang="scss" scoped>
+img {
+  padding-right: 20px;
+  width: 20px;
+  height: 20px;
+}
+
 .init_page{
   margin: 0;
   padding: 0;

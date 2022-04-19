@@ -6,7 +6,7 @@
           ref="searchInput"
           v-model="value"
           filterable
-          placeholder="请选择"
+          :placeholder="t('general.pleaseSelect')"
           @blur="hiddenSearch"
           @change="changeRouter"
         >
@@ -23,17 +23,13 @@
       v-if="btnShow"
       class="user-box"
     >
-      <el-icon class="reload" :class="[reload ? 'reloading' : '']" @click="handleReload">
-        <refresh />
-      </el-icon>
+      <div class="gvaIcon gvaIcon-refresh"  :class="[reload ? 'reloading' : '']" @click="handleReload"></div>
     </div>
     <div
       v-if="btnShow"
       class="user-box"
     >
-      <el-icon class="search-icon" @click="showSearch">
-        <search />
-      </el-icon>
+      <div class="gvaIcon gvaIcon-search"  @click="showSearch"></div>
     </div>
     <div
       v-if="btnShow"
@@ -45,7 +41,7 @@
       v-if="btnShow"
       class="user-box"
     >
-      <el-icon class="search-icon" @click="toService"><service /></el-icon>
+     <div class="gvaIcon gvaIcon-customer-service"  @click="toService"></div>
     </div>
   </div>
 </template>
@@ -62,6 +58,9 @@ import { emitter } from '@/utils/bus.js'
 import { ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRouterStore } from '@/pinia/modules/router'
+import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
+
+const { t } = useI18n() // added by mohamed hassan to support multilanguage
 
 const router = useRouter()
 

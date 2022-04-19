@@ -17,16 +17,13 @@
             class="topfix"
           >
             <el-row>
-              <!-- :xs="8" :sm="6" :md="4" :lg="3" :xl="1" -->
               <el-col>
                 <el-header class="header-cont">
                   <el-row class="pd-0">
                     <el-col :xs="2" :lg="1" :md="1" :sm="1" :xl="1" style="z-index:100">
                       <div class="menu-total" @click="totalCollapse">
-                        <el-icon v-if="isCollapse" size="24"><expand /></el-icon>
-                        <el-icon v-else size="24">
-                          <fold />
-                        </el-icon>
+                        <div v-if="isCollapse" class="gvaIcon gvaIcon-arrow-double-right" />
+                        <div v-else class="gvaIcon gvaIcon-arrow-double-left" />
                       </div>
                     </el-col>
                     <el-col :xs="10" :lg="14" :md="14" :sm="9" :xl="14" :pull="1">
@@ -54,18 +51,18 @@
                             <el-dropdown-menu class="dropdown-group">
                               <el-dropdown-item>
                                 <span style="font-weight: 600;">
-                                  当前角色：{{ userStore.userInfo.authority.authorityName }}
+                                  {{ t('layout.currentRole') }}{{ userStore.userInfo.authority.authorityName }}
                                 </span>
                               </el-dropdown-item>
                               <template v-if="userStore.userInfo.authorities">
                                 <el-dropdown-item v-for="item in userStore.userInfo.authorities.filter(i=>i.authorityId!==userStore.userInfo.authorityId)" :key="item.authorityId" @click="changeUserAuth(item.authorityId)">
                                   <span>
-                                    切换为：{{ item.authorityName }}
+                                    {{ t('layout.switchTo') }}{{ item.authorityName }}
                                   </span>
                                 </el-dropdown-item>
                               </template>
-                              <el-dropdown-item icon="avatar" @click="toPerson">个人信息</el-dropdown-item>
-                              <el-dropdown-item icon="reading-lamp" @click="userStore.LoginOut">登 出</el-dropdown-item>
+                              <el-dropdown-item icon="avatar" @click="toPerson">{{ t('layout.personalInfo') }}</el-dropdown-item>
+                              <el-dropdown-item icon="reading-lamp" @click="userStore.LoginOut">{{ t('layout.logout') }}</el-dropdown-item>
                             </el-dropdown-menu>
                           </template>
                         </el-dropdown>
@@ -81,7 +78,7 @@
             <HistoryComponent ref="layoutHistoryComponent" />
           </div>
         </transition>
-        <router-view v-if="reloadFlag" v-slot="{ Component }" v-loading="loadingFlag" element-loading-text="正在加载中" class="admin-box">
+        <router-view v-if="reloadFlag" v-slot="{ Component }" v-loading="loadingFlag" :element-loading-text="t('layout.loading')" class="admin-box">
           <transition mode="out-in" name="el-fade-in-linear">
             <keep-alive :include="routerStore.keepAliveRouters">
               <component :is="Component" />
@@ -115,11 +112,13 @@ import { computed, ref, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/pinia/modules/user'
 import { useRouterStore } from '@/pinia/modules/router'
+import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
+
+const { t } = useI18n() // added by mohamed hassan to support multilanguage
 
 const router = useRouter()
 const route = useRoute()
 const routerStore = useRouterStore()
-console.log(routerStore.keepAliveRouters)
 // 三种窗口适配
 const isCollapse = ref(false)
 const isSider = ref(true)
@@ -162,6 +161,9 @@ onMounted(() => {
       emitter.emit('mobile', isMobile.value)
     })()
   }
+  if (userStore.loadingInstance) {
+    userStore.loadingInstance.close()
+  }
 })
 
 const userStore = useUserStore()
@@ -186,7 +188,7 @@ const backgroundColor = computed(() => {
   }
 })
 
-const matched = computed(() => route.matched)
+const matched = computed(() => route.meta.matched)
 
 const changeUserAuth = async(id) => {
   const res = await setUserAuthority({

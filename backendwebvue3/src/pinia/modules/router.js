@@ -48,10 +48,11 @@ export const useRouterStore = defineStore('router', () => {
         title: '底层layout'
       },
       children: []
-    }]
-    const asyncRouterRes = await asyncMenu()
-    const asyncRouter = asyncRouterRes.data.menus
-    asyncRouter.push({
+    }]    
+    const result = await asyncMenu()
+    let asyncRouterRes=result.data
+    const asyncRouter = asyncRouterRes.data.menus        
+    asyncRouter && asyncRouter.push({
       path: '404',
       name: '404',
       hidden: true,
@@ -70,15 +71,15 @@ export const useRouterStore = defineStore('router', () => {
       },
       component: 'view/error/reload.vue'
     })
-    formatRouter(asyncRouter, routeMap)
+    formatRouter(asyncRouter, routeMap)    
     baseRouter[0].children = asyncRouter
     baseRouter.push({
       path: '/:catchAll(.*)',
       redirect: '/layout/404'
 
     })
-    asyncRouterHandle(baseRouter)
-    KeepAliveFilter(asyncRouter)
+    asyncRouterHandle(baseRouter)    
+    KeepAliveFilter(asyncRouter)    
     asyncRouters.value = baseRouter
     routerList.value = routerListArr
     keepAliveRouters.value = keepAliveRoutersArr

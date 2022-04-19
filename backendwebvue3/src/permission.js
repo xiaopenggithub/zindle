@@ -11,7 +11,7 @@ const getRouter = async(userStore) => {
   const routerStore = useRouterStore()
   await routerStore.SetAsyncRouter()
   await userStore.GetUserInfo()
-  const asyncRouters = routerStore.asyncRouters
+  const asyncRouters = routerStore.asyncRouters  
   asyncRouters.forEach(asyncRouter => {
     router.addRoute(asyncRouter)
   })
@@ -36,10 +36,11 @@ async function handleKeepAlive(to) {
 
 router.beforeEach(async(to, from, next) => {
   const userStore = useUserStore()
+  to.meta.matched = [...to.matched]
   handleKeepAlive(to)
   const token = userStore.token
   // 在白名单中的判断情况
-  document.title = getPageTitle(to.meta.title)
+  document.title = getPageTitle(to.meta.title)    
   if (whiteList.indexOf(to.name) > -1) {
     if (token) {
       if (!asyncRouterFlag && whiteList.indexOf(from.name) < 0) {
@@ -55,7 +56,7 @@ router.beforeEach(async(to, from, next) => {
     if (token) {
       // 添加flag防止多次获取动态路由和栈溢出
       if (!asyncRouterFlag && whiteList.indexOf(from.name) < 0) {
-        asyncRouterFlag++
+        asyncRouterFlag++        
         await getRouter(userStore)
         next({ ...to, replace: true })
       } else {

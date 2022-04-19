@@ -82,6 +82,7 @@ type Response struct {
 	unknownFields protoimpl.UnknownFields
 
 	NickName string `protobuf:"bytes,1,opt,name=nick_name,json=nickName,proto3" json:"nick_name,omitempty"`
+	Avatar   string `protobuf:"bytes,1,opt,name=avatar,json=avatar,proto3" json:"avatar,omitempty"`
 }
 
 func (x *Response) Reset() {

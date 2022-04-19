@@ -39,10 +39,10 @@
       :style="{ left: left + 'px', top: top + 'px' }"
       class="contextmenu"
     >
-      <li @click="closeAll">关闭所有</li>
-      <li @click="closeLeft">关闭左侧</li>
-      <li @click="closeRight">关闭右侧</li>
-      <li @click="closeOther">关闭其他</li>
+      <li @click="closeAll">{{ t('historyComponent.closeAll') }}</li>
+      <li @click="closeLeft">{{ t('historyComponent.closeLeft') }}</li>
+      <li @click="closeRight">{{ t('historyComponent.closeRight') }}</li>
+      <li @click="closeOther">{{ t('historyComponent.closeOther') }}</li>
     </ul>
   </div>
 </template>
@@ -58,6 +58,9 @@ import { emitter } from '@/utils/bus.js'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/pinia/modules/user'
+import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
+
+const { t } = useI18n() // added by mohamed hassan to support multilanguage
 
 const route = useRoute()
 const router = useRouter()
@@ -118,7 +121,7 @@ const closeAll = () => {
     {
       name: defaultRouter.value,
       meta: {
-        title: '首页',
+        title: t('menus.home'),
       },
       query: {},
       params: {},
@@ -177,7 +180,7 @@ const isSame = (route1, route2) => {
   if (route1.name !== route2.name) {
     return false
   }
-  if (Object.keys(route1.query).length != Object.keys(route2.query).length || Object.keys(route1.params).length != Object.keys(route2.params).length) {
+  if (Object.keys(route1.query).length !== Object.keys(route2.query).length || Object.keys(route1.params).length !== Object.keys(route2.params).length) {
     return false
   }
   for (const key in route1.query) {
@@ -196,9 +199,11 @@ const setTab = (route) => {
   if (!historys.value.some((item) => isSame(item, route))) {
     const obj = {}
     obj.name = route.name
-    obj.meta = route.meta
+    obj.meta = { ...route.meta }
+    delete obj.meta.matched
     obj.query = route.query
     obj.params = route.params
+    console.log(obj)
     historys.value.push(obj)
   }
   window.sessionStorage.setItem('activeValue', getFmtString(route))
@@ -278,7 +283,7 @@ const initPage = () => {
     {
       name: defaultRouter.value,
       meta: {
-        title: '首页',
+        title: t('menus.home'),
       },
       query: {},
       params: {},
@@ -303,7 +308,7 @@ onUnmounted(() => {
 
 <style lang="scss">
 .contextmenu {
-  width: 100px;
+  width: 120px;
   margin: 0;
   border: 1px solid #ccc;
   background: #fff;
