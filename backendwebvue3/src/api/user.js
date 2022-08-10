@@ -10,6 +10,12 @@ export const login = (data) => {
     data: data
   })
 }
+export function logout() {
+  return service({
+      url: '/admin/logout',
+      method: 'post'
+  })
+}
 
 // @Summary 获取验证码
 // @Produce  application/json
@@ -41,8 +47,8 @@ export const register = (data) => {
 // @Router /user/changePassword [post]
 export const changePassword = (data) => {
   return service({
-    url: '/user/changePassword',
-    method: 'post',
+    url: '/admin/updateadminpassword',
+    method: 'put',
     data: data
   })
 }

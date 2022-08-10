@@ -65,23 +65,16 @@ service.interceptors.response.use(
     if (response.headers['new-token']) {
       userStore.setToken(response.headers['new-token'])
     }
-    if (response.data.code === 0 || response.headers.success === 'true') {
-      if (response.headers.msg) {
-        response.data.msg = decodeURI(response.headers.msg)
-      }
-      return response.data
+    if (response.data.code === 200) {
+      return response
     } else {
-      ElMessage({
-        showClose: true,
-        message: response.data.msg || decodeURI(response.headers.msg),
-        type: 'error'
-      })
+      ElMessage({showClose: true,message: response.data.message || decodeURI(response.headers.msg),type: 'error'})
       if (response.data.data && response.data.data.reload) {
         userStore.token = ''
         localStorage.clear()
         router.push({ name: 'Login', replace: true })
       }
-      return response.data.msg ? response.data : response
+      return response.data.message ? response.data : response
     }
   },
   error => {

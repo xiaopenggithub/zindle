@@ -32,6 +32,7 @@ func (l *AdminInfoLogic) AdminInfo() (*types.AdminReply, error) {
 	//data["name"] = "qinrq"
 	//data["avatar"] = "https://wpimg.wallstcn.com/9e2a5d0a-bd5b-457f-ac8e-86554616c87b.jpg"
 	//data["introduction"] = "devops"
+	fmt.Sprintf("---AdminInfo--%v", l.ctx.Value("roleId"))
 	roleIdNumber := json.Number(fmt.Sprintf("%v", l.ctx.Value("roleId")))
 	roleId, _ := roleIdNumber.Int64()
 	data["menus"] = l.getAdminsMenu(roleId)

@@ -5,7 +5,7 @@
         <el-form-item label="搜索关键词">
           <el-input
             v-model="searchInfo.keyword"
-            placeholder="输入搜索账号"
+            placeholder="输入搜索关键词"
             size="mini"
           />
         </el-form-item>
@@ -18,7 +18,6 @@
             >查询</el-button
           >
         </el-form-item>
-        <!--
         <el-form-item>
           <el-button
             type="primary"
@@ -35,10 +34,7 @@
               <el-button size="mini" type="text" @click="deleteVisible = false"
                 >取消</el-button
               >
-              <el-button
-                size="mini"
-                type="primary"
-                @click="deleteBatch"
+              <el-button size="mini" type="primary" @click="deleteBatch"
                 >确定</el-button
               >
             </div>
@@ -51,7 +47,6 @@
             >
           </el-popover>
         </el-form-item>
-        -->
       </el-form>
     </div>
     <el-table
@@ -65,22 +60,23 @@
     >
       <el-table-column type="selection" width="55" fixed="left" />
       <el-table-column label="ID" prop="id" width="70" />
+      <el-table-column label="部门名称" prop="name" />
 
-      <el-table-column label="号码(手机或邮箱)" prop="account" />
-      <el-table-column label="验证码" prop="code" />
+      <el-table-column label="负责人" prop="leader" />
+      <el-table-column label="邮箱" prop="email" />
+      <el-table-column label="联系电话" prop="phone" />
 
-      <el-table-column label="类型" width="80" align="center">
+      <el-table-column label="父级ID" prop="parent_id" width="70" />
+      <el-table-column label="祖级列表" prop="ancestors" />
+      <el-table-column label="部门状态" width="80">
         <template #default="scope">
-          {{ scope.row.type | formatType }}
+          {{ scope.row.status | formatBoolean }}
         </template>
       </el-table-column>
-
-      <el-table-column label="状态" width="80" align="center">
-        <template #default="scope">
-          {{ scope.row.status | formatStatus }}
-        </template>
-      </el-table-column>
-
+      <el-table-column label="排序" prop="sort" width="70" />
+      <!--
+  <el-table-column label="创建者" prop="create_by"/>
+  <el-table-column label="更新者" prop="update_by"/>
       <el-table-column label="创建时间" width="160">
         <template #default="scope">
           {{ scope.row.created_at | formatDate }}
@@ -92,8 +88,8 @@
           {{ scope.row.updated_at | formatDate }}
         </template>
       </el-table-column>
+      -->
 
-      <!--
       <el-table-column label="操作" fixed="right" width="180" align="center">
         <template #default="scope">
           <el-button
@@ -113,7 +109,6 @@
           >
         </template>
       </el-table-column>
-      -->
     </el-table>
 
     <el-pagination
@@ -139,41 +134,100 @@
         ref="form"
         :rules="rules"
       >
+        <el-form-item label="父级:" prop="parent_id">
+          <el-select v-model="formData.parent_id" placeholder="请选择父级">
+            <el-option label="顶级" :value="0"></el-option>
+            <el-option
+              :label="item.name"
+              :value="item.id"
+              v-for="(item, index) in parents"
+              :key="index"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="部门名称:" prop="name">
+          <el-input
+            v-model="formData.name"
+            clearable
+            placeholder="请输入部门名称"
+          />
+        </el-form-item>
+
+        <el-form-item label="负责人:" prop="leader">
+          <el-input
+            v-model="formData.leader"
+            clearable
+            placeholder="请输入负责人"
+          />
+        </el-form-item>
+
+        <el-form-item label="联系电话:" prop="phone">
+          <el-input
+            v-model="formData.phone"
+            clearable
+            placeholder="请输入联系电话"
+          />
+        </el-form-item>
+
+        <el-form-item label="邮箱:" prop="email">
+          <el-input
+            v-model="formData.email"
+            clearable
+            placeholder="请输入邮箱"
+          />
+        </el-form-item>
+
+        <el-form-item label="部门状态:" prop="status">
+          <el-radio-group v-model="formData.status">
+            <el-radio :label="0" name="status">正常</el-radio>
+            <el-radio :label="1" name="status">停用</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item label="排序:" prop="sort">
+          <el-input
+            type="number"
+            v-model="formData.sort"
+            clearable
+            placeholder="请输入排序"
+          />
+        </el-form-item>
+
+        <!--
+
+           <el-form-item label="祖级列表:" prop="ancestors">
+          <el-input
+            v-model="formData.ancestors"
+            clearable
+            placeholder="请输入祖级列表"
+          />
+        </el-form-item>
+
+        <el-form-item label="创建者:" prop="create_by">
+          <el-input
+            v-model="formData.create_by"
+            clearable
+            placeholder="请输入创建者"
+          />
+        </el-form-item>
+
+        <el-form-item label="更新者:" prop="update_by">
+          <el-input
+            v-model="formData.update_by"
+            clearable
+            placeholder="请输入更新者"
+          />
+        </el-form-item>
+       
         <el-form-item label=":" prop="id">
-          <el-input v-model="formData.id" clearable placeholder="请输入" />
-        </el-form-item>
-
-        <el-form-item label="号码(手机或邮箱):" prop="account">
           <el-input
-            v-model="formData.account"
+            v-model="formData.id"
             clearable
-            placeholder="请输入号码(手机或邮箱)"
-          />
-        </el-form-item>
-
-        <el-form-item label="验证码:" prop="code">
-          <el-input
-            v-model="formData.code"
-            clearable
-            placeholder="请输入验证码"
-          />
-        </el-form-item>
-
-        <el-form-item label="类型0手机1邮箱:" prop="type">
-          <el-input
-            v-model="formData.type"
-            clearable
-            placeholder="请输入类型0手机1邮箱"
-          />
-        </el-form-item>
-
-        <el-form-item label="状态0未验证1已验证2验证错误:" prop="status">
-          <el-input
-            v-model="formData.status"
-            clearable
-            placeholder="请输入状态0未验证1已验证2验证错误"
-          />
-        </el-form-item>
+            placeholder="请输入"
+          /> </el-form-item
+        >
+        -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeDialog">取 消</el-button>
@@ -185,21 +239,28 @@
 
 <script>
 import {
-  verifyCodeList,
-  verifyCodeDelete,
-  verifyCodeDeleteBatch,
-  verifyCodeOne,
-  verifyCodeAdd,
-  verifyCodeUpdate,
-} from "@/api/verifyCode"; //  此处请自行替换地址
+  systemDepartmentList,
+  systemDepartmentParent,
+  systemDepartmentDelete,
+  systemDepartmentDeleteBatch,
+  systemDepartmentOne,
+  systemDepartmentAdd,
+  systemDepartmentUpdate,
+} from "@/api/systemDepartment"; //  此处请自行替换地址
 import { formatTimeToStr } from "@/utils/date";
 import infoList from "@/mixins/infoList";
 let defaultForm = {
+  ancestors: "",
+  create_by: "",
+  email: "",
   id: 0,
-  account: "",
-  code: "",
-  type: 0,
+  leader: "",
+  name: "",
+  parent_id: 0,
+  phone: "",
+  sort: 0,
   status: 0,
+  update_by: "",
 };
 export default {
   name: "SystemUser",
@@ -212,26 +273,16 @@ export default {
         return "";
       }
     },
-    formatType: function (v) {
-      if (v == 0) {
-        return "手机";
-      }
-      return "邮箱";
-    },
-    formatStatus: function (v) {
-      if (v == 0) {
-        return "未验证";
-      } else if (v == 1) {
-        return "已验证";
-      } else {
-        return "验证错误";
-      }
+    formatBoolean: function (v) {
+      return v == 0 ? "正常" : "停用";
     },
   },
   mixins: [infoList],
   data() {
     return {
-      listApi: verifyCodeList,
+      parents: [],
+
+      listApi: systemDepartmentList,
       dialogFormVisible: false,
       visible: false,
       type: "",
@@ -239,24 +290,30 @@ export default {
       multipleSelection: [],
       formData: Object.assign({}, defaultForm),
       rules: {
+        ancestors: [
+          { required: true, message: "请输入祖级列表", trigger: "blur" },
+        ],
+        create_by: [
+          { required: true, message: "请输入创建者", trigger: "blur" },
+        ],
+        email: [{ required: true, message: "请输入邮箱", trigger: "blur" }],
         id: [{ required: true, message: "请输入", trigger: "blur" }],
-        account: [
-          {
-            required: true,
-            message: "请输入号码(手机或邮箱)",
-            trigger: "blur",
-          },
+        leader: [{ required: true, message: "请输入负责人", trigger: "blur" }],
+        name: [{ required: true, message: "请输入部门名称", trigger: "blur" }],
+        parent_id: [
+          { required: true, message: "请输入父级ID", trigger: "blur" },
         ],
-        code: [{ required: true, message: "请输入验证码", trigger: "blur" }],
-        type: [
-          { required: true, message: "请输入类型0手机1邮箱", trigger: "blur" },
-        ],
+        phone: [{ required: true, message: "请输入联系电话", trigger: "blur" }],
+        sort: [{ required: true, message: "请输入排序", trigger: "blur" }],
         status: [
           {
             required: true,
-            message: "请输入状态0未验证1已验证2验证错误",
+            message: "请输入部门状态（0正常 1停用）",
             trigger: "blur",
           },
+        ],
+        update_by: [
+          { required: true, message: "请输入更新者", trigger: "blur" },
         ],
       },
     };
@@ -265,6 +322,14 @@ export default {
     await this.getTableData();
   },
   methods: {
+    //获取父级
+    async getParent(page, pageSize) {
+      const res = await systemDepartmentParent({ page, pageSize });
+      console.log(res);
+      if (res.code == 200) {
+        this.parents = res.data.list;
+      }
+    },
     // 条件搜索前端看此方法
     search() {
       this.page = 1;
@@ -288,7 +353,7 @@ export default {
           ids.push(item.id);
         });
 
-      const res = await verifyCodeDeleteBatch({ ids: ids.join(",") });
+      const res = await systemDepartmentDeleteBatch({ ids: ids.join(",") });
       if (res.code == 200) {
         this.$message({
           type: "success",
@@ -302,12 +367,14 @@ export default {
       }
     },
     async edit(row) {
-      const res = await verifyCodeOne({ id: row.id });
+      const res = await systemDepartmentOne({ id: row.id });
       this.type = "update";
       if (res.code == 200) {
         this.formData = res.data.item;
         this.dialogFormVisible = true;
       }
+      //加载父级
+      await this.getParent(1, 200);
     },
     closeDialog() {
       this.$refs.form.resetFields();
@@ -321,7 +388,7 @@ export default {
         type: "warning",
       })
         .then(async () => {
-          const res = await verifyCodeDelete({ id: row.id });
+          const res = await systemDepartmentDelete({ id: row.id });
           if (res.code == 200) {
             this.$message({
               type: "success",
@@ -347,19 +414,20 @@ export default {
       this.$refs.form.validate(async (valid) => {
         if (valid) {
           let res;
-          this.formData.type = parseInt(this.formData.type);
+          this.formData.parent_id = parseInt(this.formData.parent_id);
+          this.formData.sort = parseInt(this.formData.sort);
           this.formData.status = parseInt(this.formData.status);
 
           switch (this.type) {
             case "create":
               this.formData.id = 0;
-              res = await verifyCodeAdd(this.formData);
+              res = await systemDepartmentAdd(this.formData);
               break;
             case "update":
-              res = await verifyCodeUpdate(this.formData);
+              res = await systemDepartmentUpdate(this.formData);
               break;
             default:
-              res = await verifyCodeAdd(this.formData);
+              res = await systemDepartmentAdd(this.formData);
               break;
           }
           if (res.code == 200) {
@@ -374,9 +442,11 @@ export default {
         }
       });
     },
-    openDialog() {
+    async openDialog() {
       this.type = "create";
       this.dialogFormVisible = true;
+      //加载父级
+      await this.getParent(1, 200);
     },
   },
 };

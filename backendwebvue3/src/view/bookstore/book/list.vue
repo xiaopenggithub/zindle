@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="search-term">
+    <div class="search-term">      
       <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
         <el-form-item label="搜索关键词">
           <el-input
@@ -49,6 +49,7 @@
         </el-form-item>
       </el-form>
     </div>
+    {{useUserStore}}
     <el-table
       ref="multipleTable"
       :data="tableData"
@@ -61,7 +62,7 @@
       <el-table-column type="selection" width="55" fixed="left" />
       <el-table-column label="ID" prop="id" width="70" />
       <el-table-column label="封面" width="100" align="center">
-        <template slot-scope="scope">
+        <template #default="scope">
           <div v-if="scope.row.cover">
             <img :src="'/uploads1/' + scope.row.cover" width="80" height="80" />
           </div>
@@ -75,19 +76,19 @@
       <el-table-column label="排序" prop="sort" />
 
       <el-table-column label="创建时间" width="160">
-        <template slot-scope="scope">
+        <template #default="scope">
           {{ scope.row.created_at | formatDate }}
         </template>
       </el-table-column>
 
       <el-table-column label="更新时间" width="160">
-        <template slot-scope="scope">
+        <template #default="scope">
           {{ scope.row.updated_at | formatDate }}
         </template>
       </el-table-column>
 
       <el-table-column label="操作" fixed="right" width="180" align="center">
-        <template slot-scope="scope">
+        <template #default="scope">
           <el-button
             class="table-button"
             size="mini"
@@ -200,7 +201,6 @@
     </el-dialog>
   </div>
 </template>
-
 <script>
 import {
   bookList,
@@ -210,11 +210,12 @@ import {
   bookAdd,
   bookUpdate,
 } from "@/api/book"; //  此处请自行替换地址
+import { useUserStore } from '@/pinia/modules/user'
 import axios from "axios";
 import { formatTimeToStr } from "@/utils/date";
 import infoList from "@/mixins/infoList";
-import { mapGetters, mapMutations } from "vuex";
-import { store } from "@/store/index";
+// import { mapGetters, mapMutations } from "vuex";
+// import { store } from "@/store/index";
 let defaultForm = {
   id: 0,
   title: "",
@@ -284,11 +285,12 @@ export default {
     };
   },
   async created() {
-    this.headers.authorization = this.token;
+    const userStore = useUserStore()
+    this.headers.authorization = userStore.token;    
     await this.getTableData();
   },
   computed: {
-    ...mapGetters("user", ["userInfo", "token"]),
+    // ...mapGetters("user", ["userInfo", "token"]),
   },
   methods: {
     // 条件搜索前端看此方法
@@ -471,7 +473,7 @@ export default {
         console.log(response.data);
         this.showUpdateCover = false;
         // 更新store中头像
-        await store.dispatch("user/changeCoverStore", response.data);
+        // await store.dispatch("user/changeCoverStore", response.data);
       }
     },
     handleChange_coverUrl(file, fileList) {

@@ -1,5 +1,4 @@
-import { login, getUserInfo, setSelfInfo } from '@/api/user'
-import { jsonInBlacklist } from '@/api/jwt'
+import { login, logout, getUserInfo, setSelfInfo } from '@/api/user'
 import router from '@/router/index'
 import { ElLoading, ElMessage } from 'element-plus'
 import { defineStore } from 'pinia'
@@ -89,8 +88,9 @@ export const useUserStore = defineStore('user', () => {
   }
   /* 登出*/
   const LoginOut = async() => {
-    const res = await jsonInBlacklist()
-    if (res.code === 0) {
+    const result = await logout()
+    let res=result.data
+    if (res.code === 200) {
       token.value = ''
       sessionStorage.clear()
       localStorage.clear()

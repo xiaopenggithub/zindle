@@ -5,7 +5,7 @@
         <el-form-item label="搜索关键词">
           <el-input
             v-model="searchInfo.keyword"
-            placeholder="输入搜索账号"
+            placeholder="输入搜索关键词"
             size="mini"
           />
         </el-form-item>
@@ -18,7 +18,6 @@
             >查询</el-button
           >
         </el-form-item>
-        <!--
         <el-form-item>
           <el-button
             type="primary"
@@ -35,10 +34,7 @@
               <el-button size="mini" type="text" @click="deleteVisible = false"
                 >取消</el-button
               >
-              <el-button
-                size="mini"
-                type="primary"
-                @click="deleteBatch"
+              <el-button size="mini" type="primary" @click="deleteBatch"
                 >确定</el-button
               >
             </div>
@@ -51,7 +47,6 @@
             >
           </el-popover>
         </el-form-item>
-        -->
       </el-form>
     </div>
     <el-table
@@ -63,24 +58,31 @@
       tooltip-effect="dark"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="55" fixed="left" />
+      <el-table-column type="selection" width="40" align="center" />
       <el-table-column label="ID" prop="id" width="70" />
+      <el-table-column label="菜单名称" prop="title" />
+      <el-table-column label="排序" prop="sort" width="50" />
 
-      <el-table-column label="号码(手机或邮箱)" prop="account" />
-      <el-table-column label="验证码" prop="code" />
-
-      <el-table-column label="类型" width="80" align="center">
-        <template #default="scope">
-          {{ scope.row.type | formatType }}
+      <el-table-column label="图标">
+        <template #default="scope" width="110">
+          <i :class="`el-icon-${scope.row.icon}`"></i>
+          <span>{{ scope.row.icon }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="状态" width="80" align="center">
+      <el-table-column label="路由name" prop="name" />
+
+      <el-table-column label="路由path" prop="path" />
+      <el-table-column label="vue路径" prop="component" />
+
+      <el-table-column label="列表隐藏" width="100">
         <template #default="scope">
-          {{ scope.row.status | formatStatus }}
+          <span :style="scope.row.hidden==0?'':'color:red'">{{ scope.row.hidden | formatBoolean }}</span>
         </template>
       </el-table-column>
 
+      <!--
+      <el-table-column label="父菜单ID" prop="parent_id" />
       <el-table-column label="创建时间" width="160">
         <template #default="scope">
           {{ scope.row.created_at | formatDate }}
@@ -92,8 +94,8 @@
           {{ scope.row.updated_at | formatDate }}
         </template>
       </el-table-column>
+      -->
 
-      <!--
       <el-table-column label="操作" fixed="right" width="180" align="center">
         <template #default="scope">
           <el-button
@@ -113,7 +115,6 @@
           >
         </template>
       </el-table-column>
-      -->
     </el-table>
 
     <el-pagination
@@ -139,41 +140,77 @@
         ref="form"
         :rules="rules"
       >
-        <el-form-item label=":" prop="id">
-          <el-input v-model="formData.id" clearable placeholder="请输入" />
+        <el-form-item label="父级:" prop="parent_id">
+          <el-select v-model="formData.parent_id" placeholder="请选择父级">
+            <el-option label="顶级" :value="0"></el-option>
+            <el-option
+              :label="item.title"
+              :value="item.id"
+              v-for="(item, index) in parents"
+              :key="index"
+            ></el-option>
+          </el-select>
         </el-form-item>
 
-        <el-form-item label="号码(手机或邮箱):" prop="account">
+        <el-form-item label="菜单名称:" prop="title">
           <el-input
-            v-model="formData.account"
+            v-model="formData.title"
             clearable
-            placeholder="请输入号码(手机或邮箱)"
+            placeholder="请输入附加属性"
           />
         </el-form-item>
 
-        <el-form-item label="验证码:" prop="code">
+        <el-form-item label="vue路径:" prop="component">
           <el-input
-            v-model="formData.code"
+            v-model="formData.component"
             clearable
-            placeholder="请输入验证码"
+            placeholder="请输入对应前端vue文件路径"
           />
         </el-form-item>
 
-        <el-form-item label="类型0手机1邮箱:" prop="type">
+        <el-form-item label="图标:" prop="icon">
+          <icon :meta="formData">
+            <template slot="prepend">el-icon-</template>
+          </icon>
+        </el-form-item>
+
+        <el-form-item label="路由name:" prop="name">
           <el-input
-            v-model="formData.type"
+            v-model="formData.name"
             clearable
-            placeholder="请输入类型0手机1邮箱"
+            placeholder="请输入路由name"
           />
         </el-form-item>
 
-        <el-form-item label="状态0未验证1已验证2验证错误:" prop="status">
+        <el-form-item label="路由path:" prop="path">
           <el-input
-            v-model="formData.status"
+            v-model="formData.path"
             clearable
-            placeholder="请输入状态0未验证1已验证2验证错误"
+            placeholder="请输入路由path"
           />
         </el-form-item>
+
+        <el-form-item label="列表隐藏:" prop="hidden">
+          <el-radio-group v-model="formData.hidden">
+            <el-radio :label="0" name="hidden">否</el-radio>
+            <el-radio :label="1" name="hidden">是</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item label="排序:" prop="sort">
+          <el-input
+            type="number"
+            v-model="formData.sort"
+            clearable
+            placeholder="请输入排序标记"
+          />
+        </el-form-item>
+
+        <!--
+        <el-form-item label="ID:" prop="id">
+          <el-input v-model="formData.id" clearable placeholder="请输入ID" />
+        </el-form-item>
+        -->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeDialog">取 消</el-button>
@@ -185,21 +222,27 @@
 
 <script>
 import {
-  verifyCodeList,
-  verifyCodeDelete,
-  verifyCodeDeleteBatch,
-  verifyCodeOne,
-  verifyCodeAdd,
-  verifyCodeUpdate,
-} from "@/api/verifyCode"; //  此处请自行替换地址
+  systemMenuList,
+  systemMenuParent,
+  systemMenuDelete,
+  systemMenuDeleteBatch,
+  systemMenuOne,
+  systemMenuAdd,
+  systemMenuUpdate,
+} from "@/api/systemMenu"; //  此处请自行替换地址
 import { formatTimeToStr } from "@/utils/date";
 import infoList from "@/mixins/infoList";
+import icon from "@/view/superAdmin/systemMenu/icon.vue";
 let defaultForm = {
+  component: "",
+  hidden: 0,
+  icon: "",
   id: 0,
-  account: "",
-  code: "",
-  type: 0,
-  status: 0,
+  name: "",
+  parent_id: 0,
+  path: "",
+  sort: 0,
+  title: "",
 };
 export default {
   name: "SystemUser",
@@ -212,26 +255,16 @@ export default {
         return "";
       }
     },
-    formatType: function (v) {
-      if (v == 0) {
-        return "手机";
-      }
-      return "邮箱";
-    },
-    formatStatus: function (v) {
-      if (v == 0) {
-        return "未验证";
-      } else if (v == 1) {
-        return "已验证";
-      } else {
-        return "验证错误";
-      }
+    formatBoolean: function (v) {
+      return v == 0 ? "否" : "是";
     },
   },
   mixins: [infoList],
   data() {
     return {
-      listApi: verifyCodeList,
+      parents: [],
+
+      listApi: systemMenuList,
       dialogFormVisible: false,
       visible: false,
       type: "",
@@ -239,32 +272,48 @@ export default {
       multipleSelection: [],
       formData: Object.assign({}, defaultForm),
       rules: {
-        id: [{ required: true, message: "请输入", trigger: "blur" }],
-        account: [
+        component: [
           {
             required: true,
-            message: "请输入号码(手机或邮箱)",
+            message: "请输入对应前端vue文件路径",
             trigger: "blur",
           },
         ],
-        code: [{ required: true, message: "请输入验证码", trigger: "blur" }],
-        type: [
-          { required: true, message: "请输入类型0手机1邮箱", trigger: "blur" },
-        ],
-        status: [
+        hidden: [
           {
             required: true,
-            message: "请输入状态0未验证1已验证2验证错误",
+            message: "请输入1是0否在列表隐藏",
             trigger: "blur",
           },
         ],
+        icon: [{ required: true, message: "请选择图标", trigger: "change" }],
+        id: [{ required: true, message: "请输入ID", trigger: "blur" }],
+        name: [{ required: true, message: "请输入路由name", trigger: "blur" }],
+        parent_id: [
+          { required: true, message: "请输入父菜单ID", trigger: "blur" },
+        ],
+        path: [{ required: true, message: "请输入路由path", trigger: "blur" }],
+        sort: [{ required: true, message: "请输入排序标记", trigger: "blur" }],
+        title: [{ required: true, message: "请输入菜单名", trigger: "blur" }],
       },
     };
   },
+  components: {
+    icon,
+  },
   async created() {
+    this.pageSize = 100;
     await this.getTableData();
   },
   methods: {
+    //获取父级
+    async getParent(page, pageSize) {
+      const res = await systemMenuParent({ page, pageSize });
+      console.log(res);
+      if (res.code == 200) {
+        this.parents = res.data.list;
+      }
+    },
     // 条件搜索前端看此方法
     search() {
       this.page = 1;
@@ -288,7 +337,7 @@ export default {
           ids.push(item.id);
         });
 
-      const res = await verifyCodeDeleteBatch({ ids: ids.join(",") });
+      const res = await systemMenuDeleteBatch({ ids: ids.join(",") });
       if (res.code == 200) {
         this.$message({
           type: "success",
@@ -302,12 +351,14 @@ export default {
       }
     },
     async edit(row) {
-      const res = await verifyCodeOne({ id: row.id });
+      const res = await systemMenuOne({ id: row.id });
       this.type = "update";
       if (res.code == 200) {
         this.formData = res.data.item;
         this.dialogFormVisible = true;
       }
+      //加载父级
+      await this.getParent(1, 200);
     },
     closeDialog() {
       this.$refs.form.resetFields();
@@ -321,7 +372,7 @@ export default {
         type: "warning",
       })
         .then(async () => {
-          const res = await verifyCodeDelete({ id: row.id });
+          const res = await systemMenuDelete({ id: row.id });
           if (res.code == 200) {
             this.$message({
               type: "success",
@@ -347,19 +398,19 @@ export default {
       this.$refs.form.validate(async (valid) => {
         if (valid) {
           let res;
-          this.formData.type = parseInt(this.formData.type);
-          this.formData.status = parseInt(this.formData.status);
-
+          this.formData.parent_id = parseInt(this.formData.parent_id);
+          this.formData.hidden = parseInt(this.formData.hidden);
+          this.formData.sort = parseInt(this.formData.sort);
           switch (this.type) {
             case "create":
               this.formData.id = 0;
-              res = await verifyCodeAdd(this.formData);
+              res = await systemMenuAdd(this.formData);
               break;
             case "update":
-              res = await verifyCodeUpdate(this.formData);
+              res = await systemMenuUpdate(this.formData);
               break;
             default:
-              res = await verifyCodeAdd(this.formData);
+              res = await systemMenuAdd(this.formData);
               break;
           }
           if (res.code == 200) {
@@ -374,9 +425,11 @@ export default {
         }
       });
     },
-    openDialog() {
+    async openDialog() {
       this.type = "create";
       this.dialogFormVisible = true;
+      //加载父级
+      await this.getParent(1, 200);
     },
   },
 };

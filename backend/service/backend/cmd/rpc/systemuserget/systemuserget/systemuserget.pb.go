@@ -81,7 +81,7 @@ type Response struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	NickName string `protobuf:"bytes,1,opt,name=nick_name,json=nickName,proto3" json:"nick_name,omitempty"`
+	NickName string `protobuf:"bytes,1,opt,name=nick_name,json=nick_name,proto3" json:"nick_name,omitempty"`
 	Avatar   string `protobuf:"bytes,1,opt,name=avatar,json=avatar,proto3" json:"avatar,omitempty"`
 }
 

@@ -5,7 +5,7 @@
         <el-form-item label="搜索关键词">
           <el-input
             v-model="searchInfo.keyword"
-            placeholder="输入搜索账号"
+            placeholder="输入搜索关键词"
             size="mini"
           />
         </el-form-item>
@@ -18,7 +18,6 @@
             >查询</el-button
           >
         </el-form-item>
-        <!--
         <el-form-item>
           <el-button
             type="primary"
@@ -35,10 +34,7 @@
               <el-button size="mini" type="text" @click="deleteVisible = false"
                 >取消</el-button
               >
-              <el-button
-                size="mini"
-                type="primary"
-                @click="deleteBatch"
+              <el-button size="mini" type="primary" @click="deleteBatch"
                 >确定</el-button
               >
             </div>
@@ -51,7 +47,6 @@
             >
           </el-popover>
         </el-form-item>
-        -->
       </el-form>
     </div>
     <el-table
@@ -66,21 +61,11 @@
       <el-table-column type="selection" width="55" fixed="left" />
       <el-table-column label="ID" prop="id" width="70" />
 
-      <el-table-column label="号码(手机或邮箱)" prop="account" />
-      <el-table-column label="验证码" prop="code" />
-
-      <el-table-column label="类型" width="80" align="center">
-        <template #default="scope">
-          {{ scope.row.type | formatType }}
-        </template>
-      </el-table-column>
-
-      <el-table-column label="状态" width="80" align="center">
-        <template #default="scope">
-          {{ scope.row.status | formatStatus }}
-        </template>
-      </el-table-column>
-
+      <el-table-column label="分组" prop="api_group" />
+      <el-table-column label="名称" prop="description" />
+      <el-table-column label="方法" prop="method" />
+      <el-table-column label="路径" prop="path" />
+      <!--
       <el-table-column label="创建时间" width="160">
         <template #default="scope">
           {{ scope.row.created_at | formatDate }}
@@ -92,8 +77,8 @@
           {{ scope.row.updated_at | formatDate }}
         </template>
       </el-table-column>
+      -->
 
-      <!--
       <el-table-column label="操作" fixed="right" width="180" align="center">
         <template #default="scope">
           <el-button
@@ -105,15 +90,14 @@
             >变更</el-button
           >
           <el-button
-            @click="remove(scope.row)"
             size="mini"
             type="danger"
             icon="el-icon-delete"
+            @click="remove(scope.row)"
             >删除</el-button
           >
         </template>
       </el-table-column>
-      -->
     </el-table>
 
     <el-pagination
@@ -133,46 +117,40 @@
       :title="type == 'create' ? '新增记录' : '编辑记录'"
     >
       <el-form
+        ref="form"
         :model="formData"
         label-position="right"
         label-width="100px"
-        ref="form"
         :rules="rules"
       >
-        <el-form-item label=":" prop="id">
-          <el-input v-model="formData.id" clearable placeholder="请输入" />
-        </el-form-item>
-
-        <el-form-item label="号码(手机或邮箱):" prop="account">
+        <el-form-item label="api名称:" prop="description">
           <el-input
-            v-model="formData.account"
+            v-model="formData.description"
             clearable
-            placeholder="请输入号码(手机或邮箱)"
+            placeholder="请输入api名称"
           />
         </el-form-item>
 
-        <el-form-item label="验证码:" prop="code">
+        <el-form-item label="api分组:" prop="api_group">
           <el-input
-            v-model="formData.code"
+            v-model="formData.api_group"
             clearable
-            placeholder="请输入验证码"
+            placeholder="请输入api分组"
           />
         </el-form-item>
 
-        <el-form-item label="类型0手机1邮箱:" prop="type">
+        <el-form-item label="api路径:" prop="path">
           <el-input
-            v-model="formData.type"
+            v-model="formData.path"
             clearable
-            placeholder="请输入类型0手机1邮箱"
+            placeholder="请输入api路径"
           />
         </el-form-item>
 
-        <el-form-item label="状态0未验证1已验证2验证错误:" prop="status">
-          <el-input
-            v-model="formData.status"
-            clearable
-            placeholder="请输入状态0未验证1已验证2验证错误"
-          />
+        <el-form-item label="请求方法:" prop="method">
+          <el-radio-group v-model="formData.method">
+            <el-radio :label="item.name" name="method" v-for="(item,index) in methods" :key="index"></el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -185,21 +163,21 @@
 
 <script>
 import {
-  verifyCodeList,
-  verifyCodeDelete,
-  verifyCodeDeleteBatch,
-  verifyCodeOne,
-  verifyCodeAdd,
-  verifyCodeUpdate,
-} from "@/api/verifyCode"; //  此处请自行替换地址
+  systemApiList,
+  systemApiDelete,
+  systemApiDeleteBatch,
+  systemApiOne,
+  systemApiAdd,
+  systemApiUpdate,
+} from "@/api/systemApi"; //  此处请自行替换地址
 import { formatTimeToStr } from "@/utils/date";
 import infoList from "@/mixins/infoList";
-let defaultForm = {
+const defaultForm = {
+  api_group: "",
+  description: "",
   id: 0,
-  account: "",
-  code: "",
-  type: 0,
-  status: 0,
+  method: "POST",
+  path: "",
 };
 export default {
   name: "SystemUser",
@@ -212,26 +190,32 @@ export default {
         return "";
       }
     },
-    formatType: function (v) {
-      if (v == 0) {
-        return "手机";
-      }
-      return "邮箱";
-    },
-    formatStatus: function (v) {
-      if (v == 0) {
-        return "未验证";
-      } else if (v == 1) {
-        return "已验证";
+    formatBoolean: function (bool) {
+      if (bool != null) {
+        return bool ? "是" : "否";
       } else {
-        return "验证错误";
+        return "";
       }
     },
   },
   mixins: [infoList],
   data() {
     return {
-      listApi: verifyCodeList,
+      methods:[
+        {
+          name:"POST"
+        },
+        {
+          name:"PUT"
+        },
+        {
+          name:"DELETE"
+        },
+        {
+          name:"GET"
+        }
+      ],
+      listApi: systemApiList,
       dialogFormVisible: false,
       visible: false,
       type: "",
@@ -239,25 +223,16 @@ export default {
       multipleSelection: [],
       formData: Object.assign({}, defaultForm),
       rules: {
-        id: [{ required: true, message: "请输入", trigger: "blur" }],
-        account: [
-          {
-            required: true,
-            message: "请输入号码(手机或邮箱)",
-            trigger: "blur",
-          },
+        api_group: [
+          { required: true, message: "请输入api组", trigger: "blur" },
         ],
-        code: [{ required: true, message: "请输入验证码", trigger: "blur" }],
-        type: [
-          { required: true, message: "请输入类型0手机1邮箱", trigger: "blur" },
+        description: [
+          { required: true, message: "请输入api中文描述", trigger: "blur" },
         ],
-        status: [
-          {
-            required: true,
-            message: "请输入状态0未验证1已验证2验证错误",
-            trigger: "blur",
-          },
+        method: [
+          { required: true, message: "请输入请求方法", trigger: "blur" },
         ],
+        path: [{ required: true, message: "请输入api路径", trigger: "blur" }],
       },
     };
   },
@@ -288,21 +263,21 @@ export default {
           ids.push(item.id);
         });
 
-      const res = await verifyCodeDeleteBatch({ ids: ids.join(",") });
+      const res = await systemApiDeleteBatch({ ids: ids.join(",") });
       if (res.code == 200) {
         this.$message({
           type: "success",
           message: "删除成功",
         });
-        //if (this.tableData.length == ids.length) {
+        // if (this.tableData.length == ids.length) {
         //  this.page--;
-        //}
+        // }
         this.deleteVisible = false;
         this.getTableData();
       }
     },
     async edit(row) {
-      const res = await verifyCodeOne({ id: row.id });
+      const res = await systemApiOne({ id: row.id });
       this.type = "update";
       if (res.code == 200) {
         this.formData = res.data.item;
@@ -321,15 +296,15 @@ export default {
         type: "warning",
       })
         .then(async () => {
-          const res = await verifyCodeDelete({ id: row.id });
+          const res = await systemApiDelete({ id: row.id });
           if (res.code == 200) {
             this.$message({
               type: "success",
               message: "删除成功!",
             });
-            //if (this.tableData.length == 1) {
+            // if (this.tableData.length == 1) {
             //  this.page--;
-            //}
+            // }
             this.getTableData();
           }
         })
@@ -347,19 +322,17 @@ export default {
       this.$refs.form.validate(async (valid) => {
         if (valid) {
           let res;
-          this.formData.type = parseInt(this.formData.type);
-          this.formData.status = parseInt(this.formData.status);
-
+          this.formData.dept_id = parseInt(this.formData.dept_id);
           switch (this.type) {
             case "create":
               this.formData.id = 0;
-              res = await verifyCodeAdd(this.formData);
+              res = await systemApiAdd(this.formData);
               break;
             case "update":
-              res = await verifyCodeUpdate(this.formData);
+              res = await systemApiUpdate(this.formData);
               break;
             default:
-              res = await verifyCodeAdd(this.formData);
+              res = await systemApiAdd(this.formData);
               break;
           }
           if (res.code == 200) {

@@ -67,14 +67,14 @@
       <el-table-column label="手机" prop="phone" />
       <el-table-column label="用户邮箱" prop="email" />
       <el-table-column label="帐号状态" width="80" align="center">
-        <template slot-scope="scope">
+        <template #default="scope">
           {{ scope.row.status | formatStatus }}
         </template>
       </el-table-column>
       <el-table-column label="最后登录IP" prop="login_ip" />
 
       <el-table-column label="最后登录" width="160">
-        <template slot-scope="scope">
+        <template #default="scope">
           {{ scope.row.login_date | formatDate }}
         </template>
       </el-table-column>
@@ -82,13 +82,13 @@
       <el-table-column label="备注" prop="remark" />
 
       <el-table-column label="创建时间" width="160">
-        <template slot-scope="scope">
+        <template #default="scope">
           {{ scope.row.created_at | formatDate }}
         </template>
       </el-table-column>
 
       <el-table-column label="操作" fixed="right" width="180" align="center">
-        <template slot-scope="scope">
+        <template #default="scope">
           <el-button
             class="table-button"
             size="mini"

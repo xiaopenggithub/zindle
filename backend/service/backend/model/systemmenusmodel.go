@@ -158,7 +158,8 @@ ids 对应角色的菜单权，空：所有菜单
 */
 func (m *defaultSystemMenusModel) Tree(ids string) ([]*SystemMenus, error) {
 	// 条件处理
-	whereCondition := "where `hidden` = 0 "
+	//whereCondition := "where `hidden` = 0 "
+	whereCondition := "where 1=1 "
 	if ids != "" {
 		whereCondition += fmt.Sprintf(" and `id` in (%s)", ids)
 	}

@@ -60,33 +60,35 @@
     >
       <el-table-column type="selection" width="55" fixed="left" />
       <el-table-column label="ID" prop="id" width="70" />
+      
 
       <el-table-column label="用户">
-        <template slot-scope="scope">
+        <template #default="scope">
           <span>[{{scope.row.member_id}}]{{scope.row.member_name}}</span>
         </template>
       </el-table-column>
       
       <el-table-column label="书名">
-        <template slot-scope="scope">
+        <template #default="scope">
           <span>[{{scope.row.book_id}}]{{scope.row.book_name}}</span>
         </template>
       </el-table-column>
 
       <el-table-column label="还书日期" width="160">
-        <template slot-scope="scope">
+        <template #default="scope">
           {{ scope.row.return_date | formatDate }}
         </template>
       </el-table-column>
 
       <el-table-column label="创建时间" width="160">
-        <template slot-scope="scope">
+        <template #default="scope">
           {{ scope.row.created_at | formatDate }}
         </template>
       </el-table-column>
+      
 
       <el-table-column label="操作" fixed="right" width="180" align="center">
-        <template slot-scope="scope">
+        <template #default="scope">
           <el-button
             class="table-button"
             size="mini"
