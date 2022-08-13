@@ -171,8 +171,8 @@
     />
 
     <el-dialog
+      v-model="dialogFormVisible"
       :before-close="closeDialog"
-      :visible.sync="dialogFormVisible"
       :title="type == 'create' ? '新增记录' : '编辑记录'"
     >
       <el-form
@@ -446,16 +446,16 @@ export default {
     async getDepartments(page, pageSize) {
       const res = await systemDepartmentList({ page, pageSize });
       console.log(res);
-      if (res.code == 200) {
-        this.departments = res.data.list;
+      if (res.data.code == 200) {
+        this.departments = res.data.data.list;
       }
     },
     //加载角色
     async getRoles(page, pageSize) {
       const res = await systemRoleList({ page, pageSize });
       console.log(res);
-      if (res.code == 200) {
-        this.roles = res.data.list;
+      if (res.data.code == 200) {
+        this.roles = res.data.data.list;
       }
     },
     // 条件搜索前端看此方法
@@ -488,7 +488,7 @@ export default {
       // return;
 
       const res = await deleteSystemUserByIds({ ids: ids.join(",") });
-      if (res.code == 200) {
+      if (res.data.code == 200) {
         this.$message({
           type: "success",
           message: "删除成功",
@@ -501,10 +501,10 @@ export default {
       }
     },
     async updateSystemUser(row) {
-      const res = await findSystemUser({ id: row.id });
+      const res = await findSystemUser({ id: row.id });      
       this.type = "update";
-      if (res.code == 200) {
-        this.formData = res.data.item;
+      if (res.data.code == 200) {
+        this.formData = res.data.data.item;
         this.formData.password = "";
         this.dialogFormVisible = true;
       }
@@ -526,7 +526,7 @@ export default {
       })
         .then(async () => {
           const res = await deleteSystemUser({ id: row.id });
-          if (res.code == 200) {
+          if (res.data.code == 200) {
             this.$message({
               type: "success",
               message: "删除成功!",
@@ -565,11 +565,11 @@ export default {
               res = await createSystemUser(this.formData);
               break;
           }
-          if (res.code == 200) {
+          if (res.data.code == 200) {
             this.$message({
               type: "success",
               // message: "创建/更改成功",
-              message: res.message,
+              message: res.data.message,
             });
             this.closeDialog();
             this.getTableData();

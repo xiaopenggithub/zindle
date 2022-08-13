@@ -69,7 +69,7 @@ export default {
         menu_ids,
         role_id: this.row.id,
       });
-      if (res.code == 200) {
+      if (res.data.code == 200) {
         this.$message({
           type: "success",
           message: "菜单设置成功!",
@@ -82,10 +82,10 @@ export default {
   async created() {
     // 获取所有菜单树
     const res = await treeList({ ids: "" });
-    this.menuTreeData = res.data.list;
+    this.menuTreeData = res.data.data.list;
 
     const res1 = await systemRoleMenusByRoleId({ role_id: this.row.id,menu_ids:'' })
-    const roleMenus = res1.data.list
+    const roleMenus = res1.data.data.list
     const arr = []
     roleMenus.map(item => {
       // 防止直接选中父级造成全选

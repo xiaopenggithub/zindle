@@ -129,8 +129,8 @@
     />
 
     <el-dialog
+       v-model="dialogFormVisible"
       :before-close="closeDialog"
-      :visible.sync="dialogFormVisible"
       :title="type == 'create' ? '新增记录' : '编辑记录'"
     >
       <el-form
@@ -310,8 +310,8 @@ export default {
     async getParent(page, pageSize) {
       const res = await systemMenuParent({ page, pageSize });
       console.log(res);
-      if (res.code == 200) {
-        this.parents = res.data.list;
+      if (res.data.code == 200) {
+        this.parents = res.data.data.list;
       }
     },
     // 条件搜索前端看此方法
@@ -353,8 +353,8 @@ export default {
     async edit(row) {
       const res = await systemMenuOne({ id: row.id });
       this.type = "update";
-      if (res.code == 200) {
-        this.formData = res.data.item;
+      if (res.data.code == 200) {
+        this.formData = res.data.data.item;
         this.dialogFormVisible = true;
       }
       //加载父级
@@ -373,7 +373,7 @@ export default {
       })
         .then(async () => {
           const res = await systemMenuDelete({ id: row.id });
-          if (res.code == 200) {
+          if (res.data.code == 200) {
             this.$message({
               type: "success",
               message: "删除成功!",
@@ -413,11 +413,11 @@ export default {
               res = await systemMenuAdd(this.formData);
               break;
           }
-          if (res.code == 200) {
+          if (res.data.code == 200) {
             this.$message({
               type: "success",
               // message: "创建/更改成功",
-              message: res.message,
+              message: res.data.message,
             });
             this.closeDialog();
             this.getTableData();

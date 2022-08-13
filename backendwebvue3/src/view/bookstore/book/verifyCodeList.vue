@@ -128,8 +128,8 @@
     />
 
     <el-dialog
-      :before-close="closeDialog"
-      :visible.sync="dialogFormVisible"
+      v-model="dialogFormVisible"
+      :before-close="closeDialog"      
       :title="type == 'create' ? '新增记录' : '编辑记录'"
     >
       <el-form

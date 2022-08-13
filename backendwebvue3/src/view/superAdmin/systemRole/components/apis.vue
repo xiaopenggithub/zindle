@@ -49,7 +49,7 @@ export default {
   async created() {
     // 获取api并整理成树结构
     const res2 = await systemApiList({ page: 1, pageSize: 200 })
-    const apis = res2.data.list
+    const apis = res2.data.data.list
 
     this.apiTreeData = this.buildApiTree(apis)
     // console.log('----------->')
@@ -61,8 +61,8 @@ export default {
     // console.log(res)
     this.role_id = this.row.id
     this.apiTreeIds = []
-    res.data.list &&
-      res.data.list.map((item) => {
+    res.data.data.list &&
+      res.data.data.list.map((item) => {
         this.apiTreeIds.push('p:' + item.v1 + 'm:' + item.v2)
       })
   },
@@ -119,7 +119,7 @@ export default {
         role_apis: casbinInfos,
         role_id: this.role_id
       })
-      if (res.code == 200) {
+      if (res.data.code == 200) {
         this.$message({
           type: 'success',
           message: 'api设置成功',

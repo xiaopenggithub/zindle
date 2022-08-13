@@ -68,8 +68,8 @@ service.interceptors.response.use(
     if (response.data.code === 200) {
       return response
     } else {
-      ElMessage({showClose: true,message: response.data.message || decodeURI(response.headers.msg),type: 'error'})
-      if (response.data.data && response.data.data.reload) {
+      ElMessage({showClose: true,message: response.data.message || decodeURI(response.headers.msg),type: 'error'})      
+      if ((response.data.data && response.data.data.reload) || response.data.code === 401) {
         userStore.token = ''
         localStorage.clear()
         router.push({ name: 'Login', replace: true })

@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="search-term">      
+    <div class="search-term">     
+      {{path}}     
       <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
         <el-form-item label="搜索关键词">
           <el-input
@@ -120,8 +121,8 @@
     />
 
     <el-dialog
+      v-model="dialogFormVisible"
       :before-close="closeDialog"
-      :visible.sync="dialogFormVisible"
       :title="type == 'create' ? '新增记录' : '编辑记录'"
     >
       <el-form
@@ -157,7 +158,7 @@
           >
             <i class="el-icon-plus"></i>
           </el-upload>
-          <el-dialog :visible.sync="dialogVisible_coverUrl" append-to-body>
+          <el-dialog v-model="dialogVisible_coverUrl" append-to-body>
             <img width="100%" :src="dialogImageUrl_coverUrl" alt="" />
           </el-dialog>
         </el-form-item>
@@ -214,6 +215,7 @@ import { useUserStore } from '@/pinia/modules/user'
 import axios from "axios";
 import { formatTimeToStr } from "@/utils/date";
 import infoList from "@/mixins/infoList";
+import { ref } from 'vue'
 // import { mapGetters, mapMutations } from "vuex";
 // import { store } from "@/store/index";
 let defaultForm = {
@@ -317,7 +319,7 @@ export default {
         });
 
       const res = await bookDeleteBatch({ ids: ids.join(",") });
-      if (res.code == 200) {
+      if (res.data.code == 200) {
         this.$message({
           type: "success",
           message: "删除成功",
@@ -332,8 +334,8 @@ export default {
     async edit(row) {
       const res = await bookOne({ id: row.id });
       this.type = "update";
-      if (res.code == 200) {
-        this.formData = res.data.item;
+      if (res.data.code == 200) {
+        this.formData = res.data.data.item;
         this.dialogFormVisible = true;
       }
     },
@@ -350,7 +352,7 @@ export default {
       })
         .then(async () => {
           const res = await bookDelete({ id: row.id });
-          if (res.code == 200) {
+          if (res.data.code == 200) {
             this.$message({
               type: "success",
               message: "删除成功!",
@@ -391,7 +393,9 @@ export default {
           postData.append('update_by',this.formData.update_by)
 
 
-          const path = process.env.VUE_APP_BASE_API;
+          // const path = process.env.VITE_BASE_API;
+          const pathValue = ref(import.meta.env.VITE_BASE_API)
+          const path=pathValue.value          
           let url = `${path}/book/add`;
           let res;
           switch (this.type) {
