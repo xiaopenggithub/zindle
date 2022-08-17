@@ -24,6 +24,21 @@
                 重新上传</span
               >
             </div>
+
+            <div
+              class="user-headpic-update"
+              :style="{
+                'background-image': `url(${userStore.userInfo.headerImg})`,
+                'background-repeat': 'no-repeat',
+                'background-size': 'cover',
+              }"
+            >
+              <span class="update" @click="openChangeAvatarDialog()">
+                <i class="el-icon-edit"></i>
+                重新上传</span
+              >
+            </div>
+
             <div class="user-personality">
               <p v-if="!editFlag" class="nickName">
                 {{ userStore.userInfo.nickName }}
@@ -248,12 +263,164 @@
         </span>
       </template>
     </el-dialog>
+
+
+    <el-dialog
+      v-model="showUpdateAvatar"
+      @close="clearPassword"
+      title="修改头像"
+      width="360px"
+    >
+      <el-form
+        :model="pwdModify"
+        :rules="rules"
+        label-width="80px"
+        ref="modifyPwdForm"
+      >
+        <el-form-item :minlength="6" label="">
+          <el-upload
+            ref="upload_avatarUrl"
+            :action="`${path}/admin/changeAvatar`"
+            accept=".jpg,.jpeg,.png,.gif,.bmp,.pdf,.JPG,.JPEG,.PBG,.GIF,.BMP,.mp4,.MP4,.apk,.APk"
+            list-type="picture-card"
+            :class="{ imgHide: imgHideUpload }"
+            :headers="headers"
+            :limit="1"
+            :auto-upload="false"
+            :file-list="fileList_avatarUrl"
+            :on-exceed="handleExceed_avatarUrl"
+            :before-upload="handleBeforeUpload_avatarUrl"
+            :on-preview="handlePictureCardPreview_avatarUrl"
+            :on-success="handleSuccess_avatarUrl"
+            :on-remove="handleRemove_avatarUrl"
+            :on-change="handleChange_avatarUrl"
+          >
+            <i class="el-icon-plus"></i>
+          </el-upload>
+          <el-dialog v-model="dialogVisible_avatarUrl" append-to-body>
+            <img style="width:100%;height:auto;" :src="dialogImageUrl_avatarUrl" alt="" />
+          </el-dialog>
+        </el-form-item>
+      </el-form>
+      <div class="dialog-footer" slot="footer">
+        <el-button @click="showUpdateAvatar = false">取 消</el-button>
+        <el-button @click="confirmChangeAvatar" type="primary"
+          >确定上传</el-button
+        >
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import { useUserStore } from '@/pinia/modules/user'
 export default {
   name: "Person",
+  data(){
+    return {
+      showUpdateAvatar: false,
+      dialogVisible_avatarUrl: false,
+      fileList_avatarUrl: [],
+      dialogImageUrl_avatarUrl: "",
+      selectedfile_avatarUrl: false,
+      headers: {
+        authorization: "",
+      },
+      imgHideUpload: false, 
+
+      path:import.meta.env.VITE_BASE_API
+    }
+  },
+  created(){
+    const userStore = useUserStore()
+    this.fileList_avatarUrl.push({ url: userStore.userInfo.headerImg });
+    
+    this.headers.authorization = userStore.token;     
+  },
+  methods:{
+    async confirmChangeAvatar() {
+      if (!this.selectedfile_avatarUrl) {
+        this.$message.warning("请选择一个文件");
+        return;
+      }
+      this.$refs.upload_avatarUrl.submit();
+    },
+    openChangeAvatarDialog() {
+      const userStore = useUserStore()
+      this.fileList_avatarUrl = [];
+      this.fileList_avatarUrl.push({ url: userStore.userInfo.headerImg });
+      this.showUpdateAvatar = true;
+    },
+    // android上传 begin
+    handleBeforeUpload_avatarUrl(file) {
+      console.log("before");
+      if (
+        !(
+          file.type === "image/png" ||
+          file.type === "image/gif" ||
+          file.type === "image/jpg" ||
+          file.type === "image/jpeg"
+        )
+      ) {
+        this.$notify.warning({
+          title: "警告",
+          message:
+            "请上传格式为image/png, image/gif, image/jpg, image/jpeg的图片",
+        });
+      }
+      let size = file.size / 1024 / 1024 / 2;
+      if (size > 2) {
+        this.$notify.warning({
+          title: "警告",
+          message: "图片大小必须小于2M",
+        });
+      }
+    },
+    // 文件超出个数限制时的钩子
+    handleExceed_avatarUrl(files, fileList) {
+      console.log(files, fileList);
+      if (this.selectedfile_avatarUrl || fileList.length >= 1) {
+        this.$message.warning("上传的图片不能大于1张");
+        return;
+      }
+    },
+    // 点击文件列表中已上传的文件时的钩子
+    handlePictureCardPreview_avatarUrl(file) {      
+      this.dialogImageUrl_avatarUrl = file.url;
+      this.dialogVisible_avatarUrl = true;
+    },
+    async handleSuccess_avatarUrl(response, file, fileList) {
+      if (response.code == 200) {
+        console.log(response.data);
+        this.showUpdateAvatar = false;
+        // 更新store中头像
+        // await store.dispatch("user/changeAvatarStore", response.data);
+        const userStore = useUserStore();
+        userStore.ResetUserInfo({ headerImg: response.data });
+      }
+    },
+    handleChange_avatarUrl(file, fileList) {
+      this.imgHideUpload = fileList.length >= 1;
+      console.log(file);
+      //this.$refs[this.Up].submit();
+      this.selectedfile_avatarUrl = true;
+    },
+    // 文件列表移除文件时的钩子
+    handleRemove_avatarUrl(file, fileList) {
+      this.imgHideUpload = fileList.length >= 1;
+      this.fileList_avatarUrl = [];
+      this.selectedfile_avatarUrl = false;
+    },
+    // 点击上传
+    uploadFile_avatarUrl() {
+      if (!this.selectedfile_avatarUrl) {
+        this.$message.warning("请选择一个文件");
+        return;
+      }
+      this.$refs.upload_avatarUrl.submit();
+    },
+    // android上传 end
+  }
 };
 </script>
 

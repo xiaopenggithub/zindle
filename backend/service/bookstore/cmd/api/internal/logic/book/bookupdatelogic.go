@@ -39,6 +39,9 @@ func (l *BookUpdateLogic) BookUpdate(req types.BookPostReq, file *multipart.File
 	}
 	oldCover := oldData.Cover
 
+	fmt.Printf("%v\n", oldData)
+	fmt.Println("-------oldCover-------", oldCover)
+
 	req.Cover = uploadfile(file)
 
 	copier.Copy(&oldData, &req)
@@ -49,10 +52,14 @@ func (l *BookUpdateLogic) BookUpdate(req types.BookPostReq, file *multipart.File
 	}
 	// 删除oldcover
 	// delete oldCover begin
-	oldPath := "uploads" + "/" + oldCover
+	//oldPath := "uploads" + "/" + oldCover
+	oldPath := oldCover
+
 	if _, err := os.Stat(oldPath); os.IsNotExist(err) {
 		// nofile
+		fmt.Println("没有找到文件", oldCover)
 	} else {
+		fmt.Println("准备删除文件", oldCover)
 		if err := os.Remove(oldPath); err != nil {
 			fmt.Println("删除文件error")
 		}
