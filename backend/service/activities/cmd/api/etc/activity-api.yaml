@@ -1,6 +1,6 @@
-Name: books-api
+Name: activity-api
 Host: 0.0.0.0
-Port: 8892
+Port: 8893
 Mysql:
   DataSource: root:123456@tcp(127.0.0.1:3306)/db_zeromicro?charset=utf8mb4&loc=Asia%2FShanghai&parseTime=true
 CacheRedis:

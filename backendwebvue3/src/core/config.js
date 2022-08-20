@@ -3,7 +3,7 @@
  */
 
 const config = {
-  appName: 'Gin-Vue-Admin',
+  appName: '后台管理',
   appLogo: 'https://www.gin-vue-admin.com/img/logo.png',
   showViteLogo: true
 }

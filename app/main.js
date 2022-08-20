@@ -14,7 +14,7 @@ const app = new Vue({
 	...App
 })
 Vue.prototype.globalData = {
-	apiHost: 'http://192.168.1.2:8080/api/',
+	apiHost: '/api/',
 	// apiHost: 'https://ogreenphoto.xiaopeng.info/',
 }
 app.$mount()

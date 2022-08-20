@@ -2,34 +2,34 @@ package logic
 
 import (
 	"backend/common/errorx"
-	"backend/service/bookstore/cmd/api/internal/svc"
-	"backend/service/bookstore/cmd/api/internal/types"
+	"backend/service/activities/cmd/api/internal/svc"
+	"backend/service/activities/cmd/api/internal/types"
 	"context"
 	"fmt"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type BookAppFindOneLogic struct {
+type ActivityFindOneLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewBookAppFindOneLogic(ctx context.Context, svcCtx *svc.ServiceContext) BookAppFindOneLogic {
-	return BookAppFindOneLogic{
+// 付款信息 findone
+func NewActivityFindOneLogic(ctx context.Context, svcCtx *svc.ServiceContext) ActivityFindOneLogic {
+	return ActivityFindOneLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *BookAppFindOneLogic) BookAppFindOne(req types.BookDelReq) (*types.BookReply, error) {
-	one, err := l.svcCtx.BooksModel.FindOne(req.Id)
+func (l *ActivityFindOneLogic) ActivityFindOne(req types.ActivityDelReq) (*types.ActivityReply, error) {
+	one, err := l.svcCtx.ActivitysModel.FindOne(req.Id)
 	if err != nil {
 		return nil, errorx.NewCodeError(201, fmt.Sprintf("%v", err), "")
 	}
 	data := make(map[string]interface{})
-	one.Cover = "/uploads1/" + one.Cover
 	data["item"] = one
 
 	return nil, errorx.NewCodeError(200, fmt.Sprintf("%s", "获取成功"), data)

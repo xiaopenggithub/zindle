@@ -81,7 +81,7 @@ func (l *BorrowListLogic) BorrowList(req types.BookOrderListReq) (*types.BookOrd
 		if m2, ok := booksMap[v.BookId]; ok {
 			m["title"] = m2.Title
 			m["description"] = m2.Description
-			m["cover"] = "http://192.168.1.2:8080/uploads1/" + m2.Cover
+			m["cover"] = "/uploads1/" + m2.Cover
 
 		}
 		dateFormat := "2006-01-02 15:04:05"

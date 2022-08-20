@@ -66,7 +66,7 @@ func (l *BorrowDetailLogic) BorrowDetail(req types.BookOrderDelReq) (*types.Book
 	// 添加其它字段
 	book, _ := l.svcCtx.BooksModel.FindOne(one.BookId)
 	item["title"] = book.Title
-	item["cover"] = "http://192.168.1.2:8080/uploads1/" + book.Cover
+	item["cover"] = "/uploads1/" + book.Cover
 	item["description"] = book.Description
 
 	data["item"] = item

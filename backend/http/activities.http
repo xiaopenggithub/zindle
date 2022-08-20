@@ -1,0 +1,66 @@
+### 列表
+#POST http://127.0.0.1:8892/reader/list
+POST http://127.0.0.1:8893/activity/list
+Content-Type: application/json
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjEwMTc3ODEsImlhdCI6MTY2MDk0NTc4MSwicm9sZUlkIjo3LCJ1c2VySWQiOjF9.m9pT-6h4UJ11jhwt6tLGKlMl5zG6cDefDAspZ1M7JaI
+
+{
+    "page": 1,
+    "pageSize": 10
+}
+
+### 获取一个记录
+POST http://127.0.0.1:8893/activity/find
+Content-Type: application/json
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjEwMTc3ODEsImlhdCI6MTY2MDk0NTc4MSwicm9sZUlkIjo3LCJ1c2VySWQiOjF9.m9pT-6h4UJ11jhwt6tLGKlMl5zG6cDefDAspZ1M7JaI
+
+{
+  "id": 11
+}
+
+
+### 删除一个记录
+DELETE http://127.0.0.1:8893/activity/delete
+Content-Type: application/json
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjEwMTc3ODEsImlhdCI6MTY2MDk0NTc4MSwicm9sZUlkIjo3LCJ1c2VySWQiOjF9.m9pT-6h4UJ11jhwt6tLGKlMl5zG6cDefDAspZ1M7JaI
+
+{
+  "id": 11
+}
+
+### 添加一个记录
+POST http://127.0.0.1:8893/activity/add
+Content-Type: application/json
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjEwMTc3ODEsImlhdCI6MTY2MDk0NTc4MSwicm9sZUlkIjo3LCJ1c2VySWQiOjF9.m9pT-6h4UJ11jhwt6tLGKlMl5zG6cDefDAspZ1M7JaI
+
+{
+  "title": "title",
+  "address": "address",
+  "time_start": "2022-12-12 12:12:12",
+  "time_end": "2022-12-12 12:12:12",
+  "description":"description",
+  "quantity": 1,
+  "cover": "cover",
+  "sort": 1,
+  "create_by": "create_by",
+  "update_by": "update_by"
+}
+
+### 修改一个记录
+PUT http://127.0.0.1:8893/activity/update
+Content-Type: application/json
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjEwMTc3ODEsImlhdCI6MTY2MDk0NTc4MSwicm9sZUlkIjo3LCJ1c2VySWQiOjF9.m9pT-6h4UJ11jhwt6tLGKlMl5zG6cDefDAspZ1M7JaI
+
+{
+  "id": 13,
+  "title": "titleadsfadsf10088adfadsfa",
+  "address": "address",
+  "time_start": "2022-12-12 12:12:12",
+  "time_end": "2022-12-12 12:12:12",
+  "description":"description",
+  "quantity": 1,
+  "cover": "cover",
+  "sort": 1,
+  "create_by": "create_by",
+  "update_by": "update_by"
+}

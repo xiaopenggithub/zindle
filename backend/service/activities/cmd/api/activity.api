@@ -1,0 +1,72 @@
+syntax = "v1"
+
+info(
+	title: "付款信息"
+	desc: "付款信息"
+	author: "qin"
+	email: "361018729@qq.com"
+)
+
+type (
+	ActivityPostReq {
+		Address     string `db:"address" json:"address,default="`                          // 活动地址
+		Cover       string `db:"cover" json:"cover,default="`                              // 封面
+		CreateBy    string `db:"create_by" json:"create_by,default="`                      // 创建者
+		Description string `db:"description" json:"description,default="`                  // 简介
+		Id          int64  `db:"id" json:"id,optional"`                                    // ID
+		Quantity    int64  `db:"quantity" json:"quantity,default=0"`                       // 数量
+		Sort        int64  `db:"sort" json:"sort,default=0"`                               // 排序
+		TimeEnd     string `db:"time_end" json:"time_end,default=2006-01-02 15:04:05"`     // 结束时间
+		TimeStart   string `db:"time_start" json:"time_start,default=2006-01-02 15:04:05"` // 开始时间
+		Title       string `db:"title" json:"title,default="`                              // 标题
+		UpdateBy    string `db:"update_by" json:"update_by,default="`                      // 更新者
+
+	}
+	ActivityReply {
+		Id   int64  `json:"id"`
+		Name string `json:"name"`
+	}
+
+	ActivityListReq {
+		Page     int64  `json:"page,optional,default=1" form:"page,optional,default=1"`
+		PageSize int64  `json:"pageSize,optional,default=10" form:"pageSize,optional,default=10"`
+		Keyword  string `json:"keyword,optional" form:"pageSize,optional"`
+	}
+	ActivityDelReq {
+		Id int64 `json:"id"`
+	}
+	ActivityDelBatchReq {
+		Ids string `json:"ids"`
+	}
+)
+
+@server(
+	group: activity
+	jwt: Auth
+	middleware: CheckLogin // 路由中间件声明
+)
+service admin-api {
+	//	列表
+	@handler ActivityList
+	post /activity/list(ActivityListReq) returns (ActivityReply)
+	
+	//	删除
+	@handler ActivityDelete
+	delete /activity/delete(ActivityDelReq) returns (ActivityReply)
+	
+	//	删除批量
+	@handler ActivityDeleteBatch
+	delete /activity/deleteBatch(ActivityDelBatchReq) returns (ActivityReply)
+	
+	//	查询数据
+	@handler ActivityFindOne
+	post /activity/find(ActivityDelReq) returns (ActivityReply)
+	
+	// 添加
+	@handler ActivityAdd
+	post /activity/add (ActivityPostReq) returns (ActivityReply)
+	
+	// 更新
+	@handler ActivityUpdate
+	put /activity/update (ActivityPostReq) returns (ActivityReply)
+}
