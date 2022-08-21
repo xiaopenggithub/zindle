@@ -61,6 +61,62 @@
 	"h5": {
 		"router": {
 			"base": ""
-		}		
+		}
+		/*
+		"devServer": {
+			"port": 8084,
+			"disableHostCheck": true,
+			"proxy": {
+				"/api/": {
+					"target": "http://127.0.0.1:8888", //请求的目标域名
+					"changeOrigin": true,
+					"secure": false,
+					"pathRewrite": {
+						"^/api": "/"
+					}
+				},
+				"/api/book": {
+					"target": "http://127.0.0.1:8892", //请求的目标域名
+					"changeOrigin": true,
+					"secure": false,
+					"pathRewrite": {
+						"^/api": "/"
+					}
+				},
+				"/api/reader": {
+					"target": "http://127.0.0.1:8892", //请求的目标域名
+					"changeOrigin": true,
+					"secure": false,
+					"pathRewrite": {
+						"^/api": "/"
+					}
+				},
+				"/api/verifyCode": {
+					"target": "http://127.0.0.1:8892", //请求的目标域名
+					"changeOrigin": true,
+					"secure": false,
+					"pathRewrite": {
+						"^/api": "/"
+					}
+				},
+				"/api/activity": {
+					"target": "http://127.0.0.1:8892", //请求的目标域名
+					"changeOrigin": true,
+					"secure": false,
+					"pathRewrite": {
+						"^/api": "/"
+					}
+				},
+				"/api/activityOrders": {
+					"target": "http://127.0.0.1:8892", //请求的目标域名
+					"changeOrigin": true,
+					"secure": false,
+					"pathRewrite": {
+						"^/api": "/"
+					}
+				}
+			}
+		},
+		*/
 	}
 }

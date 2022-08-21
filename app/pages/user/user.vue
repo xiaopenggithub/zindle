@@ -19,6 +19,16 @@
 					<text class="list-text">借阅列表</text>
 					<text class="navigat-arrow">&#xe65e;</text>
 				</view>
+				<view class="center-list-item" @click="commingsoon">
+					<text class="list-icon">&#xe639;</text>
+					<text class="list-text">图书捐赠记录</text>
+					<text class="navigat-arrow">&#xe65e;</text>
+				</view>
+				<view class="center-list-item" @click="commingsoon">
+					<text class="list-icon">&#xe639;</text>
+					<text class="list-text">自习室预订记录</text>
+					<text class="navigat-arrow">&#xe65e;</text>
+				</view>
 			</view>
 			<view class="btn-row" v-if="token.length>0">
 				<button class="primary" type="primary" :loading="logoutBtnLoading" @tap="bindLogout">退出登录</button>
@@ -32,9 +42,9 @@
 		mapState,
 		mapMutations
 	} from 'vuex'
-	import {
-		univerifyLogin
-	} from '@/common/univerify.js'
+	// import {
+	// 	univerifyLogin
+	// } from '@/common/univerify.js'
 
 	export default {
 		data() {
@@ -57,15 +67,23 @@
 		},
 		methods: {
 			...mapMutations(['logout']),
+			commingsoon(){
+				uni.showToast({
+					title:'Comming Soon!'
+				})
+			},
 			bindLogin() {
 				if (!this.hasLogin) {
-					univerifyLogin().catch(err => {
-						if (err === false) return;
+					// univerifyLogin().catch(err => {
+					// 	if (err === false) return;
 						
-						uni.navigateTo({
-							url: '../login/login',
-						});
-					})
+					// 	uni.navigateTo({
+					// 		url: '../login/login',
+					// 	});
+					// })
+					uni.navigateTo({
+						url: '../login/login',
+					});
 				}
 			},
 			bindLogout() {

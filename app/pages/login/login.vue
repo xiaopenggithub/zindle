@@ -30,10 +30,10 @@
 		mapMutations
 	} from 'vuex'
 	import mInput from '../../components/m-input.vue'
-	import {
-		univerifyLogin,
-		univerifyErrorHandler
-	} from '@/common/univerify.js'
+	// import {
+	// 	univerifyLogin,
+	// 	univerifyErrorHandler
+	// } from '@/common/univerify.js'
 	import {
 		getDeviceUUID
 	} from '@/common/utils.js'
@@ -76,61 +76,61 @@
 		},
 		methods: {
 			...mapMutations(['login']),
-			sendSmsCode() {
-				if (this.codeDuration) {
-					uni.showModal({
-						content: `请在${this.codeDuration}秒后重试`,
-						showCancel: false
-					})
-				}
-				if (!/^1\d{10}$/.test(this.mobile)) {
-					uni.showModal({
-						content: '手机号码填写错误',
-						showCancel: false
-					})
-					return
-				}
-				uniCloud.callFunction({
-					name: 'user-center',
-					data: {
-						action: 'sendSmsCode',
-						params: {
-							mobile: this.mobile,
-							type: 'login'
-						}
-					},
-					success: (e) => {
-						if (e.result.code == 0) {
-							uni.showModal({
-								content: '验证码发送成功，请注意查收',
-								showCancel: false
-							})
-							this.codeDuration = 60
-							this.codeInterVal = setInterval(() => {
-								this.codeDuration--
-								if (this.codeDuration === 0) {
-									if (this.codeInterVal) {
-										clearInterval(this.codeInterVal)
-										this.codeInterVal = null
-									}
-								}
-							}, 1000)
-						} else {
-							uni.showModal({
-								content: '验证码发送失败：' + e.result.msg,
-								showCancel: false
-							})
-						}
+			// sendSmsCode() {
+			// 	if (this.codeDuration) {
+			// 		uni.showModal({
+			// 			content: `请在${this.codeDuration}秒后重试`,
+			// 			showCancel: false
+			// 		})
+			// 	}
+			// 	if (!/^1\d{10}$/.test(this.mobile)) {
+			// 		uni.showModal({
+			// 			content: '手机号码填写错误',
+			// 			showCancel: false
+			// 		})
+			// 		return
+			// 	}
+			// 	uniCloud.callFunction({
+			// 		name: 'user-center',
+			// 		data: {
+			// 			action: 'sendSmsCode',
+			// 			params: {
+			// 				mobile: this.mobile,
+			// 				type: 'login'
+			// 			}
+			// 		},
+			// 		success: (e) => {
+			// 			if (e.result.code == 0) {
+			// 				uni.showModal({
+			// 					content: '验证码发送成功，请注意查收',
+			// 					showCancel: false
+			// 				})
+			// 				this.codeDuration = 60
+			// 				this.codeInterVal = setInterval(() => {
+			// 					this.codeDuration--
+			// 					if (this.codeDuration === 0) {
+			// 						if (this.codeInterVal) {
+			// 							clearInterval(this.codeInterVal)
+			// 							this.codeInterVal = null
+			// 						}
+			// 					}
+			// 				}, 1000)
+			// 			} else {
+			// 				uni.showModal({
+			// 					content: '验证码发送失败：' + e.result.msg,
+			// 					showCancel: false
+			// 				})
+			// 			}
 
-					},
-					fail(e) {
-						uni.showModal({
-							content: '验证码发送失败',
-							showCancel: false
-						})
-					}
-				})
-			},
+			// 		},
+			// 		fail(e) {
+			// 			uni.showModal({
+			// 				content: '验证码发送失败',
+			// 				showCancel: false
+			// 			})
+			// 		}
+			// 	})
+			// },
 			async loginByPwd() {
 				/**
 				 * 客户端对账号信息进行一些必要的校验。

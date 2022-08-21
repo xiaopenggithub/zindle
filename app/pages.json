@@ -48,6 +48,12 @@
 			"style": {
 				"navigationBarTitleText": "借阅详情"
 			}
+		},
+		{
+			"path": "pages/activities/activity",
+			"style": {
+				"navigationBarTitleText": "活动"
+			}
 		}		
 	],
 	"tabBar": {
@@ -56,7 +62,12 @@
 		"backgroundColor": "#ffffff",
 		"list": [{
 			"pagePath": "pages/bookstore/list",
-			"text": "首页",
+			"text": "图书",
+			"iconPath": "static/img/home.png",
+			"selectedIconPath": "static/img/homeHL.png"
+		},{
+			"pagePath": "pages/activities/activity",
+			"text": "活动",
 			"iconPath": "static/img/home.png",
 			"selectedIconPath": "static/img/homeHL.png"
 		}, {
