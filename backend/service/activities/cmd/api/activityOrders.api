@@ -1,0 +1,66 @@
+syntax = "v1"
+
+info(
+	title: "活动预订信息"
+	desc: "活动预订信息"
+	author: "qin"
+	email: "361018729@qq.com"
+)
+
+type(
+ActivityOrdersPostReq {
+	Id      int64    `db:"id" json:"id,optional"`             // ID
+MemberId      int64    `db:"member_id" json:"member_id,default=0"`             // 用户ID
+ActivityId      int64    `db:"activity_id" json:"activity_id,default=0"`             // 活动ID
+Status      int64    `db:"status" json:"status,default=0"`             // 0报名1签到2取消3超时失约
+SeatNumber      int64    `db:"seat_number" json:"seat_number,default=1"`             // 座位
+
+	}
+ActivityOrdersReply {
+		Id       int64  `json:"id"`
+		Name string `json:"name"`
+	}
+
+ActivityOrdersListReq {
+		Page     int64  `json:"page,optional,default=1" form:"page,optional,default=1"`
+		PageSize int64  `json:"pageSize,optional,default=10" form:"pageSize,optional,default=10"`
+		Keyword  string `json:"keyword,optional" form:"pageSize,optional"`
+	}
+ActivityOrdersDelReq {
+		Id int64 `json:"id"`
+	}
+ActivityOrdersDelBatchReq {
+		Ids string `json:"ids"`
+	}
+)
+
+@server(
+	group: activityOrders
+	jwt: Auth
+	middleware: CheckLogin // 路由中间件声明
+)
+service activity-api {
+	//	列表
+	@handler ActivityOrdersList
+	post /activityOrders/list(ActivityOrdersListReq) returns (ActivityOrdersReply)
+
+	//	删除
+	@handler ActivityOrdersDelete
+	delete /activityOrders/delete(ActivityOrdersDelReq) returns (ActivityOrdersReply)
+
+	//	删除批量
+	@handler ActivityOrdersDeleteBatch
+	delete /activityOrders/deleteBatch(ActivityOrdersDelBatchReq) returns (ActivityOrdersReply)
+
+	//	查询数据
+	@handler ActivityOrdersFindOne
+	post /activityOrders/find(ActivityOrdersDelReq) returns (ActivityOrdersReply)
+
+	// 添加
+	@handler ActivityOrdersAdd
+	post /activityOrders/add (ActivityOrdersPostReq) returns (ActivityOrdersReply)
+
+	// 更新
+	@handler ActivityOrdersUpdate
+	put /activityOrders/update (ActivityOrdersPostReq) returns (ActivityOrdersReply)
+}

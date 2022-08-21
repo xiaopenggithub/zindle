@@ -2,7 +2,8 @@
 #POST http://127.0.0.1:8892/reader/list
 POST http://127.0.0.1:8893/activity/list
 Content-Type: application/json
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjEwMTc3ODEsImlhdCI6MTY2MDk0NTc4MSwicm9sZUlkIjo3LCJ1c2VySWQiOjF9.m9pT-6h4UJ11jhwt6tLGKlMl5zG6cDefDAspZ1M7JaI
+authorization: {{Authorization}}
+#authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjExMzMzODAsImlhdCI6MTY2MTA2MTM4MCwicm9sZUlkIjo3LCJ1c2VySWQiOjF9.hZ3wodXKnbTzSsH0m_64ufStZHE6dbb_acUom2Xwjio
 
 {
     "page": 1,
@@ -63,4 +64,23 @@ authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjEwMTc3ODEsImlh
   "sort": 1,
   "create_by": "create_by",
   "update_by": "update_by"
+}
+
+
+### App 列表
+POST http://127.0.0.1:8893/activity/appList
+Content-Type: application/json
+
+{
+  "page": 1,
+  "pageSize": 10
+}
+
+
+### App 获取一个记录
+POST http://127.0.0.1:8893/activity/appFind
+Content-Type: application/json
+
+{
+  "id": 1
 }

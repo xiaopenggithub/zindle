@@ -33,3 +33,30 @@ type ActivityDelReq struct {
 type ActivityDelBatchReq struct {
 	Ids string `json:"ids"`
 }
+
+type ActivityOrdersPostReq struct {
+	Id         int64 `db:"id" json:"id,optional"`                    // ID
+	MemberId   int64 `db:"member_id" json:"member_id,default=0"`     // 用户ID
+	ActivityId int64 `db:"activity_id" json:"activity_id,default=0"` // 活动ID
+	Status     int64 `db:"status" json:"status,default=0"`           // 0报名1签到2取消3超时失约
+	SeatNumber int64 `db:"seat_number" json:"seat_number,default=1"` // 座位
+}
+
+type ActivityOrdersReply struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+type ActivityOrdersListReq struct {
+	Page     int64  `json:"page,optional,default=1" form:"page,optional,default=1"`
+	PageSize int64  `json:"pageSize,optional,default=10" form:"pageSize,optional,default=10"`
+	Keyword  string `json:"keyword,optional" form:"pageSize,optional"`
+}
+
+type ActivityOrdersDelReq struct {
+	Id int64 `json:"id"`
+}
+
+type ActivityOrdersDelBatchReq struct {
+	Ids string `json:"ids"`
+}

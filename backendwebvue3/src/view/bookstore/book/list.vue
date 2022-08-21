@@ -163,7 +163,7 @@
           </el-dialog>
         </el-form-item>
 
-        <el-form-item label="标题:" prop="title">
+        <el-form-item label="标题" prop="title">
           <el-input
             v-model="formData.title"
             clearable
@@ -179,7 +179,7 @@
           />
         </el-form-item>
 
-        <el-form-item label="数量:" prop="quantity">
+        <el-form-item label="数量" prop="quantity">
           <el-input
             v-model="formData.quantity"
             clearable
@@ -187,11 +187,19 @@
           />
         </el-form-item>
 
-        <el-form-item label="排序:" prop="sort">
+        <el-form-item label="排序" prop="sort">
           <el-input
             v-model="formData.sort"
             clearable
             placeholder="请输入排序"
+          />
+        </el-form-item>
+
+        <el-form-item label="捐赠人" prop="donor">
+          <el-input
+            v-model="formData.donor"
+            clearable
+            placeholder="请输入捐赠人"
           />
         </el-form-item>
       </el-form>

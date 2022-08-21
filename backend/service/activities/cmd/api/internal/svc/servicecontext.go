@@ -9,16 +9,18 @@ import (
 )
 
 type ServiceContext struct {
-	Config         config.Config
-	CheckLogin     rest.Middleware
-	ActivitysModel model.ActivitysModel
+	Config               config.Config
+	CheckLogin           rest.Middleware
+	ActivitysModel       model.ActivitysModel
+	ActivityOrderssModel model.ActivityOrderssModel
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	conn := sqlx.NewMysql(c.Mysql.DataSource)
 	return &ServiceContext{
-		Config:         c,
-		CheckLogin:     middleware.NewCheckLoginMiddleware(c.Mysql.DataSource).Handle,
-		ActivitysModel: model.NewActivitysModel(conn, c.CacheRedis),
+		Config:               c,
+		CheckLogin:           middleware.NewCheckLoginMiddleware(c.Mysql.DataSource).Handle,
+		ActivitysModel:       model.NewActivitysModel(conn, c.CacheRedis),
+		ActivityOrderssModel: model.NewActivityOrderssModel(conn, c.CacheRedis),
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	activity "backend/service/activities/cmd/api/internal/handler/activity"
+	activityOrders "backend/service/activities/cmd/api/internal/handler/activityOrders"
 	"backend/service/activities/cmd/api/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -44,6 +45,60 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPut,
 					Path:    "/activity/update",
 					Handler: activity.ActivityUpdateHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/activity/appList",
+				Handler: activity.ActivityAppListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/activity/appFind",
+				Handler: activity.ActivityAppFindOneHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckLogin},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/activityOrders/list",
+					Handler: activityOrders.ActivityOrdersListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/activityOrders/delete",
+					Handler: activityOrders.ActivityOrdersDeleteHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/activityOrders/deleteBatch",
+					Handler: activityOrders.ActivityOrdersDeleteBatchHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/activityOrders/find",
+					Handler: activityOrders.ActivityOrdersFindOneHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/activityOrders/add",
+					Handler: activityOrders.ActivityOrdersAddHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/activityOrders/update",
+					Handler: activityOrders.ActivityOrdersUpdateHandler(serverCtx),
 				},
 			}...,
 		),

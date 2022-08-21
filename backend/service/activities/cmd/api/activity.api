@@ -6,7 +6,7 @@ info(
 	author: "qin"
 	email: "361018729@qq.com"
 )
-
+import "activityOrders.api"
 type (
 	ActivityPostReq {
 		Address     string `db:"address" json:"address,default="`                          // 活动地址
@@ -45,7 +45,7 @@ type (
 	jwt: Auth
 	middleware: CheckLogin // 路由中间件声明
 )
-service admin-api {
+service activity-api {
 	//	列表
 	@handler ActivityList
 	post /activity/list(ActivityListReq) returns (ActivityReply)
@@ -69,4 +69,17 @@ service admin-api {
 	// 更新
 	@handler ActivityUpdate
 	put /activity/update (ActivityPostReq) returns (ActivityReply)
+}
+
+@server(
+	group: activity
+)
+service activity-api {
+	//	app活动列表
+	@handler ActivityAppList
+	post /activity/appList(ActivityListReq) returns (ActivityReply)
+	
+	//	app活动详情
+	@handler ActivityAppFindOne
+	post /activity/appFind(ActivityDelReq) returns (ActivityReply)
 }

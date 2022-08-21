@@ -2,8 +2,7 @@ package handler
 
 import (
 	"backend/common/errorx"
-
-	"backend/service/activities/cmd/api/internal/logic/activity"
+	"backend/service/activities/cmd/api/internal/logic/activityOrders"
 	"backend/service/activities/cmd/api/internal/svc"
 	"backend/service/activities/cmd/api/internal/types"
 	"fmt"
@@ -11,17 +10,17 @@ import (
 	"net/http"
 )
 
-// 付款信息 create
-func ActivityAddHandler(ctx *svc.ServiceContext) http.HandlerFunc {
+// 活动预订信息 create
+func ActivityOrdersAddHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.ActivityPostReq
+		var req types.ActivityOrdersPostReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.Error(w, errorx.NewDefaultError(fmt.Sprintf("%v", err), ""))
 			return
 		}
 
-		l := logic.NewActivityAddLogic(r.Context(), ctx)
-		resp, err := l.ActivityAdd(req)
+		l := logic.NewActivityOrdersAddLogic(r.Context(), ctx)
+		resp, err := l.ActivityOrdersAdd(req)
 		if err != nil {
 			returnCode := 500
 			switch e := err.(type) {
