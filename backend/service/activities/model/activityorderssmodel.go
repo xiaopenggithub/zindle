@@ -25,9 +25,11 @@ type (
 	ActivityOrderssModel interface {
 		Insert(data ActivityOrderss) (sql.Result, error)
 		FindOne(id int64) (*ActivityOrderss, error)
+		FindOneOrder(id int64, memberId int64) (*ActivityOrderss, error)
 		Update(data ActivityOrderss) error
 		Delete(id int64) error
 		List(req utils.ListReq) ([]*ActivityOrderss, int, error)
+		ListMy(req utils.ListReq, memberId int64) ([]*ActivityOrderss, int, error)
 		DeleteBatch(ids string) error
 		CheckDuplicate(fieldname string) (ActivityOrderss, error)
 	}
@@ -71,6 +73,23 @@ func (m *defaultActivityOrderssModel) FindOne(id int64) (*ActivityOrderss, error
 	err := m.QueryRow(&resp, activityOrderssIdKey, func(conn sqlx.SqlConn, v interface{}) error {
 		query := fmt.Sprintf("select %s from %s where `id` = ? limit 1", activityOrderssRows, m.table)
 		return conn.QueryRow(v, query, id)
+	})
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, model.ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *defaultActivityOrderssModel) FindOneOrder(id int64, memberId int64) (*ActivityOrderss, error) {
+	activityOrderssIdKey := fmt.Sprintf("%s%v", cacheActivityOrderssIdPrefix, id)
+	var resp ActivityOrderss
+	err := m.QueryRow(&resp, activityOrderssIdKey, func(conn sqlx.SqlConn, v interface{}) error {
+		query := fmt.Sprintf("select %s from %s where (`id` = ? and `member_id` = ?) limit 1", activityOrderssRows, m.table)
+		return conn.QueryRow(v, query, id, memberId)
 	})
 	switch err {
 	case nil:
@@ -137,6 +156,46 @@ func (m *defaultActivityOrderssModel) List(req utils.ListReq) ([]*ActivityOrders
 
 	return items, total, nil
 }
+
+func (m *defaultActivityOrderssModel) ListMy(req utils.ListReq, memberId int64) ([]*ActivityOrderss, int, error) {
+	total := 0
+
+	// 条件处理
+	whereCondition := "where " + softDeleteFlag
+	whereCondition += fmt.Sprintf(" and `member_id`=%v ", memberId)
+	//if req.Keyword != "" {
+	//	whereCondition += "and `name` like '%" + req.Keyword + "%'"
+	//}
+
+	orderBy := "order by id desc"
+	items := make([]*ActivityOrderss, 0)
+	query := fmt.Sprintf("SELECT %s FROM %s %s %s LIMIT ? OFFSET ?", activityOrderssRows, m.table, whereCondition, orderBy)
+	queryCount := fmt.Sprintf("SELECT count(1) FROM %s %s", m.table, whereCondition)
+	err := m.CachedConn.QueryRowNoCache(&total, queryCount)
+
+	// 查询错误
+	if err != nil {
+		return items, total, err
+	}
+
+	// 没有记录
+	if total == 0 {
+		return items, total, nil
+	}
+
+	//获取记录
+	err = m.CachedConn.QueryRowsNoCache(&items, query, req.PageSize, req.PageSize*(req.Page-1))
+	if err != nil {
+		logx.Errorf("usersSex.findOne error, sex=%d, err=%s", req.Page, err.Error())
+		if err == sqlx.ErrNotFound {
+			return nil, total, model.ErrNotFound
+		}
+		return nil, total, err
+	}
+
+	return items, total, nil
+}
+
 func (m *defaultActivityOrderssModel) DeleteBatch(ids string) error {
 	query := fmt.Sprintf("update %s set `deleted_at`=? where `id` in (%s)", m.table, ids)
 	_, err := m.ExecNoCache(query, time.Now().Format("2006-01-02 15:04:05"))

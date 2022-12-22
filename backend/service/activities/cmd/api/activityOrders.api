@@ -64,3 +64,25 @@ service activity-api {
 	@handler ActivityOrdersUpdate
 	put /activityOrders/update (ActivityOrdersPostReq) returns (ActivityOrdersReply)
 }
+
+@server(
+	group: activityOrders
+	jwt: Auth
+)
+service activity-api {
+	//	活动预约
+	@handler AddOrder
+	post /activityOrders/addOrder(ActivityOrdersPostReq) returns (ActivityOrdersReply)
+
+	//	我参加活动预约列表
+	@handler MyOrderActivityList
+	post /activityOrders/myList(ActivityOrdersListReq) returns (ActivityOrdersReply)
+
+	//	活动预约详情
+	@handler MyOrderDetail
+	post /activityOrders/myDetail(ActivityOrdersDelReq) returns (ActivityOrdersReply)
+
+	// 更新:取消或提前离开
+	@handler OrdersUpdate
+	put /activityOrders/ordersUpdate (ActivityOrdersPostReq) returns (ActivityOrdersReply)
+}

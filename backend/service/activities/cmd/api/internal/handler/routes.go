@@ -104,4 +104,30 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/activityOrders/addOrder",
+				Handler: activityOrders.AddOrderHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/activityOrders/myList",
+				Handler: activityOrders.MyOrderActivityListHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/activityOrders/myDetail",
+				Handler: activityOrders.MyOrderDetailHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/activityOrders/ordersUpdate",
+				Handler: activityOrders.OrdersUpdateHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+	)
 }

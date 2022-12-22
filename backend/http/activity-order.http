@@ -1,0 +1,41 @@
+### 我参加活动预约列表
+POST http://127.0.0.1:8893/activityOrders/myList
+Content-Type: application/json
+authorization: {{authorization}}
+
+{
+    "page": 1,
+    "pageSize": 10
+}
+
+### 活动预约详情
+POST http://127.0.0.1:8893/activityOrders/myDetail
+Content-Type: application/json
+authorization: {{authorization}}
+
+{
+  "id": 6
+}
+
+
+### 活动预约
+POST http://127.0.0.1:8893/activityOrders/addOrder
+Content-Type: application/json
+authorization: {{authorization}}
+
+{
+  "activity_id": 2,
+  "seat_number": 21
+}
+
+### 更新:取消或提前离开
+PUT http://127.0.0.1:8893/activityOrders/ordersUpdate
+Content-Type: application/json
+authorization: {{authorization}}
+
+{
+  "id": 6,
+  "activity_id": 1,
+  "seat_number": 111,
+  "status": 9
+}

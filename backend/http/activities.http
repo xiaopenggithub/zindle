@@ -2,7 +2,7 @@
 #POST http://127.0.0.1:8892/reader/list
 POST http://127.0.0.1:8893/activity/list
 Content-Type: application/json
-authorization: {{Authorization}}
+authorization: {{authorization}}
 #authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjExMzMzODAsImlhdCI6MTY2MTA2MTM4MCwicm9sZUlkIjo3LCJ1c2VySWQiOjF9.hZ3wodXKnbTzSsH0m_64ufStZHE6dbb_acUom2Xwjio
 
 {
