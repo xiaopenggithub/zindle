@@ -1,0 +1,8 @@
+### login
+POST http://127.0.0.1:8888/admin/adminLogin
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "123456"
+}

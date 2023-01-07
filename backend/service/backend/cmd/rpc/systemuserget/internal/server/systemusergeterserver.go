@@ -13,6 +13,7 @@ import (
 
 type SystemusergeterServer struct {
 	svcCtx *svc.ServiceContext
+	systemuserget.UnimplementedSystemusergeterServer
 }
 
 func NewSystemusergeterServer(svcCtx *svc.ServiceContext) *SystemusergeterServer {

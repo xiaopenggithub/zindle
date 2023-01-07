@@ -43,13 +43,13 @@ func (l *GetUserInfoLogic) GetUserInfo() (*types.AdminReply, error) {
 	}
 	fmt.Println("systemuserResp.NickName-------<<<<")
 	fmt.Println(systemuserResp.NickName)
-	fmt.Println(systemuserResp.Avatar)
-	fmt.Printf("\n========%v<<<<<<<\n", systemuserResp.Avatar)
+	//fmt.Println(systemuserResp.Avatar)
+	//fmt.Printf("\n========%v<<<<<<<\n", systemuserResp.Avatar)
 	fmt.Println("systemuserResp.NickName-------<<<<")
 	//通过rpc获取nickname
 	user := make(map[string]interface{})
 	user["nickName"] = "--nickName--" //systemuserResp.NickName
-	user["headerImg"] = "/uploads/" + systemuserResp.Avatar
+	//user["headerImg"] = "/uploads/" + systemuserResp.Avatar
 	authority := make(map[string]interface{})
 	// menurouter-name
 	authority["defaultRouter"] = "dashboard"

@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package systemuserget;
+option go_package="./systemuserget";
 
 message Request {
   int64 id = 1;

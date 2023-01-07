@@ -28,13 +28,10 @@ func (l *GetSystemuserLogic) GetSystemuser(in *systemuserget.Request) (*systemus
 	fmt.Println("GetSystemuser-Id:", in.Id)
 	one, err := l.svcCtx.SystemUserModel.FindOne(in.Id)
 	if err != nil {
-		fmt.Println("-------------err--------rpc----GetSystemuser------")
 		return nil, err
 	}
-	fmt.Println("GetSystemuser-nickname:", one.NickName)
 
 	return &systemuserget.Response{
-		NickName: one.Avatar,
-		Avatar:   one.Avatar,
+		NickName: one.NickName,
 	}, nil
 }
