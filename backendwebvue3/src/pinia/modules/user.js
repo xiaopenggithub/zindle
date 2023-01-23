@@ -1,4 +1,5 @@
 import { login, logout, getUserInfo, setSelfInfo } from '@/api/user'
+import { jsonInBlacklist } from '@/api/jwt'
 import router from '@/router/index'
 import { ElLoading, ElMessage } from 'element-plus'
 import { defineStore } from 'pinia'
@@ -53,8 +54,7 @@ export const useUserStore = defineStore('user', () => {
   }
   /* 获取用户信息*/
   const GetUserInfo = async() => {
-    const result = await getUserInfo()
-    let res=result.data    
+    const res = await getUserInfo()
     if (res.code === 200) {
       setUserInfo(res.data)
     }
@@ -64,12 +64,14 @@ export const useUserStore = defineStore('user', () => {
   const LoginIn = async(loginInfo) => {
     loadingInstance.value = ElLoading.service({
       fullscreen: true,
-      text: '登陆中，请稍候...',
+      text: '登录中，请稍候...',
     })
     try {
-      const result = await login(loginInfo)
-      let res=result.data
-      if (res.code === 200) {
+      const res = await login(loginInfo)
+      if (res.code === 200) {        
+        console.log('----userinfo----')
+        console.log(res.data.user)
+        console.log('----userinfo----')
         setUserInfo(res.data.user)
         setToken(res.data.token)
         const routerStore = useRouterStore()
@@ -77,8 +79,10 @@ export const useUserStore = defineStore('user', () => {
         const asyncRouters = routerStore.asyncRouters
         asyncRouters.forEach(asyncRouter => {
           router.addRoute(asyncRouter)
-        })
-        router.push({ name: userInfo.value.authority.defaultRouter })
+        })        
+        console.log('userInfo.value.authority.defaultRouter:'+userInfo.value.authority.defaultRouter)
+        await router.push({ name: userInfo.value.authority.defaultRouter })
+        loadingInstance.value.close()
         return true
       }
     } catch (e) {
@@ -88,8 +92,7 @@ export const useUserStore = defineStore('user', () => {
   }
   /* 登出*/
   const LoginOut = async() => {
-    const result = await logout()
-    let res=result.data
+    const res = await logout()        
     if (res.code === 200) {
       token.value = ''
       sessionStorage.clear()
@@ -97,6 +100,12 @@ export const useUserStore = defineStore('user', () => {
       router.push({ name: 'Login', replace: true })
       window.location.reload()
     }
+  }
+  /* 清理数据 */
+  const ClearStorage = async() => {
+    token.value = ''
+    sessionStorage.clear()
+    localStorage.clear()
   }
   /* 设置侧边栏模式*/
   const changeSideMode = async(data) => {
@@ -136,7 +145,7 @@ export const useUserStore = defineStore('user', () => {
     return userInfo.activeColor
   })
 
-  watch(token, () => {
+  watch(() => token.value, () => {
     window.localStorage.setItem('token', token.value)
   })
 
@@ -157,6 +166,7 @@ export const useUserStore = defineStore('user', () => {
     setToken,
     baseColor,
     activeColor,
-    loadingInstance
+    loadingInstance,
+    ClearStorage
   }
 })

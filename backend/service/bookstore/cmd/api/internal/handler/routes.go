@@ -13,8 +13,8 @@ import (
 	"github.com/zeromicro/go-zero/rest"
 )
 
-func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
-	engine.AddRoutes(
+func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
+	server.AddRoutes(
 		rest.WithMiddlewares(
 			[]rest.Middleware{serverCtx.CheckLogin},
 			[]rest.Route{
@@ -53,7 +53,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 	)
 
-	engine.AddRoutes(
+	server.AddRoutes(
 		[]rest.Route{
 			{
 				Method:  http.MethodPost,
@@ -73,7 +73,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 		},
 	)
 
-	engine.AddRoutes(
+	server.AddRoutes(
 		rest.WithMiddlewares(
 			[]rest.Middleware{serverCtx.CheckLogin},
 			[]rest.Route{
@@ -112,7 +112,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 	)
 
-	engine.AddRoutes(
+	server.AddRoutes(
 		[]rest.Route{
 			{
 				Method:  http.MethodPut,
@@ -143,7 +143,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 	)
 
-	engine.AddRoutes(
+	server.AddRoutes(
 		[]rest.Route{
 			{
 				Method:  http.MethodPut,
@@ -154,7 +154,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 	)
 
-	engine.AddRoutes(
+	server.AddRoutes(
 		[]rest.Route{
 			{
 				Method:  http.MethodPost,
@@ -179,7 +179,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 		},
 	)
 
-	engine.AddRoutes(
+	server.AddRoutes(
 		rest.WithMiddlewares(
 			[]rest.Middleware{serverCtx.CheckLogin},
 			[]rest.Route{
@@ -218,7 +218,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 	)
 
-	engine.AddRoutes(
+	server.AddRoutes(
 		rest.WithMiddlewares(
 			[]rest.Middleware{serverCtx.CheckLogin},
 			[]rest.Route{

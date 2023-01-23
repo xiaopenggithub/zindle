@@ -1,14 +1,14 @@
 <template>
   <div id="userLayout">
-    <div class="login_panle">
-      <div class="login_panle_form">
-        <div class="login_panle_form_title">
+    <div class="login_panel">
+      <div class="login_panel_form">
+        <div class="login_panel_form_title">
           <img
-            class="login_panle_form_title_logo"
-            :src="$GIN_VUE_ADMIN.appLogo"
+            class="login_panel_form_title_logo"
+            src="~@/assets/nav_logo.png"
             alt
           >
-          <p class="login_panle_form_title_p">{{ $GIN_VUE_ADMIN.appName }}</p>
+          <p class="login_panel_form_title_p">{{ $GIN_VUE_ADMIN.appName }}</p>
         </div>
         <div style="padding-left: 92%; padding-bottom: 20px;">
           <el-dropdown trigger="click" @command="handleSetLanguage">
@@ -28,6 +28,7 @@
           ref="loginForm"
           :model="loginFormData"
           :rules="rules"
+          :validate-on-rule-change="false"
           @keyup.enter="submitForm"
         >
           <el-form-item prop="username">
@@ -62,31 +63,7 @@
               </template>
             </el-input>
           </el-form-item>
-          <!--
-          <el-form-item style="position: relative" prop="captcha">
-            <el-input
-              v-model="loginFormData.captcha"
-              :placeholder="t('login.entVerificationCode')"
-              style="width: 60%"
-            />
-            <div class="vPic">
-              <img
-                v-if="picPath"
-                :src="picPath"
-                :alt="t('login.entVerificationCode')"
-                @click="loginVerify()"
-              >
-            </div>
-          </el-form-item>
-          -->
           <el-form-item>
-            <!--
-            <el-button
-              type="primary"
-              style="width: 46%"
-              @click="checkInit"
-            >{{ t('login.init') }}</el-button>
-            -->
             <el-button
               type="primary"
               style="width: 46%; margin-left: 8%"
@@ -95,45 +72,12 @@
           </el-form-item>
         </el-form>
       </div>
-      <div class="login_panle_right" />
-      <!--
-      <div class="login_panle_foot">
-        <div class="links">
-          <a href="http://doc.henrongyi.top/" target="_blank">
-            <img src="@/assets/docs.png" class="link-icon">
-          </a>
-          <a href="https://support.qq.com/product/371961" target="_blank">
-            <img src="@/assets/kefu.png" class="link-icon">
-          </a>
-          <a
-            href="https://github.com/flipped-aurora/gin-vue-admin"
-            target="_blank"
-          >
-            <img src="@/assets/github.png" class="link-icon">
-          </a>
-          <a href="https://space.bilibili.com/322210472" target="_blank">
-            <img src="@/assets/video.png" class="link-icon">
-          </a>
-        </div>
-        <div class="copyright">
-          <bootomInfo />
-        </div>
-      </div>
-      -->
+      <div class="login_panel_right" />
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Login',
-}
-</script>
-
 <script setup>
-import { captcha } from '@/api/user'
-import { checkDB } from '@/api/initdb'
-import bootomInfo from '@/view/layout/bottomInfo/bottomInfo.vue'
 import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -162,16 +106,6 @@ const checkPassword = (rule, value, callback) => {
   }
 }
 
-// 获取验证码
-const loginVerify = () => {
-  captcha({}).then((ele) => {
-    rules.captcha[1].max = ele.data.captchaLength
-    rules.captcha[1].min = ele.data.captchaLength
-    picPath.value = ele.data.picPath
-    loginFormData.captchaId = ele.data.captchaId
-  })
-}
-
 const getLanguage = () => {
   var lang = Cookies.get('language')
   return (lang || 'en')
@@ -179,7 +113,7 @@ const getLanguage = () => {
 
 getLanguage()
 
-// loginVerify()
+
 
 // 登录相关操作
 const lock = ref('lock')
@@ -193,15 +127,14 @@ const picPath = ref('')
 const loginFormData = reactive({
   username: 'admin',
   password: '123456',
-  // captcha: '',
-  // captchaId: '',
+  captcha: '',
+  captchaId: '',
 })
 
 const rules = reactive({
   username: [{ validator: checkUsername, trigger: 'blur' }],
   password: [{ validator: checkPassword, trigger: 'blur' }],
   captcha: [
-    { required: true, message: t('login.entVerificationCode'), trigger: 'blur' },
     {
       message: t('login.errVerificationCode'),
       trigger: 'blur',
@@ -220,7 +153,7 @@ const submitForm = () => {
     if (v) {
       const flag = await login()
       if (!flag) {
-        //loginVerify()
+        
       }
     } else {
       ElMessage({
@@ -228,64 +161,22 @@ const submitForm = () => {
         message: t('login.errLogin'),
         showClose: true,
       })
-      loginVerify()
       return false
     }
   })
 }
 
-// 跳转初始化
-const checkInit = async() => {
-  const res = await checkDB()
-  if (res.code === 0) {
-    if (res.data?.needInit) {
-      userStore.NeedInit()
-      router.push({ name: 'Init' })
-    } else {
-      ElMessage({
-        type: 'info',
-        message: t('login.errInit'),
-      })
-    }
-  }
-}
-
 const handleSetLanguage = (lang) => {
-  // console.log('handleSetLanguage() called with value: ' + lang)
   i18n.locale.value = lang
 
   userStore.setLanguage(lang)
 
-  // console.log('userStore handleSetLanguage() called with value: ' + userStore.getLanguage())
-
   Cookies.set('language', lang)
-
-  // if (lang === 'ar') {
-  //   console.log('Arabic language selected changing to RTL')
-  //   document.querySelector('html').classList.add('is-rtl')
-  // } else {
-  //   console.log('Non Arabic language selected changing to LTR')
-  //   document.querySelector('html').classList.add('is-ltr')
-  // }
-
-  // const htmlEl = document.querySelector('html')
-
-  // if (this.$i18n.locale === 'ar') {
-  //   console.log('change language to arabic and ltr to rtl')
-  //   htmlEl.setAttribute('dir', 'rtl')
-  // } else {
-  //   console.log('change language to english and rtl to ltr')
-  //   htmlEl.setAttribute('dir', 'ltr')
-  // }
-
-  // htmlEl.setAttribute('lang', lang)
 
   ElMessage({
     message: t('general.langSwitch'),
     type: 'success'
   })
-
-  // this.$emit('handerevent')
 }
 </script>
 

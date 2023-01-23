@@ -1,5 +1,6 @@
 <template>
   <div>
+    <warning-bar href="https://www.bilibili.com/video/BV1kv4y1g7nT?p=3" title="此功能为开发环境使用，不建议发布到生产，具体使用效果请看视频https://www.bilibili.com/video/BV1kv4y1g7nT?p=3" />
     <!-- 从数据库直接获取字段 -->
     <div class="gva-search-box">
       <el-collapse v-model="activeNames" style="margin-bottom:12px">
@@ -13,8 +14,29 @@
             </div>
           </template>
           <el-form ref="getTableForm" style="margin-top:24px" :inline="true" :model="dbform" label-width="120px">
+            <el-form-item label="业务库" prop="selectDBtype">
+              <template #label>
+                <el-tooltip content="注：需要提前到db-list自行配置多数据库，如未配置需配置后重启服务方可使用。（此处可选择对应库表，可理解为从哪个库选择表）" placement="bottom" effect="light">
+                  <div> 业务库 <el-icon><QuestionFilled /></el-icon> </div>
+                </el-tooltip>
+              </template>
+              <el-select v-model="dbform.businessDB" clearable style="width:194px" placeholder="选择业务库" @change="getDbFunc">
+                <el-option
+                  v-for="item in dbList"
+                  :key="item.aliasName"
+                  :value="item.aliasName"
+                  :label="item.aliasName"
+                  :disabled="item.disable"
+                >
+                  <div>
+                    <span>{{ item.aliasName }}</span>
+                    <span style="float:right;color:#8492a6;font-size:13px">{{ item.dbName }}</span>
+                  </div>
+                </el-option>
+              </el-select>
+            </el-form-item>
             <el-form-item :label="t('autoCode.dbName')" prop="structName">
-              <el-select v-model="dbform.dbName" filterable :placeholder="t('autoCode.selectDB')" @change="getTableFunc">
+              <el-select v-model="dbform.dbName" clearable filterable :placeholder="t('autoCode.selectDB')" @change="getTableFunc">
                 <el-option
                   v-for="item in dbOptions"
                   :key="item.database"
@@ -47,7 +69,7 @@
     </div>
     <div class="gva-search-box">
       <!-- 初始版本自动化代码工具 -->
-      <el-form ref="autoCodeForm" :rules="rules" :model="form" label-width="180px" :inline="true">
+      <el-form ref="autoCodeForm" :rules="rules" :model="form" label-width="120px" :inline="true">
         <el-form-item :label="t('autoCode.structName')" prop="structName">
           <el-input v-model="form.structName" :placeholder="t('autoCode.structNameNote')" />
         </el-form-item>
@@ -63,12 +85,45 @@
         <el-form-item :label="t('autoCode.fileName')" prop="packageName">
           <el-input v-model="form.packageName" :placeholder="t('autoCode.fileNameNote')" @blur="toLowerCaseFunc(form,'packageName')" />
         </el-form-item>
-        <el-form-item label="Package（包）" prop="packageName">
+        <el-form-item label="Package（包）" prop="package">
           <el-select v-model="form.package" style="width:194px">
             <el-option v-for="item in pkgs" :key="item.ID" :value="item.packageName" :label="item.packageName" />
           </el-select>
           <el-icon class="auto-icon" @click="getPkgs"><refresh /></el-icon>
           <el-icon class="auto-icon" @click="goPkgs"><document-add /></el-icon>
+        </el-form-item>
+        <el-form-item label="业务库" prop="businessDB">
+          <template #label>
+            <el-tooltip content="注：需要提前到db-list自行配置多数据库，此项为空则会使用gva本库创建自动化代码(global.GVA_DB),填写后则会创建指定库的代码(global.MustGetGlobalDBByDBName(dbname))" placement="bottom" effect="light">
+              <div> 业务库 <el-icon><QuestionFilled /></el-icon> </div>
+            </el-tooltip>
+          </template>
+          <el-select
+            v-model="form.businessDB"
+            style="width:194px"
+            placeholder="选择业务库"
+          >
+            <el-option
+              v-for="item in dbList"
+              :key="item.aliasName"
+              :value="item.aliasName"
+              :label="item.aliasName"
+              :disabled="item.disable"
+            >
+              <div>
+                <span>{{ item.aliasName }}</span>
+                <span style="float:right;color:#8492a6;font-size:13px">{{ item.dbName }}</span>
+              </div>
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <template #label>
+            <el-tooltip content="注：会自动在结构体添加 created_by updated_by deleted_by，方便用户进行资源权限控制" placement="bottom" effect="light">
+              <div> 创建资源标识 <el-icon><QuestionFilled /></el-icon> </div>
+            </el-tooltip>
+          </template>
+          <el-checkbox v-model="form.autoCreateResource" />
         </el-form-item>
         <el-form-item>
           <template #label>
@@ -94,44 +149,53 @@
         <el-button size="mini" type="primary" @click="editAndAddField()">{{ t('autoCode.addField') }}</el-button>
       </div>
       <el-table :data="form.fields">
-        <el-table-column align="left" type="index" :label="t('autoCode.fieldIndex')" width="100" />
-        <el-table-column align="left" prop="fieldName" :label="t('autoCode.fieldName')" width="120" />
-        <el-table-column align="left" prop="fieldDesc" :label="t('autoCode.fieldDesc')" width="120" />
-        <el-table-column align="left" prop="fieldJson" :label="t('autoCode.fieldJson')" width="110" />
+        <el-table-column align="left" type="index" :label="t('autoCode.fieldIndex')" width="60" />
+        <el-table-column align="left" prop="fieldName" :label="t('autoCode.fieldName')" />
+        <el-table-column align="left" prop="fieldDesc" :label="t('autoCode.fieldDesc')" />
+        <el-table-column align="left" prop="require" label="是否必填">
+          <template #default="{row}">{{ row.require?"是":"否" }}</template>
+        </el-table-column>
+        <el-table-column align="left" prop="sort" label="是否排序">
+          <template #default="{row}">{{ row.sort?"是":"否" }}</template>
+        </el-table-column>
+        <el-table-column align="left" prop="fieldJson" min-width="120px" label="FieldJson" />
         <el-table-column align="left" prop="fieldType" :label="t('autoCode.fieldDataType')" width="130" />
         <el-table-column align="left" prop="dataTypeLong" :label="t('autoCode.fieldLen')" width="130" />
         <el-table-column align="left" prop="columnName" :label="t('autoCode.columnName')" width="130" />
         <el-table-column align="left" prop="comment" :label="t('autoCode.comment')" width="130" />
         <el-table-column align="left" prop="fieldSearchType" :label="t('general.searchCriteria')" width="130" />
         <el-table-column align="left" prop="dictType" :label="t('autoCode.dictionary')" width="130" />
-        <el-table-column align="left" :lable="t('general.operations')" width="300">
+        <el-table-column align="left" :lable="t('general.operations')" width="300" fixed="right">
           <template #default="scope">
             <el-button
-              size="mini"
-              type="text"
+              size="small"
+              type="primary"
+              link
               icon="edit"
               @click="editAndAddField(scope.row)"
             >{{ t('general.edit') }}</el-button>
             <el-button
-              size="mini"
-              type="text"
+              size="small"
+              type="primary"
+              link
               :disabled="scope.$index === 0"
               @click="moveUpField(scope.$index)"
             >{{ t('autoCode.moveUp') }}</el-button>
             <el-button
-              size="mini"
-              type="text"
+              size="small"
+              type="primary"
+              link
               :disabled="(scope.$index + 1) === form.fields.length"
               @click="moveDownField(scope.$index)"
             >{{ t('autoCode.moveDown') }}</el-button>
-            <el-popover :visible="scope.row.visible" placement="top">
+            <el-popover v-model="scope.row.visible" placement="top">
               <p>{{ t('autoCode.confirmDelete') }}</p>
               <div style="text-align: right; margin-top: 8px;">
-                <el-button size="mini" type="text" @click="scope.row.visible = false">{{ t('general.cancel') }}</el-button>
-                <el-button type="primary" size="mini" @click="deleteField(scope.$index)">{{ t('general.confirm') }}</el-button>
+                <el-button size="small" type="primary" link @click="scope.row.visible = false">{{ t('general.cancel') }}</el-button>
+                <el-button type="primary" size="small" @click="deleteField(scope.$index)">{{ t('general.confirm') }}</el-button>
               </div>
               <template #reference>
-                <el-button size="mini" type="text" icon="delete">{{ t('general.delete') }}</el-button>
+                <el-button size="small" type="primary" link icon="delete" @click="scope.row.visible = true">{{ t('general.delete') }}</el-button>
               </template>
             </el-popover>
           </template>
@@ -144,7 +208,7 @@
       </div>
     </div>
     <!-- 组件弹窗 -->
-    <el-dialog v-model="dialogFlag" :title="t('autoCode.componentContent')">
+    <el-dialog v-model="dialogFlag" width="70%" :title="t('autoCode.componentContent')">
       <FieldDialog v-if="dialogFlag" ref="fieldDialogNode" :dialog-middle="dialogMiddle" />
       <template #footer>
         <div class="dialog-footer">
@@ -155,7 +219,7 @@
     </el-dialog>
 
     <el-dialog v-model="previewFlag">
-      <template #title>
+      <template #header>
         <div class="previewCodeTool">
           <p>{{ t('autoCode.actionBar') }}</p>
           <el-button size="mini" type="primary" @click="selectText">{{ t('general.selectAll') }}</el-button>
@@ -185,9 +249,10 @@ import PreviewCodeDialog from '@/view/systemTools/autoCode/component/previewCode
 import { toUpperCase, toHump, toSQLLine, toLowerCase } from '@/utils/stringFun'
 import { createTemp, getDB, getTable, getColumn, preview, getMeta, getPackageApi } from '@/api/autoCode'
 import { getDict } from '@/utils/dictionary'
-import { ref, getCurrentInstance, reactive } from 'vue'
+import { ref, getCurrentInstance, reactive, watch, toRaw } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import WarningBar from '@/components/warningBar/warningBar.vue'
 import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
 
 const { t } = useI18n() // added by mohamed hassan to support multilanguage
@@ -201,19 +266,22 @@ const fieldTemplate = {
   columnName: '',
   dataTypeLong: '',
   comment: '',
+  require: false,
+  sort: false,
+  errorText: '',
+  clearable: true,
   fieldSearchType: '',
   dictType: ''
 }
-
 const route = useRoute()
 const router = useRouter()
 const activeNames = reactive([])
 const preViewCode = ref({})
 const dbform = ref({
+  businessDB: '',
   dbName: '',
   tableName: ''
 })
-const dbOptions = ref([])
 const tableOptions = ref([])
 const addFlag = ref('')
 const fdMap = ref({})
@@ -224,8 +292,10 @@ const form = ref({
   package: '',
   abbreviation: '',
   description: '',
-  autoCreateApiToSql: false,
-  autoMoveFile: false,
+  businessDB: '',
+  autoCreateApiToSql: true,
+  autoMoveFile: true,
+  autoCreateResource: false,
   fields: []
 })
 const rules = ref({
@@ -410,23 +480,39 @@ const enterForm = async(isPreview) => {
     }
   })
 }
+
+const dbList = ref([])
+const dbOptions = ref([])
+
 const getDbFunc = async() => {
-  const res = await getDB()
+  dbform.value.dbName = ''
+  dbform.value.tableName = ''
+  const res = await getDB({ businessDB: dbform.value.businessDB })
   if (res.code === 0) {
     dbOptions.value = res.data.dbs
+    dbList.value = res.data.dbList
   }
 }
 const getTableFunc = async() => {
-  const res = await getTable({ dbName: dbform.value.dbName })
+  const res = await getTable({ businessDB: dbform.value.businessDB, dbName: dbform.value.dbName })
   if (res.code === 0) {
     tableOptions.value = res.data.tables
   }
   dbform.value.tableName = ''
 }
+
 const getColumnFunc = async() => {
   const gormModelList = ['id', 'created_at', 'updated_at', 'deleted_at']
   const res = await getColumn(dbform.value)
   if (res.code === 0) {
+    let dbtype = ''
+    if (dbform.value.businessDB !== '') {
+      const dbtmp = dbList.value.find(item => item.aliasName === dbform.value.businessDB)
+      console.log(dbtmp)
+      const dbraw = toRaw(dbtmp)
+      console.log(dbraw)
+      dbtype = dbraw.dbtype
+    }
     const tbHump = toHump(dbform.value.tableName)
     form.value.structName = toUpperCase(tbHump)
     form.value.tableName = dbform.value.tableName
@@ -434,6 +520,7 @@ const getColumnFunc = async() => {
     form.value.abbreviation = tbHump
     form.value.description = tbHump + t('autoCode.table')
     form.value.autoCreateApiToSql = true
+    form.value.autoMoveFile = true
     form.value.fields = []
     res.data.columns &&
           res.data.columns.forEach(item => {
@@ -446,8 +533,11 @@ const getColumnFunc = async() => {
                 dataType: item.dataType,
                 fieldJson: fbHump,
                 dataTypeLong: item.dataTypeLong && item.dataTypeLong.split(',')[0],
-                columnName: item.columnName,
+                columnName: dbtype === 'oracle' ? item.columnName.toUpperCase() : item.columnName,
                 comment: item.columnComment,
+                require: false,
+                errorText: '',
+                clearable: true,
                 fieldSearchType: '',
                 dictType: ''
               })
@@ -494,6 +584,12 @@ const init = () => {
 }
 init()
 
+watch(() => route.params.id, (id) => {
+  if (route.name === 'autoCodeEdit') {
+    init()
+  }
+})
+
 </script>
 
 <style scoped lang="scss">
@@ -517,4 +613,5 @@ init()
   color: #666;
   cursor: pointer;
 }
+
 </style>

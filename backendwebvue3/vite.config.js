@@ -8,6 +8,8 @@ import * as fs from 'fs'
 import vuePlugin from '@vitejs/plugin-vue'
 import vueI18n from '@intlify/vite-plugin-vue-i18n' // added by mohamed hassan to support multilanguage
 
+import GvaPosition from './vitePlugin/gvaPosition'
+import GvaPositionServer from './vitePlugin/codeServer'
 // @see https://cn.vitejs.dev/config/
 export default ({
   command,
@@ -28,13 +30,13 @@ export default ({
 
   const timestamp = Date.parse(new Date())
 
-  const rollupOptions = {
-    output: {
-      entryFileNames: `gva/gin-vue-admin-[name].${timestamp}.js`,
-      chunkFileNames: `js/gin-vue-admin-[name].${timestamp}.js`,
-      assetFileNames: `assets/gin-vue-admin-[name].${timestamp}.[ext]`
-    }
-  }
+  // const rollupOptions = {
+  //   output: {
+  //     entryFileNames: `gva/gin-vue-admin-[name].${timestamp}.js`,
+  //     chunkFileNames: `js/gin-vue-admin-[name].${timestamp}.js`,
+  //     assetFileNames: `assets/gin-vue-admin-[name].${timestamp}.[ext]`
+  //   }
+  // }
 
   const optimizeDeps = {}
 
@@ -69,12 +71,12 @@ export default ({
       },
     },
     build: {
-      target: 'es2015',
+      target: 'es2017',
       minify: 'terser', // 是否进行压缩,boolean | 'terser' | 'esbuild',默认使用terser
-      manifest: false, // 是否产出maifest.json
-      sourcemap: false, // 是否产出soucemap.json
+      manifest: false, // 是否产出manifest.json
+      sourcemap: false, // 是否产出sourcemap.json
       outDir: 'dist', // 产出目录
-      rollupOptions,
+      // rollupOptions,
     },
     esbuild,
     optimizeDeps,
@@ -84,6 +86,8 @@ export default ({
         include: path.resolve(__dirname, './src/locales/**'),
         compositionOnly: true
       }), // end of adding by mohamed hassan to support multilangauge
+      GvaPositionServer(),
+      GvaPosition(),
       legacyPlugin({
         targets: ['Android > 39', 'Chrome >= 60', 'Safari >= 10.1', 'iOS >= 10.3', 'Firefox >= 54', 'Edge >= 15'],
       }), vuePlugin(), [Banner(`\n Build based on gin-vue-admin \n Time : ${timestamp}`)]

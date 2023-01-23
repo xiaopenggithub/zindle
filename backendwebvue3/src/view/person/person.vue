@@ -10,7 +10,7 @@
                 'background-image': `url(${
                   userStore.userInfo.headerImg &&
                   userStore.userInfo.headerImg.slice(0, 4) !== 'http'
-                    ? userStore.userInfo.headerImg
+                    ? path + userStore.userInfo.headerImg
                     : userStore.userInfo.headerImg
                 })`,
                 'background-repeat': 'no-repeat',
@@ -21,28 +21,12 @@
                 <el-icon>
                   <edit />
                 </el-icon>
-                重新上传</span
-              >
+                重新上传</span>
             </div>
-
-            <div
-              class="user-headpic-update"
-              :style="{
-                'background-image': `url(${userStore.userInfo.headerImg})`,
-                'background-repeat': 'no-repeat',
-                'background-size': 'cover',
-              }"
-            >
-              <span class="update" @click="openChangeAvatarDialog()">
-                <i class="el-icon-edit"></i>
-                重新上传</span
-              >
-            </div>
-
             <div class="user-personality">
               <p v-if="!editFlag" class="nickName">
                 {{ userStore.userInfo.nickName }}
-                <el-icon class="pointer" color="#66b1ff" @click="openEidt">
+                <el-icon class="pointer" color="#66b1ff" @click="openEdit">
                   <edit />
                 </el-icon>
               </p>
@@ -68,21 +52,21 @@
                 <el-tooltip
                   class="item"
                   effect="light"
-                  content="北京反转极光科技有限公司-技术部-前端事业群"
+                  content="上海网络科技有限公司-研发部"
                   placement="top"
                 >
                   <li>
                     <el-icon>
                       <data-analysis />
                     </el-icon>
-                    北京反转极光科技有限公司-技术部-前端事业群
+                    上海网络科技有限公司-研发部
                   </li>
                 </el-tooltip>
                 <li>
                   <el-icon>
                     <video-camera />
                   </el-icon>
-                  中国·北京市·朝阳区
+                  中国·上海市·徐汇区
                 </li>
                 <el-tooltip
                   class="item"
@@ -94,7 +78,7 @@
                     <el-icon>
                       <medal />
                     </el-icon>
-                    GoLang/JavaScript/Vue/Gorm
+                    PHP/Java/Vue/React
                   </li>
                 </el-tooltip>
               </ul>
@@ -111,18 +95,14 @@
                   <p class="title">密保手机</p>
                   <p class="desc">
                     已绑定手机:{{ userStore.userInfo.phone }}
-                    <a href="javascript:void(0)" @click="changePhoneFlag = true"
-                      >立即修改</a
-                    >
+                    <a href="javascript:void(0)" @click="changePhoneFlag = true">立即修改</a>
                   </p>
                 </li>
                 <li>
                   <p class="title">密保邮箱</p>
                   <p class="desc">
                     已绑定邮箱：{{ userStore.userInfo.email }}
-                    <a href="javascript:void(0)" @click="changeEmailFlag = true"
-                      >立即修改</a
-                    >
+                    <a href="javascript:void(0)" @click="changeEmailFlag = true">立即修改</a>
                   </p>
                 </li>
                 <li>
@@ -136,9 +116,10 @@
                   <p class="title">修改密码</p>
                   <p class="desc">
                     修改个人密码
-                    <a href="javascript:void(0)" @click="showPassword = true"
-                      >修改密码</a
-                    >
+                    <a
+                      href="javascript:void(0)"
+                      @click="showPassword = true"
+                    >修改密码</a>
                   </p>
                 </li>
               </ul>
@@ -162,11 +143,11 @@
         :rules="rules"
         label-width="80px"
       >
-        <el-form-item :minlength="6" label="原密码" prop="password">
-          <el-input v-model="pwdModify.password" show-password />
+        <el-form-item :minlength="6" label="原密码" prop="oldPassword">
+          <el-input v-model="pwdModify.oldPassword" show-password />
         </el-form-item>
-        <el-form-item :minlength="6" label="新密码" prop="newPassword">
-          <el-input v-model="pwdModify.newPassword" show-password />
+        <el-form-item :minlength="6" label="新密码" prop="password">
+          <el-input v-model="pwdModify.password" show-password />
         </el-form-item>
         <el-form-item :minlength="6" label="确认密码" prop="confirmPassword">
           <el-input v-model="pwdModify.confirmPassword" show-password />
@@ -174,12 +155,15 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button size="small" @click="showPassword = false">{{
-            t("general.close")
-          }}</el-button>
-          <el-button size="small" type="primary" @click="savePassword">{{
-            t("general.confirm")
-          }}</el-button>
+          <el-button
+            size="small"
+            @click="showPassword = false"
+          >{{ t('general.close') }}</el-button>
+          <el-button
+            size="small"
+            type="primary"
+            @click="savePassword"
+          >{{ t('general.confirm') }}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -187,38 +171,26 @@
     <el-dialog v-model="changePhoneFlag" title="绑定手机" width="600px">
       <el-form :model="phoneForm">
         <el-form-item label="手机号" label-width="120px">
-          <el-input
-            v-model="phoneForm.phone"
-            placeholder="请输入手机号"
-            autocomplete="off"
-          />
+          <el-input v-model="phoneForm.phone" placeholder="请输入手机号" autocomplete="off" />
         </el-form-item>
         <el-form-item label="验证码" label-width="120px">
           <div class="code-box">
-            <el-input
-              v-model="phoneForm.code"
-              autocomplete="off"
-              placeholder="请自行设计短信服务，此处为模拟随便写"
-              style="width: 300px"
-            />
-            <el-button
-              size="small"
-              type="primary"
-              :disabled="time > 0"
-              @click="getCode"
-              >{{ time > 0 ? `(${time}s)后重新获取` : "获取验证码" }}</el-button
-            >
+            <el-input v-model="phoneForm.code" autocomplete="off" placeholder="请自行设计短信服务，此处为模拟随便写" style="width:300px" />
+            <el-button size="small" type="primary" :disabled="time>0" @click="getCode">{{ time>0?`(${time}s)后重新获取`:'获取验证码' }}</el-button>
           </div>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button size="small" @click="closeChangePhone">{{
-            t("general.cancel")
-          }}</el-button>
-          <el-button type="primary" size="small" @click="changePhone"
-            >更改</el-button
-          >
+          <el-button
+            size="small"
+            @click="closeChangePhone"
+          >{{ t('general.cancel') }}</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click="changePhone"
+          >更改</el-button>
         </span>
       </template>
     </el-dialog>
@@ -226,384 +198,219 @@
     <el-dialog v-model="changeEmailFlag" title="绑定邮箱" width="600px">
       <el-form :model="emailForm">
         <el-form-item label="邮箱" label-width="120px">
-          <el-input
-            v-model="emailForm.email"
-            placeholder="请输入邮箱"
-            autocomplete="off"
-          />
+          <el-input v-model="emailForm.email" placeholder="请输入邮箱" autocomplete="off" />
         </el-form-item>
         <el-form-item label="验证码" label-width="120px">
           <div class="code-box">
-            <el-input
-              v-model="emailForm.code"
-              placeholder="请自行设计邮件服务，此处为模拟随便写"
-              autocomplete="off"
-              style="width: 300px"
-            />
-            <el-button
-              size="small"
-              type="primary"
-              :disabled="emailTime > 0"
-              @click="getEmailCode"
-              >{{
-                emailTime > 0 ? `(${emailTime}s)后重新获取` : "获取验证码"
-              }}</el-button
-            >
+            <el-input v-model="emailForm.code" placeholder="请自行设计邮件服务，此处为模拟随便写" autocomplete="off" style="width:300px" />
+            <el-button size="small" type="primary" :disabled="emailTime>0" @click="getEmailCode">{{ emailTime>0?`(${emailTime}s)后重新获取`:'获取验证码' }}</el-button>
           </div>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button size="small" @click="closeChangeEmail">{{
-            t("general.cancel")
-          }}</el-button>
-          <el-button type="primary" size="small" @click="changeEmail"
-            >更改</el-button
-          >
+          <el-button
+            size="small"
+            @click="closeChangeEmail"
+          >{{ t('general.cancel') }}</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            @click="changeEmail"
+          >更改</el-button>
         </span>
       </template>
-    </el-dialog>
-
-
-    <el-dialog
-      v-model="showUpdateAvatar"
-      @close="clearPassword"
-      title="修改头像"
-      width="360px"
-    >
-      <el-form
-        :model="pwdModify"
-        :rules="rules"
-        label-width="80px"
-        ref="modifyPwdForm"
-      >
-        <el-form-item :minlength="6" label="">
-          <el-upload
-            ref="upload_avatarUrl"
-            :action="`${path}/admin/changeAvatar`"
-            accept=".jpg,.jpeg,.png,.gif,.bmp,.pdf,.JPG,.JPEG,.PBG,.GIF,.BMP,.mp4,.MP4,.apk,.APk"
-            list-type="picture-card"
-            :class="{ imgHide: imgHideUpload }"
-            :headers="headers"
-            :limit="1"
-            :auto-upload="false"
-            :file-list="fileList_avatarUrl"
-            :on-exceed="handleExceed_avatarUrl"
-            :before-upload="handleBeforeUpload_avatarUrl"
-            :on-preview="handlePictureCardPreview_avatarUrl"
-            :on-success="handleSuccess_avatarUrl"
-            :on-remove="handleRemove_avatarUrl"
-            :on-change="handleChange_avatarUrl"
-          >
-            <i class="el-icon-plus"></i>
-          </el-upload>
-          <el-dialog v-model="dialogVisible_avatarUrl" append-to-body>
-            <img style="width:100%;height:auto;" :src="dialogImageUrl_avatarUrl" alt="" />
-          </el-dialog>
-        </el-form-item>
-      </el-form>
-      <div class="dialog-footer" slot="footer">
-        <el-button @click="showUpdateAvatar = false">取 消</el-button>
-        <el-button @click="confirmChangeAvatar" type="primary"
-          >确定上传</el-button
-        >
-      </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { useUserStore } from '@/pinia/modules/user'
 export default {
-  name: "Person",
-  data(){
-    return {
-      showUpdateAvatar: false,
-      dialogVisible_avatarUrl: false,
-      fileList_avatarUrl: [],
-      dialogImageUrl_avatarUrl: "",
-      selectedfile_avatarUrl: false,
-      headers: {
-        authorization: "",
-      },
-      imgHideUpload: false, 
-
-      path:import.meta.env.VITE_BASE_API
-    }
-  },
-  created(){
-    const userStore = useUserStore()
-    this.fileList_avatarUrl.push({ url: userStore.userInfo.headerImg });
-    
-    this.headers.authorization = userStore.token;     
-  },
-  methods:{
-    async confirmChangeAvatar() {
-      if (!this.selectedfile_avatarUrl) {
-        this.$message.warning("请选择一个文件");
-        return;
-      }
-      this.$refs.upload_avatarUrl.submit();
-    },
-    openChangeAvatarDialog() {
-      const userStore = useUserStore()
-      this.fileList_avatarUrl = [];
-      this.fileList_avatarUrl.push({ url: userStore.userInfo.headerImg });
-      this.showUpdateAvatar = true;
-    },
-    // android上传 begin
-    handleBeforeUpload_avatarUrl(file) {
-      console.log("before");
-      if (
-        !(
-          file.type === "image/png" ||
-          file.type === "image/gif" ||
-          file.type === "image/jpg" ||
-          file.type === "image/jpeg"
-        )
-      ) {
-        this.$notify.warning({
-          title: "警告",
-          message:
-            "请上传格式为image/png, image/gif, image/jpg, image/jpeg的图片",
-        });
-      }
-      let size = file.size / 1024 / 1024 / 2;
-      if (size > 2) {
-        this.$notify.warning({
-          title: "警告",
-          message: "图片大小必须小于2M",
-        });
-      }
-    },
-    // 文件超出个数限制时的钩子
-    handleExceed_avatarUrl(files, fileList) {
-      console.log(files, fileList);
-      if (this.selectedfile_avatarUrl || fileList.length >= 1) {
-        this.$message.warning("上传的图片不能大于1张");
-        return;
-      }
-    },
-    // 点击文件列表中已上传的文件时的钩子
-    handlePictureCardPreview_avatarUrl(file) {      
-      this.dialogImageUrl_avatarUrl = file.url;
-      this.dialogVisible_avatarUrl = true;
-    },
-    async handleSuccess_avatarUrl(response, file, fileList) {
-      if (response.code == 200) {
-        console.log(response.data);
-        this.showUpdateAvatar = false;
-        // 更新store中头像
-        // await store.dispatch("user/changeAvatarStore", response.data);
-        const userStore = useUserStore();
-        userStore.ResetUserInfo({ headerImg: response.data });
-      }
-    },
-    handleChange_avatarUrl(file, fileList) {
-      this.imgHideUpload = fileList.length >= 1;
-      console.log(file);
-      //this.$refs[this.Up].submit();
-      this.selectedfile_avatarUrl = true;
-    },
-    // 文件列表移除文件时的钩子
-    handleRemove_avatarUrl(file, fileList) {
-      this.imgHideUpload = fileList.length >= 1;
-      this.fileList_avatarUrl = [];
-      this.selectedfile_avatarUrl = false;
-    },
-    // 点击上传
-    uploadFile_avatarUrl() {
-      if (!this.selectedfile_avatarUrl) {
-        this.$message.warning("请选择一个文件");
-        return;
-      }
-      this.$refs.upload_avatarUrl.submit();
-    },
-    // android上传 end
-  }
-};
+  name: 'Person',
+}
 </script>
 
 <script setup>
-import ChooseImg from "@/components/chooseImg/index.vue";
-import { setSelfInfo, changePassword } from "@/api/user.js";
-import { reactive, ref } from "vue";
-import { ElMessage } from "element-plus";
-import { useUserStore } from "@/pinia/modules/user";
-import { useI18n } from "vue-i18n"; // added by mohamed hassan to support multilanguage
+import ChooseImg from '@/components/chooseImg/index.vue'
+import { setSelfInfo, changePassword } from '@/api/user.js'
+import { reactive, ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/pinia/modules/user'
+import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
 
-const { t } = useI18n(); // added by mohamed hassan to support multilanguage
+const { t } = useI18n() // added by mohamed hassan to support multilanguage
 
-const path = ref(import.meta.env.VITE_BASE_API);
-const activeName = ref("second");
+const path = ref(import.meta.env.VITE_BASE_API + '/')
+const activeName = ref('second')
 const rules = reactive({
-  password: [
-    { required: true, message: "请输入密码", trigger: "blur" },
-    { min: 6, message: "最少6个字符", trigger: "blur" },
+  oldPassword: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 6, message: '最少6个字符', trigger: 'blur' },
   ],
-  newPassword: [
-    { required: true, message: "请输入新密码", trigger: "blur" },
-    { min: 6, message: "最少6个字符", trigger: "blur" },
+  password: [
+    { required: true, message: '请输入新密码', trigger: 'blur' },
+    { min: 6, message: '最少6个字符', trigger: 'blur' },
   ],
   confirmPassword: [
-    { required: true, message: "请输入确认密码", trigger: "blur" },
-    { min: 6, message: "最少6个字符", trigger: "blur" },
+    { required: true, message: '请输入确认密码', trigger: 'blur' },
+    { min: 6, message: '最少6个字符', trigger: 'blur' },
     {
       validator: (rule, value, callback) => {
-        if (value !== pwdModify.value.newPassword) {
-          callback(new Error("两次密码不一致"));
+        if (value !== pwdModify.value.password) {
+          callback(new Error('两次密码不一致'))
         } else {
-          callback();
+          callback()
         }
       },
-      trigger: "blur",
+      trigger: 'blur',
     },
   ],
-});
+})
 
-const userStore = useUserStore();
-const modifyPwdForm = ref(null);
-const showPassword = ref(false);
-const pwdModify = ref({});
-const nickName = ref("");
-const editFlag = ref(false);
-const savePassword = async () => {
+const userStore = useUserStore()
+const modifyPwdForm = ref(null)
+const showPassword = ref(false)
+const pwdModify = ref({})
+const nickName = ref('')
+const editFlag = ref(false)
+const savePassword = async() => {
   modifyPwdForm.value.validate((valid) => {
     if (valid) {
       changePassword({
-        oldPassword: pwdModify.value.password,
-        password: pwdModify.value.newPassword,
+        oldPassword: pwdModify.value.oldPassword,
+        password: pwdModify.value.password,
       }).then((res) => {
-        if (res.data.code === 200) {
-          ElMessage.success("修改密码成功！");
+        if (res.code === 200) {
+          ElMessage.success('修改密码成功！')
         }
-        showPassword.value = false;
-      });
+        showPassword.value = false
+      })
     } else {
-      return false;
+      return false
     }
-  });
-};
+  })
+}
 
 const clearPassword = () => {
   pwdModify.value = {
-    password: "",
-    newPassword: "",
-    confirmPassword: "",
-  };
-  modifyPwdForm.value.clearValidate();
-};
-
-const chooseImgRef = ref(null);
-const openChooseImg = () => {
-  chooseImgRef.value.open();
-};
-
-const enterImg = async (url) => {
-  const res = await setSelfInfo({ headerImg: url });
-  if (res.code === 0) {
-    userStore.ResetUserInfo({ headerImg: url });
-    ElMessage({
-      type: "success",
-      message: "设置成功",
-    });
+    password: '',
+    newPassword: '',
+    confirmPassword: '',
   }
-};
+  modifyPwdForm.value.clearValidate()
+}
 
-const openEidt = () => {
-  nickName.value = userStore.userInfo.nickName;
-  editFlag.value = true;
-};
+const chooseImgRef = ref(null)
+const openChooseImg = () => {
+  chooseImgRef.value.open()
+}
+
+const enterImg = async(url) => {
+  const res = await setSelfInfo({ headerImg: url })
+  if (res.code === 0) {
+    userStore.ResetUserInfo({ headerImg: url })
+    ElMessage({
+      type: 'success',
+      message: '设置成功',
+    })
+  }
+}
+
+const openEdit = () => {
+  nickName.value = userStore.userInfo.nickName
+  editFlag.value = true
+}
 
 const closeEdit = () => {
-  nickName.value = "";
-  editFlag.value = false;
-};
+  nickName.value = ''
+  editFlag.value = false
+}
 
-const enterEdit = async () => {
+const enterEdit = async() => {
   const res = await setSelfInfo({
-    nickName: nickName.value,
-  });
+    nickName: nickName.value
+  })
   if (res.code === 0) {
-    userStore.ResetUserInfo({ nickName: nickName.value });
+    userStore.ResetUserInfo({ nickName: nickName.value })
     ElMessage({
-      type: "success",
-      message: "设置成功",
-    });
+      type: 'success',
+      message: '设置成功',
+    })
   }
-  nickName.value = "";
-  editFlag.value = false;
-};
+  nickName.value = ''
+  editFlag.value = false
+}
 
 const handleClick = (tab, event) => {
-  console.log(tab, event);
-};
+  console.log(tab, event)
+}
 
-const changePhoneFlag = ref(false);
-const time = ref(0);
+const changePhoneFlag = ref(false)
+const time = ref(0)
 const phoneForm = reactive({
-  phone: "",
-  code: "",
-});
+  phone: '',
+  code: ''
+})
 
-const getCode = async () => {
-  time.value = 60;
+const getCode = async() => {
+  time.value = 60
   let timer = setInterval(() => {
-    time.value--;
+    time.value--
     if (time.value <= 0) {
-      clearInterval(timer);
-      timer = null;
+      clearInterval(timer)
+      timer = null
     }
-  }, 1000);
-};
+  }, 1000)
+}
 
 const closeChangePhone = () => {
-  changePhoneFlag.value = false;
-  phoneForm.phone = "";
-  phoneForm.code = "";
-};
+  changePhoneFlag.value = false
+  phoneForm.phone = ''
+  phoneForm.code = ''
+}
 
-const changePhone = async () => {
-  const res = await setSelfInfo({ phone: phoneForm.phone });
+const changePhone = async() => {
+  const res = await setSelfInfo({ phone: phoneForm.phone })
   if (res.code === 0) {
-    ElMessage.success("修改成功");
-    userStore.ResetUserInfo({ phone: phoneForm.phone });
-    closeChangePhone();
+    ElMessage.success('修改成功')
+    userStore.ResetUserInfo({ phone: phoneForm.phone })
+    closeChangePhone()
   }
-};
+}
 
-const changeEmailFlag = ref(false);
-const emailTime = ref(0);
+const changeEmailFlag = ref(false)
+const emailTime = ref(0)
 const emailForm = reactive({
-  email: "",
-  code: "",
-});
+  email: '',
+  code: ''
+})
 
-const getEmailCode = async () => {
-  emailTime.value = 60;
+const getEmailCode = async() => {
+  emailTime.value = 60
   let timer = setInterval(() => {
-    emailTime.value--;
+    emailTime.value--
     if (emailTime.value <= 0) {
-      clearInterval(timer);
-      timer = null;
+      clearInterval(timer)
+      timer = null
     }
-  }, 1000);
-};
+  }, 1000)
+}
 
 const closeChangeEmail = () => {
-  changeEmailFlag.value = false;
-  emailForm.email = "";
-  emailForm.code = "";
-};
+  changeEmailFlag.value = false
+  emailForm.email = ''
+  emailForm.code = ''
+}
 
-const changeEmail = async () => {
-  const res = await setSelfInfo({ email: emailForm.email });
+const changeEmail = async() => {
+  const res = await setSelfInfo({ email: emailForm.email })
   if (res.code === 0) {
-    ElMessage.success("修改成功");
-    userStore.ResetUserInfo({ email: emailForm.email });
-    closeChangeEmail();
+    ElMessage.success('修改成功')
+    userStore.ResetUserInfo({ email: emailForm.email })
+    closeChangeEmail()
   }
-};
+}
+
 </script>
 
 <style lang="scss">
@@ -638,6 +445,9 @@ const changeEmail = async () => {
     min-height: calc(90vh - 200px);
     padding: 30px 20px;
     text-align: center;
+    background-color: #fff;
+    border-radius: 8px;
+    flex-shrink: 0;
     .el-avatar {
       border-radius: 50%;
     }
@@ -685,6 +495,9 @@ const changeEmail = async () => {
   }
 }
 .user-addcount {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
   ul {
     li {
       .title {
@@ -702,6 +515,9 @@ const changeEmail = async () => {
         }
       }
       border-bottom: 2px solid #f0f2f5;
+      &:last-child{
+        border-bottom: none;
+      }
     }
   }
 }
@@ -741,7 +557,7 @@ const changeEmail = async () => {
 .pointer {
   cursor: pointer;
 }
-.code-box {
+.code-box{
   display: flex;
   justify-content: space-between;
 }

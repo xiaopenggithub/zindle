@@ -28,9 +28,7 @@ func NewGetUserInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) GetUse
 }
 
 func (l *GetUserInfoLogic) GetUserInfo() (*types.AdminReply, error) {
-	fmt.Println("id>>>>>>>>1")
 	idNumber := json.Number(fmt.Sprintf("%v", l.ctx.Value("userId")))
-	fmt.Println("id>>>>>>>>", idNumber)
 	id, err := idNumber.Int64()
 	if err != nil {
 		return nil, errorx.NewCodeError(401, "请重新登录再操作", "")
@@ -41,18 +39,18 @@ func (l *GetUserInfoLogic) GetUserInfo() (*types.AdminReply, error) {
 	if err != nil {
 		fmt.Println("rpc----error", err)
 	}
-	fmt.Println("systemuserResp.NickName-------<<<<")
-	fmt.Println(systemuserResp.NickName)
-	//fmt.Println(systemuserResp.Avatar)
-	//fmt.Printf("\n========%v<<<<<<<\n", systemuserResp.Avatar)
-	fmt.Println("systemuserResp.NickName-------<<<<")
 	//通过rpc获取nickname
 	user := make(map[string]interface{})
-	user["nickName"] = "--nickName--" //systemuserResp.NickName
+	user["nickName"] = systemuserResp.NickName
 	//user["headerImg"] = "/uploads/" + systemuserResp.Avatar
 	authority := make(map[string]interface{})
 	// menurouter-name
 	authority["defaultRouter"] = "dashboard"
 	user["authority"] = authority
+
+	//user["sideMode"] = "dark"
+	user["sideMode"] = "light"
+	user["activeColor"] = "#1890ff"
+	user["baseColor"] = "#fff"
 	return nil, errorx.NewCodeError(200, "成功", user)
 }

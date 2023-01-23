@@ -4,11 +4,15 @@ import service from '@/utils/request'
 // @Param 可以什么都不填 调一下即可
 // @Router /menu/getMenu [post]
 export const asyncMenu = () => {
+  // return service({
+  //   url: '/menu/getMenu',
+  //   method: 'post'
+  // })
   return service({
-    // url: '/menu/getMenu', 
-    url: '/admin/getMenu', 
-    method: 'get'
-  })
+    url: '/admin/info',
+    method: 'get',
+    params: { t: Math.random() }
+})
 }
 
 // @Summary 获取menu列表

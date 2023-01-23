@@ -47,11 +47,12 @@ func (l *AdminLoginLogic) AdminLogin(req types.AdminLoginReq, ip string) (*types
 	}
 
 	if userInfo.Password != utils.MD5V(req.Password) {
-		//fmt.Println("req.password", utils.MD5V(req.Password))
-		//fmt.Println("req.Username", req.Username)
-		//fmt.Printf("userInfo.Password[%s]\n", userInfo.Password)
-		//fmt.Printf("userInfo.Name[%s]\n", userInfo.Name)
-		//fmt.Printf("userInfo:%v\n", userInfo)
+		fmt.Println("req.Password....", req.Password)
+		fmt.Println("req.password", utils.MD5V(req.Password))
+		fmt.Println("req.Username", req.Username)
+		fmt.Printf("userInfo.Password[%s]\n", userInfo.Password)
+		fmt.Printf("userInfo.Name[%s]\n", userInfo.NickName)
+		fmt.Printf("userInfo:%v\n", userInfo)
 		return nil, errorx.NewDefaultError("用户名或密码不正确", "")
 	}
 
@@ -86,6 +87,11 @@ func (l *AdminLoginLogic) AdminLogin(req types.AdminLoginReq, ip string) (*types
 	}
 	//通过rpc获取nickname
 	user["nickName"] = systemuserResp.NickName
+
+	//user["sideMode"] = "dark"
+	user["sideMode"] = "light"
+	user["activeColor"] = "#1890ff"
+	user["baseColor"] = "#fff"
 
 	tokenInfo["user"] = user
 

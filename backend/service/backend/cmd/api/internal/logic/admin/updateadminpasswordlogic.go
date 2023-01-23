@@ -29,6 +29,7 @@ func NewUpdateadminpasswordLogic(ctx context.Context, svcCtx *svc.ServiceContext
 }
 
 func (l *UpdateadminpasswordLogic) Updateadminpassword(req types.AdminUpdatePwdReq) (*types.AdminReply, error) {
+	fmt.Printf("%v", req)
 	if len(strings.TrimSpace(req.Password)) == 0 || len(strings.TrimSpace(req.OldPassword)) == 0 {
 		return nil, errorx.NewDefaultError("参数错误", "")
 	}

@@ -1,7 +1,7 @@
 <template>
   <div class="init_page">
-    <div class="init_page_panle">
-      <div v-if="hello < 2" id="hello" :class="[hello < 1 ? 'slide-in-fwd-top' : 'slide-out-right']" class="hello  ">
+    <div class="init_page_panel">
+      <div v-if="hello < 2" id="hello" :class="[hello < 1 ? 'slide-in-fwd-top' : 'slide-out-right']" class="hello">
         <div>
           <div class="hello_title">{{ $GIN_VUE_ADMIN.appName }}</div>
           <p class="in-two a-fadeinT">{{ t('init.note') }}</p>
@@ -33,7 +33,7 @@
           <el-form-item :label="t('init.dbType')">
             <el-select v-model="form.dbType" :placeholder="t('general.pleaseSelect')" @change="changeDB">
               <el-option key="mysql" label="MySQL" value="mysql" />
-              <el-option key="pgsql" :label="'PostgreSQL (' + t('init.beta') + ')'" value="pgsql" />
+              <el-option key="pgsql" label="PostgreSQL" value="pgsql" />
             </el-select>
           </el-form-item>
           <el-form-item :label="t('init.dbHost')">
@@ -90,7 +90,7 @@ const showNext = () => {
 }
 
 const goDoc = () => {
-  window.open('https://www.gin-vue-admin.com/docs/first_master#3-init')
+  window.open('https://www.gin-vue-admin.com/guide/start-quickly/env.html')
 }
 
 const out = ref(false)
@@ -180,14 +180,13 @@ img {
   width: 100%;
   height: 100%;
   position: relative;
-  .init_page_panle{
+  .init_page_panel{
     position: absolute;
     top: 3vh;
     left: 2vw;
     width: 96vw;
     height: 94vh;
     background-color: rgba(255,255,255,.8);
-    backdrop-filter: blur(5px);
     border-radius: 10px;
     display: flex;
     align-items: center;

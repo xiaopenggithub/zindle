@@ -25,8 +25,8 @@ const messages = {
 export default createI18n({
   legacy: false, // you must set `false`, to use Composition API
   globalInjection: true,
-  locale: process.env.VUE_APP_I18N_LOCALE || Cookies.get('language') || 'zh', // get selected language from cookies
-  fallbackLocale: process.env.VUE_APP_I18N_FALLBACK_LOCALE || 'zh',
+  locale: process.env.VUE_APP_I18N_LOCALE || Cookies.get('language') || 'en', // get selected language from cookies
+  fallbackLocale: process.env.VUE_APP_I18N_FALLBACK_LOCALE || 'en',
   // messages: loadLocaleMessages()
   messages
 })

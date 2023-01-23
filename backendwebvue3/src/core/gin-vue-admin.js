@@ -6,7 +6,7 @@
 import { register } from './global'
 
 export default {
-  install: (app) => {
-    register(app)
-  }
+    install: (app) => {
+        register(app)
+    }
 }

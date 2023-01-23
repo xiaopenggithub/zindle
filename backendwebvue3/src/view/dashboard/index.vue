@@ -1,39 +1,45 @@
 <template>
   <div class="page">
-    <!--
     <div class="gva-card-box">
       <div class="gva-card gva-top-card">
         <div class="gva-top-card-left">
-          <div class="gva-top-card-left-title">{{ t('view.dashboard.title') }}</div>
-          <div class="gva-top-card-left-dot">{{ t('view.dashboard.note') }}</div>
+          <div class="gva-top-card-left-title">
+            <!--{{ t('view.dashboard.title') }}-->
+            <h4>
+              早安，管理员:{{ userStore.userInfo.nickName }}，
+              请开始您一天的工作吧！
+            </h4>
+          </div>
+          <div class="gva-top-card-left-dot">{{ weatherInfo }}</div>
           <div class="gva-top-card-left-rows">
-            <el-row v-auth="888">
+            <el-row>
               <el-col :span="8" :xs="24" :sm="8">
                 <div class="flex-center">
-                  <el-icon class="dasboard-icon">
+                  <el-icon class="dashboard-icon">
                     <sort />
                   </el-icon>
-                  {{ t('view.dashboard.todaysTraffic') }} (1231231)
+                  馆藏图书({{summary.totalBook}})
                 </div>
               </el-col>
               <el-col :span="8" :xs="24" :sm="8">
                 <div class="flex-center">
-                  <el-icon class="dasboard-icon">
+                  <el-icon class="dashboard-icon">
                     <avatar />
                   </el-icon>
-                  {{ t('view.dashboard.totalNumberOfUsers') }} (24001)
+                  累计借阅({{summary.totalBorrow}})
                 </div>
               </el-col>
               <el-col :span="8" :xs="24" :sm="8">
                 <div class="flex-center">
-                  <el-icon class="dasboard-icon">
+                  <el-icon class="dashboard-icon">
                     <comment />
                   </el-icon>
-                  {{ t('view.dashboard.positiveRatings') }} (99%)
+                  待归还({{summary.totalShouldReturn}})
                 </div>
               </el-col>
             </el-row>
           </div>
+          <!--
           <div>
             <div class="gva-top-card-left-item">
               {{ t('view.dashboard.instructionalUse') }}
@@ -48,15 +54,15 @@
               <a
                 style="color:#409EFF"
                 target="view_window"
-                href="https://github.com/flipped-aurora/gva-plugins"
-              >https://github.com/flipped-aurora/gva-plugins</a>
+                href="https://plugin.gin-vue-admin.com/#/layout/home"
+              >https://plugin.gin-vue-admin.com</a>
             </div>
           </div>
+          -->
         </div>
         <img src="@/assets/dashboard.png" class="gva-top-card-right" alt>
       </div>
     </div>
-    -->
     <div class="gva-card-box">
       <el-card class="gva-card quick-entrance">
         <template #header>
@@ -87,7 +93,7 @@
     <!-- <div class="quick-entrance-title"></div> -->
     </div>
     <!--
-    <div class="gva-card-box">
+      <div class="gva-card-box">
       <div class="gva-card">
         <div class="card-header">
           <span>{{ t('view.dashboard.statistics') }}</span>
@@ -97,7 +103,7 @@
             <el-col :xs="24" :sm="18">
               <echarts-line />
             </el-col>
-            <el-col :xs="24" :sm="6">              
+            <el-col :xs="24" :sm="6">
               <dashboard-table />
             </el-col>
           </el-row>
@@ -109,56 +115,63 @@
 </template>
 
 <script setup>
-// import echartsLine from '@/view/dashboard/dashboardCharts/echartsLine.vue'
-// import dashboardTable from '@/view/dashboard/dashboardTable/dashboardTable.vue'
-import { ref } from 'vue'
+import EchartsLine from '@/view/dashboard/dashboardCharts/echartsLine.vue'
+import DashboardTable from '@/view/dashboard/dashboardTable/dashboardTable.vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useWeatherInfo } from '@/view/dashboard/weather.js'
 import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
+
+import { useUserStore } from '@/pinia/modules/user'
+
+import { counts } from "@/api/book";
 
 const { t } = useI18n() // added by mohamed hassan to support multilanguage
 
-const toolCards = ref([
+const weatherInfo = useWeatherInfo()
+
+const toolCards = ref([  
   {
-    label: t('view.dashboard.userManage'),
-    icon: 'monitor',
-    name: 'user',
-    color: '#ff9c6e',
-    bg: 'rgba(255, 156, 110,.3)'
-  },
-  {
-    label: t('view.dashboard.roleManage'),
-    icon: 'setting',
-    name: 'authority',
-    color: '#69c0ff',
-    bg: 'rgba(105, 192, 255,.3)'
-  },
-  {
-    label: t('view.dashboard.menuManage'),
-    icon: 'menu',
-    name: 'menu',
-    color: '#b37feb',
-    bg: 'rgba(179, 127, 235,.3)'
-  },
-  {
-    label: t('view.dashboard.codeGen'),
+    label: '图书管理',
     icon: 'cpu',
-    name: 'autoCode',
+    name: 'books',
     color: '#ffd666',
     bg: 'rgba(255, 214, 102,.3)'
   },
   {
-    label: t('view.dashboard.formCreator'),
+    label: '借阅记录',
     icon: 'document-checked',
-    name: 'formCreate',
+    name: 'bookOrder',
     color: '#ff85c0',
     bg: 'rgba(255, 133, 192,.3)'
+  },  
+  {
+    label: t('view.dashboard.userManage'),
+    icon: 'user',
+    name: 'readers',
+    color: '#ff9c6e',
+    bg: 'rgba(255, 156, 110,.3)'
+  },  
+  {
+    label: t('view.dashboard.menuManage'),
+    icon: 'menu',
+    name: 'systemMenuList',
+    color: '#b37feb',
+    bg: 'rgba(179, 127, 235,.3)'
   },
   {
-    label: t('view.dashboard.about'),
-    icon: 'user',
-    name: 'about',
+    label: 'API管理',
+    icon: 'monitor',
+    name: 'systemApiList',
     color: '#5cdbd3',
     bg: 'rgba(92, 219, 211,.3)'
+  },
+  {
+    label: t('view.dashboard.roleManage'),
+    icon: 'setting',
+    name: 'systemRoleList',
+    color: '#69c0ff',
+    bg: 'rgba(105, 192, 255,.3)'
   }
 ])
 
@@ -168,10 +181,22 @@ const toTarget = (name) => {
   router.push({ name })
 }
 
-</script>
-<script>
-export default {
-  name: 'Dashboard'
+const userStore = useUserStore()
+
+// 图书汇总
+const summary = ref({
+  totalBook:0,
+  totalBorrow:0,
+  totalShouldReturn:0,
+})
+onMounted(()=>{  
+  loadCounts()
+})
+const loadCounts = async () => {
+  const res = await counts({ id: 0 });  
+  if (res.code == 200) {
+    summary.value=res.data.counts
+  }
 }
 </script>
 
@@ -212,7 +237,7 @@ export default {
                 color: #343844;
             }
             &-dot {
-                font-size: 14px;
+                font-size: 16px;
                 color: #6B7687;
                 margin-top: 24px;
             }
@@ -289,7 +314,7 @@ export default {
       padding: 14px;
     }
 }
-.dasboard-icon {
+.dashboard-icon {
     font-size: 20px;
     color: rgb(85, 160, 248);
     width: 30px;
@@ -301,7 +326,7 @@ export default {
     @include flex-center;
 }
 
-//小屏幕不显示右侧，将登陆框居中
+//小屏幕不显示右侧，将登录框居中
 @media (max-width: 750px) {
     .gva-card {
         padding: 20px 10px !important;
@@ -325,7 +350,7 @@ export default {
                 line-height: 20px;
             }
         }
-        .dasboard-icon {
+        .dashboard-icon {
             font-size: 18px;
         }
     }

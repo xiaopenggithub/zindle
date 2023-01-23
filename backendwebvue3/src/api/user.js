@@ -16,7 +16,6 @@ export function logout() {
       method: 'post'
   })
 }
-
 // @Summary 获取验证码
 // @Produce  application/json
 // @Param data body {username:"string",password:"string"}
@@ -156,7 +155,7 @@ export const setUserAuthorities = (data) => {
 // @Produce application/json
 // @Success 200 {string} json "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /user/getUserInfo [get]
-export const getUserInfo = () => {
+export const getUserInfo = () => {  
   return service({
     url: '/admin/getUserInfo',
     method: 'get'

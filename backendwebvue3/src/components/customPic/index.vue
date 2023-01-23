@@ -25,7 +25,7 @@ import noAvatarPng from '@/assets/noBody.png'
 import { useUserStore } from '@/pinia/modules/user'
 import { computed, ref } from 'vue'
 const props = defineProps({
-  picType: { 
+  picType: {
     type: String,
     required: false,
     default: 'avatar'
@@ -47,7 +47,7 @@ const avatar = computed(() => {
     if (userStore.userInfo.headerImg !== '' && userStore.userInfo.headerImg.slice(0, 4) === 'http') {
       return userStore.userInfo.headerImg
     }
-    return userStore.userInfo.headerImg
+    return path.value + userStore.userInfo.headerImg
   } else {
     if (props.picSrc !== '' && props.picSrc.slice(0, 4) === 'http') {
       return props.picSrc

@@ -1,102 +1,251 @@
 <template>
   <div>
-    <div class="clearflex">
-      <el-button @click="relation" class="fl-right" size="small" type="primary"
-        >确 定</el-button
-      >
+    <div class="clearfix sticky-button">
+      <el-input v-model="filterText" class="fitler" placeholder="筛选" />
+      <el-button class="fl-right" size="small" type="primary" @click="relation">{{ t('general.confirm') }}</el-button>
     </div>
-    <el-tree
-      :data="menuTreeData"
-      :default-checked-keys="menuTreeIds"
-      :props="menuDefaultProps"
-      @check="nodeChange"
-      default-expand-all
-      highlight-current
-      node-key="id"
-      ref="menuTree"
-      show-checkbox
-    ></el-tree>
+    <div class="tree-content">      
+      <el-tree
+        ref="menuTree"
+        :data="menuTreeData"
+        :default-checked-keys="menuTreeIds"
+        :props="menuDefaultProps"
+        default-expand-all
+        highlight-current
+        node-key="id"
+        show-checkbox
+        :filter-node-method="filterNode"
+        @check="nodeChange"
+      >
+        <template #default="{ node , data }">
+          <span class="custom-tree-node">
+            <span>{{ node.label }}</span>
+            <span>
+              <el-button
+                type="primary"
+                link
+                size="small"
+                :style="{color:row.defaultRouter === data.name?'#E6A23C':'#85ce61'}"
+                :disabled="!node.checked"
+                @click="() => setDefault(data)"
+              >
+                {{ row.defaultRouter === data.name? t('menus.home') : t('menus.setAsHome') }}
+              </el-button>
+            </span>
+            <!--
+            <span v-if="data.menuBtn.length">
+              <el-button
+                type="primary"
+                link
+                size="small"
+                @click="() => OpenBtn(data)"
+              >
+                分配按钮
+              </el-button>
+            </span>
+            -->
+          </span>
+        </template>
+      </el-tree>
+    </div>
+    <el-dialog v-model="btnVisible" title="分配按钮" destroy-on-close>
+      <el-table
+        ref="btnTableRef"
+        :data="btnData"
+        row-key="ID"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection" width="55" />
+        <el-table-column label="按钮名称" prop="name" />
+        <el-table-column label="按钮备注" prop="desc" />
+      </el-table>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button size="small" @click="closeDialog">{{ t('general.close') }}</el-button>
+          <el-button size="small" type="primary" @click="enterDialog">{{ t('general.confirm') }}</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
-<script>
+
+<script setup>
 import { treeList } from "@/api/systemMenu";
-import { systemRoleMenuAdd,systemRoleMenusByRoleId} from "@/api/systemRoleMenu";
+import { 
+  systemRoleMenuAdd,
+  systemRoleMenusByRoleId
+} from "@/api/systemRoleMenu";
+
+// import { 
+//   // getBaseMenuTree, 
+//   getMenuAuthority, 
+//   addMenuAuthority 
+// } from '@/api/menu'
+// import {
+//   updateAuthority
+// } from '@/api/authority'
+// import { getAuthorityBtnApi, setAuthorityBtnApi } from '@/api/authorityBtn'
+import { nextTick, ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
+
+const { t } = useI18n() // added by mohamed hassan to support multilanguage
+
+const props = defineProps({
+  row: {
+    default: function() {
+      return {}
+    },
+    type: Object
+  }
+})
+
+const emit = defineEmits(['changeRow'])
+const filterText = ref('')
+const menuTreeData = ref([])
+const menuTreeIds = ref([])
+const needConfirm = ref(false)
+
+const menuDefaultProps = ref({
+  children: 'children',
+  label: function(data) {    
+    return data.title    
+  }
+})
+
+const init = async() => {
+  // 获取所有菜单树
+  const res = await treeList({ ids: "" })
+  menuTreeData.value = res.data.list  
+  const res1 = await systemRoleMenusByRoleId({ role_id: props.row.id,menu_ids:'' })
+  const menus = res1.data.list
+  const arr = []  
+  menus.forEach(item => {
+    // 防止直接选中父级造成全选
+    if (!menus.some(same => same.parent_id === item.id)) {
+      arr.push(Number(item.id))
+    }
+  })
+  menuTreeIds.value = arr  
+}
+
+init()
+
+const setDefault = (data) => {}
+// const setDefault = async(data) => {
+//   const res = await updateAuthority({ authorityId: props.row.authorityId, AuthorityName: props.row.authorityName, parentId: props.row.parentId, defaultRouter: data.name })
+//   if (res.code === 0) {
+//     ElMessage({ type: 'success', message: t('general.setupSuccess') })
+//     emit('changeRow', 'defaultRouter', res.data.authority.defaultRouter)
+//   }
+// }
+const nodeChange = () => {
+  needConfirm.value = true
+}
+// 暴露给外层使用的切换拦截统一方法
+const enterAndNext = () => {
+  relation()
+}
+// 关联树 确认方法
+const menuTree = ref(null)
+const relation = async() => {
+  const checkArr = menuTree.value.getCheckedNodes(false, true)
+  let menu_ids = "";
+  for (let i = 0; i < checkArr.length; i++) {
+    if (menu_ids == "") {
+      menu_ids = `${checkArr[i].id}`;
+    } else {
+      menu_ids += `,${checkArr[i].id}`;
+    }
+  }
+  const res = await systemRoleMenuAdd({
+    menu_ids,
+    role_id: props.row.id
+  })
+  if (res.code === 200) {
+    ElMessage({
+      type: 'success',
+      message: t('menus.menuSetupSuccess')
+    })
+  }
+}
+
+defineExpose({ enterAndNext, needConfirm })
+
+const btnVisible = ref(false)
+
+const btnData = ref([])
+const multipleSelection = ref([])
+const btnTableRef = ref()
+let menuID = ''
+// const OpenBtn = async(data) => {
+//   menuID = data.ID
+//   const res = await getAuthorityBtnApi({ menuID: menuID, authorityId: props.row.authorityId })
+//   if (res.code === 0) {
+//     openDialog(data)
+//     await nextTick()
+//     if (res.data.selected) {
+//       res.data.selected.forEach(id => {
+//         btnData.value.some(item => {
+//           if (item.ID === id) {
+//             btnTableRef.value.toggleRowSelection(item, true)
+//           }
+//         })
+//       })
+//     }
+//   }
+// }
+
+const handleSelectionChange = (val) => {
+  multipleSelection.value = val
+}
+
+const openDialog = (data) => {
+  btnVisible.value = true
+  btnData.value = data.menuBtn
+}
+
+const closeDialog = () => {
+  btnVisible.value = false
+}
+const enterDialog = () => {}
+// const enterDialog = async() => {
+//   const selected = multipleSelection.value.map(item => item.ID)
+//   const res = await setAuthorityBtnApi({
+//     menuID,
+//     selected,
+//     authorityId: props.row.authorityId
+//   })
+//   if (res.code === 0) {
+//     ElMessage({ type: 'success', message: '设置成功' })
+//     btnVisible.value = false
+//   }
+// }
+
+const filterNode = (value, data) => {
+  if (!value) return true
+  // console.log(data.mate.title)
+  return data.meta.title.indexOf(value) !== -1
+}
+
+watch(filterText, (val) => {
+  menuTree.value.filter(val)
+})
+
+</script>
+
+<script>
 
 export default {
-  name: "Menus",
-  props: {
-    row: {
-      default: function () {
-        return {};
-      },
-      type: Object,
-    },
-  },
-  data() {
-    return {
-      menuTreeData: [],
-      menuTreeIds: [],
-      needConfirm: false,
-      menuDefaultProps: {
-        children: "children",
-        label: function (data) {
-          return data.title;
-        },
-      },
-    };
-  },
-  methods: {
-    nodeChange() {
-      this.needConfirm = true;
-    },
-    // 暴露给外层使用的切换拦截统一方法
-    enterAndNext() {
-      this.relation();
-    },
-    // 关联树 确认方法
-    async relation() {
-      const checkArr = this.$refs.menuTree.getCheckedNodes(false, true);
-      // console.log(checkArr);
-      let menu_ids = "";
-      for (let i = 0; i < checkArr.length; i++) {
-        if (menu_ids == "") {
-          menu_ids = `${checkArr[i].id}`;
-        } else {
-          menu_ids += `,${checkArr[i].id}`;
-        }
-      }
-      const res = await systemRoleMenuAdd({
-        menu_ids,
-        role_id: this.row.id,
-      });
-      if (res.data.code == 200) {
-        this.$message({
-          type: "success",
-          message: "菜单设置成功!",
-          duration: 800,
-        });
-        // this.$emit('hideDrawerOnSuccess',{role_id:this.row.id})
-      }
-    },
-  },
-  async created() {
-    // 获取所有菜单树
-    const res = await treeList({ ids: "" });
-    this.menuTreeData = res.data.data.list;
-
-    const res1 = await systemRoleMenusByRoleId({ role_id: this.row.id,menu_ids:'' })
-    const roleMenus = res1.data.data.list
-    const arr = []
-    roleMenus.map(item => {
-      // 防止直接选中父级造成全选
-      if (!roleMenus.some(same => same.parent_id === item.id)) {
-        // console.log(item.id)
-        arr.push(Number(item.id))
-      }
-    })
-    this.menuTreeIds = arr
-  },
-};
+  name: 'Menus'
+}
 </script>
-<style lang="scss">
+
+<style lang="scss" scope>
+@import "@/style/button.scss";
+.custom-tree-node{
+  span+span{
+    margin-left: 12px;
+  }
+}
 </style>

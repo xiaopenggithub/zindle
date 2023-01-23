@@ -2,10 +2,10 @@
   <el-container class="layout-cont">
     <el-container :class="[isSider?'openside':'hideside',isMobile ? 'mobile': '']">
       <el-row :class="[isShadowBg?'shadowBg':'']" @click="changeShadow()" />
-      <el-aside class="main-cont main-left">
+      <el-aside class="main-cont main-left gva-aside">
         <div class="tilte" :style="{background: backgroundColor}">
-          <img alt class="logoimg" :src="$GIN_VUE_ADMIN.appLogo">
-          <h2 v-if="isSider" class="tit-text" :style="{color:textColor}">{{ $GIN_VUE_ADMIN.appName }}</h2>
+          <img alt class="logoimg" src="~@/assets/nav_logo.png"> 
+          <div v-if="isSider" class="tit-text" :style="{color:textColor}">{{ $GIN_VUE_ADMIN.appName }}</div>
         </div>
         <Aside class="aside" />
       </el-aside>
@@ -27,11 +27,12 @@
                       </div>
                     </el-col>
                     <el-col :xs="10" :lg="14" :md="14" :sm="9" :xl="14" :pull="1">
-                      <el-breadcrumb class="breadcrumb">
+                      <!-- 修改为手机端不显示顶部标签 -->
+                      <el-breadcrumb v-show="!isMobile" class="breadcrumb">
                         <el-breadcrumb-item
                           v-for="item in matched.slice(1,matched.length)"
                           :key="item.path"
-                        >{{ route.params.title || item.meta.title }}</el-breadcrumb-item>
+                        >{{ fmtTitle(item.meta.title,route) }}</el-breadcrumb-item>
                       </el-breadcrumb>
                     </el-col>
                     <el-col :xs="12" :lg="9" :md="9" :sm="14" :xl="9">
@@ -41,26 +42,14 @@
                           <div class="dp-flex justify-content-center align-items height-full width-full">
                             <span class="header-avatar" style="cursor: pointer">
                               <CustomPic />
-                              <span style="margin-left: 5px">{{ userStore.userInfo.nickName }}</span>
+                              <span v-show="!isMobile" style="margin-left: 5px">{{ userStore.userInfo.nickName }}</span>
                               <el-icon>
                                 <arrow-down />
                               </el-icon>
                             </span>
                           </div>
                           <template #dropdown>
-                            <el-dropdown-menu class="dropdown-group">
-                              <el-dropdown-item>
-                                <span style="font-weight: 600;">
-                                  {{ t('layout.currentRole') }}{{ userStore.userInfo.authority.authorityName }}
-                                </span>
-                              </el-dropdown-item>
-                              <template v-if="userStore.userInfo.authorities">
-                                <el-dropdown-item v-for="item in userStore.userInfo.authorities.filter(i=>i.authorityId!==userStore.userInfo.authorityId)" :key="item.authorityId" @click="changeUserAuth(item.authorityId)">
-                                  <span>
-                                    {{ t('layout.switchTo') }}{{ item.authorityName }}
-                                  </span>
-                                </el-dropdown-item>
-                              </template>
+                            <el-dropdown-menu class="dropdown-group">                              
                               <el-dropdown-item icon="avatar" @click="toPerson">{{ t('layout.personalInfo') }}</el-dropdown-item>
                               <el-dropdown-item icon="reading-lamp" @click="userStore.LoginOut">{{ t('layout.logout') }}</el-dropdown-item>
                             </el-dropdown-menu>
@@ -78,12 +67,20 @@
             <HistoryComponent ref="layoutHistoryComponent" />
           </div>
         </transition>
-        <router-view v-if="reloadFlag" v-slot="{ Component }" v-loading="loadingFlag" :element-loading-text="t('layout.loading')" class="admin-box">
-          <transition mode="out-in" name="el-fade-in-linear">
-            <keep-alive :include="routerStore.keepAliveRouters">
-              <component :is="Component" />
-            </keep-alive>
-          </transition>
+        <router-view
+          v-if="reloadFlag"
+          v-slot="{ Component }"
+          v-loading="loadingFlag"
+          :element-loading-text="t('layout.loading')"
+          class="admin-box"
+        >
+          <div>
+            <transition mode="out-in" name="el-fade-in-linear">
+              <keep-alive :include="routerStore.keepAliveRouters">
+                <component :is="Component" />
+              </keep-alive>
+            </transition>
+          </div>
         </router-view>
         <BottomInfo />
         <setting />
@@ -110,8 +107,9 @@ import { setUserAuthority } from '@/api/user'
 import { emitter } from '@/utils/bus.js'
 import { computed, ref, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useUserStore } from '@/pinia/modules/user'
 import { useRouterStore } from '@/pinia/modules/router'
+import { fmtTitle } from '@/utils/fmtRouterTitle'
+import { useUserStore } from '@/pinia/modules/user'
 import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
 
 const { t } = useI18n() // added by mohamed hassan to support multilanguage
@@ -123,6 +121,7 @@ const routerStore = useRouterStore()
 const isCollapse = ref(false)
 const isSider = ref(true)
 const isMobile = ref(false)
+
 const initPage = () => {
   const screenWidth = document.body.clientWidth
   if (screenWidth < 1000) {
@@ -195,23 +194,27 @@ const changeUserAuth = async(id) => {
     authorityId: id
   })
   if (res.code === 0) {
-    emitter.emit('closeAllPage')
-    setTimeout(() => {
-      window.location.reload()
-    }, 1)
+    window.sessionStorage.setItem('needCloseAll', 'true')
+    window.location.reload()
   }
 }
 
 const reloadFlag = ref(true)
+let reloadTimer = null
 const reload = async() => {
-  if (route.meta.keepAlive) {
-    reloadFlag.value = false
-    await nextTick()
-    reloadFlag.value = true
-  } else {
-    const title = route.meta.title
-    router.push({ name: 'Reload', params: { title }})
+  if (reloadTimer) {
+    window.clearTimeout(reloadTimer)
   }
+  reloadTimer = window.setTimeout(async() => {
+    if (route.meta.keepAlive) {
+      reloadFlag.value = false
+      await nextTick()
+      reloadFlag.value = true
+    } else {
+      const title = route.meta.title
+      router.push({ name: 'Reload', params: { title }})
+    }
+  }, 400)
 }
 
 const isShadowBg = ref(false)

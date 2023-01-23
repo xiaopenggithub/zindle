@@ -1,197 +1,142 @@
 <template>
-  <div>
-    <div class="search-term">
-      <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
-        <el-form-item label="搜索关键词">
-          <el-input
-            v-model="searchInfo.keyword"
-            placeholder="输入搜索关键词"
-            size="mini"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            size="mini"
-            icon="el-icon-search"
-            @click="search"
-            >查询</el-button
-          >
-        </el-form-item>
-        <!--
-        <el-form-item>
-          <el-button
-            type="primary"
-            size="mini"
-            icon="el-icon-plus"
-            @click="openDialog"
-            >新增</el-button
-          >
-        </el-form-item>
-        <el-form-item>
-          <el-popover v-model="deleteVisible" placement="top" width="160">
-            <p>确定要删除吗？</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="deleteVisible = false"
-                >取消</el-button
-              >
-              <el-button size="mini" type="primary" @click="deleteBatch"
-                >确定</el-button
-              >
-            </div>
-            <el-button
-              slot="reference"
-              icon="el-icon-delete"
-              size="mini"
-              type="danger"
-              >批量删除</el-button
-            >
-          </el-popover>
-        </el-form-item>
-        -->
-      </el-form>
-    </div>
-    <el-table
-      ref="multipleTable"
-      :data="tableData"
-      border
-      stripe
-      style="width: 100%"
-      tooltip-effect="dark"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column type="selection" width="55" fixed="left" />
-      <el-table-column label="ID" prop="id" width="70" />
-
-      <el-table-column label="用户账号" prop="username" />
-      <el-table-column label="手机" prop="phone" />
-      <el-table-column label="用户邮箱" prop="email" />
-      <el-table-column label="帐号状态" width="80" align="center">
-        <template #default="scope">
-          {{ scope.row.status | formatStatus }}
-        </template>
-      </el-table-column>
-      <el-table-column label="最后登录IP" prop="login_ip" />
-
-      <el-table-column label="最后登录" width="160">
-        <template #default="scope">
-          {{ scope.row.login_date | formatDate }}
-        </template>
-      </el-table-column>
-
-      <el-table-column label="备注" prop="remark" />
-
-      <el-table-column label="创建时间" width="160">
-        <template #default="scope">
-          {{ scope.row.created_at | formatDate }}
-        </template>
-      </el-table-column>
-
-      <el-table-column label="操作" fixed="right" width="180" align="center">
-        <template #default="scope">
-          <el-button
-            class="table-button"
-            size="mini"
-            type="primary"
-            icon="el-icon-edit"
-            @click="edit(scope.row)"
-            >变更</el-button
-          >
-          <!--
-          <el-button
-            @click="remove(scope.row)"
-            size="mini"
-            type="danger"
-            icon="el-icon-delete"
-            >删除</el-button
-          >
-          -->
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <el-pagination
-      :current-page="page"
-      :page-size="pageSize"
-      :page-sizes="[10, 30, 50, 100]"
-      :style="{ float: 'right', padding: '20px' }"
-      :total="total"
-      layout="total, sizes, prev, pager, next, jumper"
-      @current-change="handleCurrentChange"
-      @size-change="handleSizeChange"
-    />
-
-    <el-dialog
-      v-model="dialogFormVisible"
-      :before-close="closeDialog"
-      :title="type == 'create' ? '新增记录' : '编辑记录'"
-    >
-      <el-form
-        :model="formData"
-        label-position="right"
-        label-width="100px"
-        ref="form"
-        :rules="rules"
-      >
-        <el-form-item label="用户账号:" prop="username">
-          <el-input
-            v-model="formData.username"
-            :disabled="true"
-            clearable
-            placeholder="请输入用户账号"
-          />
-        </el-form-item>
-
-        <el-form-item label="密码:" prop="password">
-          <el-input
-            v-model="formData.password"
-            clearable
-            placeholder="请输入密码"
-            :disabled="true"
-          />
-        </el-form-item>
-
-        <el-form-item label="手机:" prop="phone">
-          <el-input
-            v-model="formData.phone"
-            clearable
-            placeholder="请输入手机"            
-          />
-        </el-form-item>
-
-        <el-form-item label="用户邮箱:" prop="email">
-          <el-input
-            v-model="formData.email"
-            clearable
-            placeholder="请输入用户邮箱"
-            :disabled="true"
-          />
-        </el-form-item>
-
-        <el-form-item label="帐号状态:" prop="status">
-          <el-radio-group v-model="formData.status">
-            <el-radio :label="0" name="status">正常</el-radio>
-            <el-radio :label="1" name="status">停用</el-radio>
-          </el-radio-group>
-        </el-form-item>
-
-        <el-form-item label="备注:" prop="remark">
-          <el-input
-            v-model="formData.remark"
-            clearable
-            placeholder="请输入备注"
-          />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="closeDialog">取 消</el-button>
-        <el-button type="primary" @click="enterDialog">确 定</el-button>
+    <div>
+      <div class="gva-search-box">
+        <el-form ref="searchForm" :inline="true" :model="searchInfo">
+          <el-form-item label="搜索关键词">
+            <el-input v-model="searchInfo.keyword" placeholder="输入搜索关键词" clearable/>
+          </el-form-item>
+          <el-form-item>
+            <el-button size="small" type="primary" icon="search" @click="onSubmit">{{ t('general.search') }}</el-button>
+            <el-button size="small" icon="refresh" @click="onReset">{{ t('general.reset') }}</el-button>
+          </el-form-item>
+        </el-form>
       </div>
-    </el-dialog>
-  </div>
-</template>
+      <div class="gva-table-box">
+        <el-table :data="tableData" @sort-change="sortChange" @selection-change="handleSelectionChange">          
+            <el-table-column label="ID" prop="id" width="70" />
 
-<script>
+            <el-table-column label="用户账号" prop="username" />
+            <el-table-column label="手机" prop="phone" />
+            <el-table-column label="用户邮箱" prop="email" />
+            <el-table-column label="帐号状态" width="80" align="center">
+                <template #default="scope">
+                {{ formatStatus(scope.row.status)}}
+                </template>
+            </el-table-column>
+            <el-table-column label="最后登录IP" prop="login_ip" />
+
+            <el-table-column label="最后登录" width="160">
+                <template #default="scope">
+                {{ formatDate(scope.row.login_date)}}
+                </template>
+            </el-table-column>
+
+            <el-table-column label="备注" prop="remark" />
+
+            <el-table-column label="创建时间" width="160">
+                <template #default="scope">
+                {{ formatDate(scope.row.created_at)}}
+                </template>
+            </el-table-column>
+
+            <el-table-column label="操作" fixed="right" width="180" align="center">
+                <template #default="scope">
+                    <el-button
+                        icon="edit"
+                        size="small"
+                        type="primary"
+                        link
+                        @click="editFunc(scope.row)">{{ t('general.edit') }}</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div class="gva-pagination">
+          <el-pagination
+            :current-page="page"
+            :page-size="pageSize"
+            :page-sizes="[10, 30, 50, 100]"
+            :total="total"
+            layout="total, sizes, prev, pager, next, jumper"
+            @current-change="handleCurrentChange"
+            @size-change="handleSizeChange"
+          />
+        </div>
+  
+      </div>
+  
+      <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle">        
+        <el-form ref="apiForm" :model="form" :rules="rules" label-width="120px">
+            <el-form-item label="用户账号:" prop="username">
+            <el-input
+                v-model="form.username"
+                :disabled="true"
+                clearable
+                placeholder="请输入用户账号"
+            />
+            </el-form-item>
+
+            <el-form-item label="密码:" prop="password">
+            <el-input
+                v-model="form.password"
+                clearable
+                placeholder="请输入密码"
+                :disabled="true"
+            />
+            </el-form-item>
+
+            <el-form-item label="手机:" prop="phone">
+            <el-input
+                v-model="form.phone"
+                clearable
+                placeholder="请输入手机"
+                :disabled="true"
+            />
+            </el-form-item>
+
+            <el-form-item label="用户邮箱:" prop="email">
+            <el-input
+                v-model="form.email"
+                clearable
+                placeholder="请输入用户邮箱"
+                :disabled="true"
+            />
+            </el-form-item>
+
+            <el-form-item label="帐号状态:" prop="status">
+            <el-radio-group v-model="form.status">
+                <el-radio :label="0" name="status">正常</el-radio>
+                <el-radio :label="1" name="status">停用</el-radio>
+            </el-radio-group>
+            </el-form-item>
+
+            <el-form-item label="备注:" prop="remark">
+            <el-input
+                v-model="form.remark"
+                clearable
+                placeholder="请输入备注"
+            />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+          <div class="dialog-footer">
+            <el-button size="small" @click="closeDialog">{{ t('general.close') }}</el-button>
+            <el-button size="small" type="primary" @click="enterDialog">{{ t('general.confirm') }}</el-button>
+          </div>
+        </template>
+      </el-dialog>
+    </div>
+  </template>
+  
+  <script setup>
+  import {
+    systemApiOne,
+    systemApiList,
+    systemApiAdd,
+    systemApiUpdate,
+    systemApiDelete,
+    systemApiDeleteBatch,  
+  } from "@/api/systemApi";
+
 import {
   readerList,
   readerDelete,
@@ -199,203 +144,272 @@ import {
   readerOne,
   readerAdd,
   readerUpdate,
-} from "@/api/reader"; //  此处请自行替换地址
+} from "@/api/reader";
 import { formatTimeToStr } from "@/utils/date";
-import infoList from "@/mixins/infoList";
-let defaultForm = {
-  id: 0,
-  username: "",
-  password: "",
-  nickname: "",
-  phone: "",
-  email: "",
-  status: 0,
-  login_ip: "",
-  login_date: "",
-  remark: "",
-};
-export default {
-  name: "SystemUser",
-  filters: {
-    formatDate: function (time) {
-      if (time != null && time != "") {
-        var date = new Date(time);
-        return formatTimeToStr(date, "yyyy-MM-dd hh:mm:ss");
-      } else {
-        return "";
-      }
-    },
-    formatStatus: function (v) {
-      if (v == 0) {
-        return "正常";
-      }
-      return "停用";
-    },
-    formatBoolean: function (bool) {
-      if (bool != null) {
-        return bool ? "是" : "否";
-      } else {
-        return "";
-      }
-    },
-  },
-  mixins: [infoList],
-  data() {
-    return {
-      listApi: readerList,
-      dialogFormVisible: false,
-      visible: false,
-      type: "",
-      deleteVisible: false,
-      multipleSelection: [],
-      formData: Object.assign({}, defaultForm),
-      rules: {
-        id: [{ required: true, message: "请输入用户ID", trigger: "blur" }],
-        username: [
-          { required: true, message: "请输入用户账号", trigger: "blur" },
-        ],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
-        nickname: [
-          { required: true, message: "请输入用户昵称", trigger: "blur" },
-        ],
-        phone: [{ required: true, message: "请输入手机", trigger: "blur" }],
-        email: [{ required: true, message: "请输入用户邮箱", trigger: "blur" }],
-        status: [
-          {
-            required: true,
-            message: "请输入帐号状态（0正常 1停用）",
-            trigger: "blur",
-          },
-        ],
-        login_ip: [
-          { required: true, message: "请输入最后登录IP", trigger: "blur" },
-        ],
-        login_date: [
-          { required: true, message: "请输入最后登录时间", trigger: "blur" },
-        ],
-        // remark: [{ required: true, message: "请输入备注", trigger: "blur" }],
-      },
-    };
-  },
-  async created() {
-    await this.getTableData();
-  },
-  methods: {
-    // 条件搜索前端看此方法
-    search() {
-      this.page = 1;
-      this.pageSize = 10;
-      this.getTableData();
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    async deleteBatch() {
-      const ids = [];
-      if (this.multipleSelection.length == 0) {
-        this.$message({
-          type: "warning",
-          message: "请选择要删除的数据",
-        });
-        return;
-      }
-      this.multipleSelection &&
-        this.multipleSelection.map((item) => {
-          ids.push(item.id);
-        });
 
-      const res = await readerDeleteBatch({ ids: ids.join(",") });
-      if (res.data.code == 200) {
-        this.$message({
-          type: "success",
-          message: "删除成功",
-        });
-        //if (this.tableData.length == ids.length) {
-        //  this.page--;
-        //}
-        this.deleteVisible = false;
-        this.getTableData();
+  import { toSQLLine } from '@/utils/stringFun'
+  import WarningBar from '@/components/warningBar/warningBar.vue'
+  import { ref } from 'vue'
+  import { ElMessage, ElMessageBox } from 'element-plus'
+  import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
+  
+  const { t } = useI18n() // added by mohamed hassan to support multilanguage
+  
+  const methodFilter = (value) => {
+    const target = methodOptions.value.filter(item => item.value === value)[0]
+    return target && `${target.label}`
+  }
+  
+  const apis = ref([])
+  const form = ref({
+    id: 0,
+    username: "",
+    password: "",
+    nickname: "",
+    phone: "",
+    email: "",
+    status: 0,
+    login_ip: "",
+    login_date: "",
+    remark: "",
+  })
+  const methodOptions = ref([
+    {
+      value: 'POST',
+      label: t('view.api.create'),
+      type: 'success'
+    },
+    {
+      value: 'GET',
+      label: t('view.api.view'),
+      type: ''
+    },
+    {
+      value: 'PUT',
+      label: t('view.api.update'),
+      type: 'warning'
+    },
+    {
+      value: 'DELETE',
+      label: t('general.delete'),
+      type: 'danger'
+    }
+  ])
+  
+  const type = ref('')
+  const rules = ref({
+    path: [{ required: true, message: t('view.api.enterApiPath'), trigger: 'blur' }],
+    api_group: [
+      { required: true, message: t('view.api.enterGroupName'), trigger: 'blur' }
+    ],
+    method: [
+      { required: true, message: t('view.api.selectRequestMethod'), trigger: 'blur' }
+    ],
+    description: [
+      { required: true, message: t('view.api.enterApiDescription'), trigger: 'blur' }
+    ]
+  })
+  
+  const page = ref(1)
+  const total = ref(0)
+  const pageSize = ref(10)
+  const tableData = ref([])
+  const searchInfo = ref({})
+  
+  const onReset = () => {
+    searchInfo.value = {}
+  }
+  // 搜索
+  const onSubmit = () => {
+    page.value = 1
+    pageSize.value = 10
+    getTableData()
+  }
+  
+  // 分页
+  const handleSizeChange = (val) => {
+    pageSize.value = val
+    getTableData()
+  }
+  
+  const handleCurrentChange = (val) => {
+    page.value = val
+    getTableData()
+  }
+  
+  // 排序
+  const sortChange = ({ prop, order }) => {
+    if (prop) {
+      if (prop === 'ID') {
+        prop = 'id'
       }
-    },
-    async edit(row) {
-      const res = await readerOne({ id: row.id });
-      this.type = "update";
-      if (res.data.code == 200) {
-        this.formData = res.data.data.item;
-        this.dialogFormVisible = true;
-      }
-    },
-    closeDialog() {
-      this.$refs.form.resetFields();
-      this.formData = Object.assign({}, defaultForm);
-      this.dialogFormVisible = false;
-    },
-    async remove(row) {
-      this.$confirm("此操作将永久删除所有角色下该api, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(async () => {
-          const res = await readerDelete({ id: row.id });
-          if (res.data.code == 200) {
-            this.$message({
-              type: "success",
-              message: "删除成功!",
-            });
-            //if (this.tableData.length == 1) {
-            //  this.page--;
-            //}
-            this.getTableData();
-          }
-        })
-        .catch(() => {
-          console.log("已取消删除");
-          /*
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-          */
-        });
-    },
-    async enterDialog() {
-      this.$refs.form.validate(async (valid) => {
-        if (valid) {
-          let res;
-          this.formData.status = parseInt(this.formData.status);
-
-          switch (this.type) {
-            case "create":
-              this.formData.id = 0;
-              res = await readerAdd(this.formData);
-              break;
-            case "update":
-              res = await readerUpdate(this.formData);
-              break;
-            default:
-              res = await readerAdd(this.formData);
-              break;
-          }
-          if (res.data.code == 200) {
-            this.$message({
-              type: "success",
-              // message: "创建/更改成功",
-              message: res.data.message,
-            });
-            this.closeDialog();
-            this.getTableData();
-          }
+      searchInfo.value.orderKey = toSQLLine(prop)
+      searchInfo.value.desc = order === 'descending'
+    }
+    getTableData()
+  }
+  
+  // 查询
+  const getTableData = async() => {    
+    const table = await readerList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    if (table.code === 200) {
+      tableData.value = table.data.list
+      total.value = table.data.total
+      page.value = table.data.page
+      pageSize.value = table.data.pageSize
+    }
+  }
+  
+  getTableData()
+  
+  // 批量操作
+  const handleSelectionChange = (val) => {
+    apis.value = val
+  }
+  
+  
+  
+  // 弹窗相关
+  const apiForm = ref(null)
+  const initForm = () => {
+    apiForm.value.resetFields()
+    form.value = {
+      path: '',
+      apiGroup: '',
+      method: '',
+      description: ''
+    }
+  }
+  
+  const dialogTitle = ref('新增Api')
+  const dialogFormVisible = ref(false)
+  const openDialog = (key) => {
+    switch (key) {
+      case 'addApi':
+        dialogTitle.value = t('view.api.newApi')
+        break
+      case 'edit':
+        dialogTitle.value = t('view.api.editApi')
+        break
+      default:
+        break
+    }
+    type.value = key
+    dialogFormVisible.value = true
+  }
+  const closeDialog = () => {
+    initForm()
+    dialogFormVisible.value = false
+  }
+  
+  const editFunc = async(row) => {
+    const res = await readerOne({ id: row.id })
+    form.value = res.data.item
+    openDialog('edit')
+  }
+  
+  const enterDialog = async() => {
+    apiForm.value.validate(async valid => {
+      if (valid) {
+        switch (type.value) {
+          case 'addApi':
+            {
+              const res = await systemApiAdd(form.value)
+              if (res.code === 200) {
+                ElMessage({
+                  type: 'success',
+                  message: t('general.addSuccess'),
+                  showClose: true
+                })
+              }
+              getTableData()
+              closeDialog()
+            }  
+            break
+          case 'edit':
+            {
+              form.value.login_date=formatDate(form.value.login_date)
+              const res = await readerUpdate(form.value)
+              if (res.code === 200) {
+                ElMessage({
+                  type: 'success',
+                  message: t('general.editSuccess'),
+                  showClose: true
+                })
+              }
+              getTableData()
+              closeDialog()
+            }
+            break
+          default:
+            // eslint-disable-next-line no-lone-blocks
+            {
+              ElMessage({
+                type: 'error',
+                message: t('view.api.unknownOperation'),
+                showClose: true
+              })
+            }
+            break
         }
-      });
-    },
-    openDialog() {
-      this.type = "create";
-      this.dialogFormVisible = true;
-    },
-  },
-};
-</script>
+      }
+    })
+  }
+  
+  const deleteApiFunc = async(row) => {
+    ElMessageBox.confirm(t('view.api.deleteApiConfirm'), t('general.hint'), {
+      confirmButtonText: t('general.confirm'),
+      cancelButtonText: t('general.cancel'),
+      type: 'warning'
+    })
+      .then(async() => {
+        const res = await systemApiDelete(row)
+        if (res.code === 200) {
+          ElMessage({
+            type: 'success',
+            message: t('general.deleteSuccess')
+          })
+          if (tableData.value.length === 1 && page.value > 1) {
+            page.value--
+          }
+          getTableData()
+        }
+      })
+  }
 
-<style>
-</style>
+    const formatDate=(time)=>{
+        if (time != null && time != "") {
+            var date = new Date(time);
+            return formatTimeToStr(date, "yyyy-MM-dd hh:mm:ss");
+        } else {
+            return "";
+        }
+    }
+
+    const formatType=(v)=>{
+      if (v == 0) {
+        return "手机";
+      }
+      return "邮箱";
+    }
+    const formatStatus=(v)=>{
+        if (v == 0) {
+            return "正常";
+        }
+        return "停用";
+    }
+  
+  </script>
+  
+  <style scoped lang="scss">
+  .button-box {
+    padding: 10px 20px;
+    .el-button {
+      float: right;
+    }
+  }
+  .warning {
+    color: #dc143c;
+  }
+  </style>
+  

@@ -20,7 +20,7 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/pinia/modules/user'
 
-const emit = defineEmits(['on-success'])
+const emit = defineEmits(['on-success']) 
 const props = defineProps({
   imageUrl: {
     type: String,

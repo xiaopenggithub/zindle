@@ -1,147 +1,80 @@
 <template>
   <div>
-    <div class="search-term">
-      <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
+    <div class="gva-search-box">
+      <el-form ref="searchForm" :inline="true" :model="searchInfo">
         <el-form-item label="搜索关键词">
-          <el-input
-            v-model="searchInfo.keyword"
-            placeholder="输入搜索关键词"
-            size="mini"
-          />
+          <el-input v-model="searchInfo.keyword" placeholder="输入搜索关键词" clearable/>
         </el-form-item>
         <el-form-item>
-          <el-button
-            type="primary"
-            size="mini"
-            icon="el-icon-search"
-            @click="search"
-            >查询</el-button
-          >
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            size="mini"
-            icon="el-icon-plus"
-            @click="openDialog"
-            >新增</el-button
-          >
-        </el-form-item>
-        <el-form-item>
-          <el-popover v-model="deleteVisible" placement="top" width="160">
-            <p>确定要删除吗？</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="deleteVisible = false"
-                >取消</el-button
-              >
-              <el-button size="mini" type="primary" @click="deleteBatch"
-                >确定</el-button
-              >
-            </div>
-            <el-button
-              slot="reference"
-              icon="el-icon-delete"
-              size="mini"
-              type="danger"
-              >批量删除</el-button
-            >
-          </el-popover>
+          <el-button size="small" type="primary" icon="search" @click="onSubmit">{{ t('general.search') }}</el-button>
+          <el-button size="small" icon="refresh" @click="onReset">{{ t('general.reset') }}</el-button>
         </el-form-item>
       </el-form>
     </div>
-    <el-table
-      ref="multipleTable"
-      :data="tableData"
-      border
-      stripe
-      style="width: 100%"
-      tooltip-effect="dark"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column type="selection" width="40" align="center" />
-      <el-table-column label="ID" prop="id" width="70" />
-      <el-table-column label="菜单名称" prop="title" />
-      <el-table-column label="排序" prop="sort" width="50" />
+    <div class="gva-table-box">
+      <div class="gva-btn-list">
+        <el-button size="mini" type="primary" icon="plus" @click="openDialog('add')">{{ t('menu.addRootMenu') }}</el-button>
+      </div>
 
-      <el-table-column label="图标">
-        <template #default="scope" width="110">
-          <i :class="`el-icon-${scope.row.icon}`"></i>
-          <span>{{ scope.row.icon }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="路由name" prop="name" />
-
-      <el-table-column label="路由path" prop="path" />
-      <el-table-column label="vue路径" prop="component" />
-
-      <el-table-column label="列表隐藏" width="100">
-        <template #default="scope">
-          <span :style="scope.row.hidden==0?'':'color:red'">{{ scope.row.hidden | formatBoolean }}</span>
-        </template>
-      </el-table-column>
-
-      <!--
-      <el-table-column label="父菜单ID" prop="parent_id" />
-      <el-table-column label="创建时间" width="160">
-        <template #default="scope">
-          {{ scope.row.created_at | formatDate }}
-        </template>
-      </el-table-column>
-
-      <el-table-column label="更新时间" width="160">
-        <template #default="scope">
-          {{ scope.row.updated_at | formatDate }}
-        </template>
-      </el-table-column>
-      -->
-
-      <el-table-column label="操作" fixed="right" width="180" align="center">
-        <template #default="scope">
-          <el-button
-            class="table-button"
-            size="mini"
-            type="primary"
-            icon="el-icon-edit"
-            @click="edit(scope.row)"
-            >变更</el-button
-          >
-          <el-button
-            @click="remove(scope.row)"
-            size="mini"
-            type="danger"
-            icon="el-icon-delete"
-            >删除</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <el-pagination
-      :current-page="page"
-      :page-size="pageSize"
-      :page-sizes="[10, 30, 50, 100]"
-      :style="{ float: 'right', padding: '20px' }"
-      :total="total"
-      layout="total, sizes, prev, pager, next, jumper"
-      @current-change="handleCurrentChange"
-      @size-change="handleSizeChange"
-    />
-
-    <el-dialog
-       v-model="dialogFormVisible"
-      :before-close="closeDialog"
-      :title="type == 'create' ? '新增记录' : '编辑记录'"
-    >
+      <!-- 由于此处菜单跟左侧列表一一对应所以不需要分页 pageSize默认999 -->
+      <el-table :data="tableData" row-key="ID">
+        <el-table-column align="left" label="ID" min-width="100" prop="id" />
+        <el-table-column align="left" :label="t('menu.displayName')" min-width="120" prop="authorityName">
+          <template #default="scope">
+            <span>{{ scope.row.title }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="left" :label="t('menu.icon')" min-width="140" prop="authorityName">
+          <template #default="scope">
+            <div class="icon-column">
+              <el-icon>
+                <component :is="scope.row.icon" />
+              </el-icon>
+              <span>{{ scope.row.icon }}</span>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column align="left" :label="t('menu.routeName')" show-overflow-tooltip min-width="160" prop="name" />
+        <el-table-column align="left" :label="t('menu.routePath')" show-overflow-tooltip min-width="160" prop="path" />
+        <el-table-column align="left" :label="t('menu.visibility')" min-width="100" prop="hidden">
+          <template #default="scope">
+            <span>{{ scope.row.hidden? t('menu.hide') : t('menu.show') }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="left" :label="t('menu.parent')" min-width="90" prop="parentId" />
+        <el-table-column align="left" :label="t('menu.sort')" min-width="70" prop="sort" />
+        <el-table-column align="left" :label="t('menu.filePath')" min-width="360" prop="component" />
+        <el-table-column align="left" fixed="right" :label="t('general.operations')" width="200">
+            <template #default="scope">
+              <el-button
+                icon="edit"
+                size="small"
+                type="primary"
+                link
+                @click="editFunc(scope.row)"
+              >{{ t('general.edit') }}</el-button>
+              <el-button
+                icon="delete"
+                size="small"
+                type="primary"
+                link
+                @click="deleteFunc(scope.row)"
+              >{{ t('general.delete') }}</el-button>
+            </template>
+          </el-table-column>
+      </el-table>
+    </div>
+    <el-dialog v-model="dialogFormVisible" :before-close="handleClose" :title="dialogTitle" width="800px">      
       <el-form
-        :model="formData"
+        v-if="dialogFormVisible"
+        ref="menuForm"
+        :model="form"
+        :rules="rules"
         label-position="right"
         label-width="100px"
-        ref="form"
-        :rules="rules"
       >
-        <el-form-item label="父级:" prop="parent_id">
-          <el-select v-model="formData.parent_id" placeholder="请选择父级">
+      <el-form-item label="父级:" prop="parent_id">
+          <el-select v-model="form.parent_id" placeholder="请选择父级">
             <el-option label="顶级" :value="0"></el-option>
             <el-option
               :label="item.title"
@@ -154,7 +87,7 @@
 
         <el-form-item label="菜单名称:" prop="title">
           <el-input
-            v-model="formData.title"
+            v-model="form.title"
             clearable
             placeholder="请输入附加属性"
           />
@@ -162,21 +95,21 @@
 
         <el-form-item label="vue路径:" prop="component">
           <el-input
-            v-model="formData.component"
+            v-model="form.component"
             clearable
             placeholder="请输入对应前端vue文件路径"
           />
         </el-form-item>
 
         <el-form-item label="图标:" prop="icon">
-          <icon :meta="formData">
+          <icon :meta="form">
             <template slot="prepend">el-icon-</template>
           </icon>
         </el-form-item>
 
         <el-form-item label="路由name:" prop="name">
           <el-input
-            v-model="formData.name"
+            v-model="form.name"
             clearable
             placeholder="请输入路由name"
           />
@@ -184,14 +117,14 @@
 
         <el-form-item label="路由path:" prop="path">
           <el-input
-            v-model="formData.path"
+            v-model="form.path"
             clearable
             placeholder="请输入路由path"
           />
         </el-form-item>
 
         <el-form-item label="列表隐藏:" prop="hidden">
-          <el-radio-group v-model="formData.hidden">
+          <el-radio-group v-model="form.hidden">
             <el-radio :label="0" name="hidden">否</el-radio>
             <el-radio :label="1" name="hidden">是</el-radio>
           </el-radio-group>
@@ -200,27 +133,30 @@
         <el-form-item label="排序:" prop="sort">
           <el-input
             type="number"
-            v-model="formData.sort"
+            v-model.number="form.sort"
             clearable
             placeholder="请输入排序标记"
           />
         </el-form-item>
-
-        <!--
-        <el-form-item label="ID:" prop="id">
-          <el-input v-model="formData.id" clearable placeholder="请输入ID" />
-        </el-form-item>
-        -->
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="closeDialog">取 消</el-button>
-        <el-button type="primary" @click="enterDialog">确 定</el-button>
-      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button size="small" @click="closeDialog">{{ t('general.cancel') }}</el-button>
+          <el-button size="small" type="primary" @click="enterDialog">{{ t('general.confirm') }}</el-button>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>
 
-<script>
+<script setup>
+// import {
+//   updateBaseMenu,
+//   getMenuList,
+//   addBaseMenu,
+//   deleteBaseMenu,
+//   getBaseMenuById
+// } from '@/api/menu'
 import {
   systemMenuList,
   systemMenuParent,
@@ -229,211 +165,334 @@ import {
   systemMenuOne,
   systemMenuAdd,
   systemMenuUpdate,
-} from "@/api/systemMenu"; //  此处请自行替换地址
-import { formatTimeToStr } from "@/utils/date";
-import infoList from "@/mixins/infoList";
-import icon from "@/view/superAdmin/systemMenu/icon.vue";
-let defaultForm = {
-  component: "",
-  hidden: 0,
-  icon: "",
-  id: 0,
-  name: "",
-  parent_id: 0,
-  path: "",
-  sort: 0,
-  title: "",
-};
-export default {
-  name: "SystemUser",
-  filters: {
-    formatDate: function (time) {
-      if (time != null && time != "") {
-        var date = new Date(time);
-        return formatTimeToStr(date, "yyyy-MM-dd hh:mm:ss");
+} from "@/api/systemMenu";
+import icon from '@/view/superAdmin/systemMenu/icon.vue'
+import WarningBar from '@/components/warningBar/warningBar.vue'
+// import { canRemoveAuthorityBtnApi } from '@/api/authorityBtn'
+import { reactive, ref } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
+
+const { t } = useI18n() // added by mohamed hassan to support multilanguage
+
+const rules = reactive({
+  path: [{ required: true, message: t('menu.enterMenuNameNote'), trigger: 'blur' }],
+  component: [
+    { required: true, message: t('menu.enterFilePathNote'), trigger: 'blur' }
+  ],
+  'meta.title': [
+    { required: true, message: t('menu.enterMenuDisplayNameNote'), trigger: 'blur' }
+  ]
+})
+
+
+const onReset = () => {
+  searchInfo.value = {}
+}
+// 搜索
+const onSubmit = () => {
+  page.value = 1
+  pageSize.value = 10
+  getTableData()
+}
+
+const parents = ref([])
+//获取父级
+const getParent=async (page, pageSize)=>{
+  const res = await systemMenuParent({ page, pageSize });
+  console.log(res);
+  if (res.code == 200) {
+    parents.value = res.data.list;
+  }
+}
+//加载父级
+getParent(1, 200)
+
+const deleteFunc = async(row) => {
+  ElMessageBox.confirm(t('view.api.deleteApiConfirm'), t('general.hint'), {
+    confirmButtonText: t('general.confirm'),
+    cancelButtonText: t('general.cancel'),
+    type: 'warning'
+  })
+    .then(async() => {
+      const res = await systemMenuDelete(row)
+      if (res.code === 200) {
+        ElMessage({
+          type: 'success',
+          message: t('general.deleteSuccess')
+        })
+        if (tableData.value.length === 1 && page.value > 1) {
+          page.value--
+        }
+        getTableData()
+      }
+    })
+}
+
+const type = ref('')
+const openDialog = (key) => {
+  switch (key) {
+    case 'add':
+      dialogTitle.value = t('view.api.newApi')
+      break
+    case 'edit':
+      dialogTitle.value = t('view.api.editApi')
+      break
+    default:
+      break
+  }
+  type.value = key
+  dialogFormVisible.value = true
+}
+
+const editFunc = async(row) => {
+  const res = await systemMenuOne({ id: row.id })
+  form.value = res.data.item
+  openDialog('edit')
+}
+
+const page = ref(1)
+const total = ref(0)
+const pageSize = ref(999)
+const tableData = ref([])
+const searchInfo = ref({})
+// 查询
+const getTableData = async() => {
+  const table = await systemMenuList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+  if (table.code === 200) {
+    tableData.value = table.data.list
+    total.value = table.data.total
+    page.value = table.data.page
+    pageSize.value = table.data.pageSize
+  }
+}
+
+getTableData()
+
+// 新增参数
+const addParameter = (form) => {
+  if (!form.parameters) {
+    form.parameters = []
+  }
+  form.parameters.push({
+    type: 'query',
+    key: '',
+    value: ''
+  })
+}
+
+const fmtComponent = () => {
+  form.value.component = form.value.component.replace(/\\/g, '/')
+}
+
+// 删除参数
+const deleteParameter = (parameters, index) => {
+  parameters.splice(index, 1)
+}
+
+// 新增可控按钮
+const addBtn = (form) => {
+  if (!form.menuBtn) {
+    form.menuBtn = []
+  }
+  form.menuBtn.push({
+    name: '',
+    desc: '',
+  })
+}
+// 删除可控按钮
+const deleteBtn = async(btns, index) => {
+  const btn = btns[index]
+  if (btn.ID === 0) {
+    btns.splice(index, 1)
+    return
+  }  
+}
+
+const form = ref({
+  ID: 0,
+  path: '',
+  name: '',
+  hidden: false,
+  parentId: '',
+  component: '',
+  meta: {
+    activeName: '',
+    title: '',
+    icon: '',
+    defaultMenu: false,
+    closeTab: false,
+    keepAlive: false
+  },
+  parameters: [],
+  menuBtn: []
+})
+const changeName = () => {
+  form.value.path = form.value.name
+}
+
+const handleClose = (done) => {
+  initForm()
+  done()
+}
+// 删除菜单
+// const deleteMenu = (ID) => {
+//   ElMessageBox.confirm(t('menu.deleteAllRolesConfirm'), t('general.hint'), {
+//     confirmButtonText: t('general.confirm'),
+//     cancelButtonText: t('general.cancel'),
+//     type: 'warning'
+//   })
+//     .then(async() => {
+//       const res = await deleteBaseMenu({ ID })
+//       if (res.code === 0) {
+//         ElMessage({
+//           type: 'success',
+//           message: t('general.deleteSuccess')
+//         })
+//         if (tableData.value.length === 1 && page.value > 1) {
+//           page.value--
+//         }
+//         getTableData()
+//       }
+//     })
+//     .catch(() => {
+//       ElMessage({
+//         type: 'info',
+//         message: t('general.undeleted')
+//       })
+//     })
+// }
+// 初始化弹窗内表格方法
+const menuForm = ref(null)
+const checkFlag = ref(false)
+const initForm = () => {
+  checkFlag.value = false
+  menuForm.value.resetFields()
+  form.value = {
+    ID: 0,
+    path: '',
+    name: '',
+    hidden: false,
+    parentId: '',
+    component: '',
+    meta: {
+      title: '',
+      icon: '',
+      defaultMenu: false,
+      closeTab: false,
+      keepAlive: false
+    }
+  }
+}
+// 关闭弹窗
+
+const dialogFormVisible = ref(false)
+const closeDialog = () => {
+  initForm()
+  dialogFormVisible.value = false
+}
+// 添加menu
+const enterDialog = async() => {
+  menuForm.value.validate(async valid => {
+    if (valid) {
+      let res
+      if (type.value=='edit') {
+        res = await systemMenuUpdate(form.value)
       } else {
-        return "";
+        res = await systemMenuAdd(form.value)
       }
-    },
-    formatBoolean: function (v) {
-      return v == 0 ? "否" : "是";
-    },
-  },
-  mixins: [infoList],
-  data() {
-    return {
-      parents: [],
+      if (res.code === 200) {
+        ElMessage({
+          type: 'success',
+          message: isEdit.value ? t('general.editSuccess') : t('general.addSuccess')
+        })
+        getTableData()
+      }
+      initForm()
+      dialogFormVisible.value = false
+    }
+  })
+}
 
-      listApi: systemMenuList,
-      dialogFormVisible: false,
-      visible: false,
-      type: "",
-      deleteVisible: false,
-      multipleSelection: [],
-      formData: Object.assign({}, defaultForm),
-      rules: {
-        component: [
-          {
-            required: true,
-            message: "请输入对应前端vue文件路径",
-            trigger: "blur",
-          },
-        ],
-        hidden: [
-          {
-            required: true,
-            message: "请输入1是0否在列表隐藏",
-            trigger: "blur",
-          },
-        ],
-        icon: [{ required: true, message: "请选择图标", trigger: "change" }],
-        id: [{ required: true, message: "请输入ID", trigger: "blur" }],
-        name: [{ required: true, message: "请输入路由name", trigger: "blur" }],
-        parent_id: [
-          { required: true, message: "请输入父菜单ID", trigger: "blur" },
-        ],
-        path: [{ required: true, message: "请输入路由path", trigger: "blur" }],
-        sort: [{ required: true, message: "请输入排序标记", trigger: "blur" }],
-        title: [{ required: true, message: "请输入菜单名", trigger: "blur" }],
-      },
-    };
-  },
-  components: {
-    icon,
-  },
-  async created() {
-    this.pageSize = 100;
-    await this.getTableData();
-  },
-  methods: {
-    //获取父级
-    async getParent(page, pageSize) {
-      const res = await systemMenuParent({ page, pageSize });
-      console.log(res);
-      if (res.data.code == 200) {
-        this.parents = res.data.data.list;
-      }
-    },
-    // 条件搜索前端看此方法
-    search() {
-      this.page = 1;
-      this.pageSize = 10;
-      this.getTableData();
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    async deleteBatch() {
-      const ids = [];
-      if (this.multipleSelection.length == 0) {
-        this.$message({
-          type: "warning",
-          message: "请选择要删除的数据",
-        });
-        return;
-      }
-      this.multipleSelection &&
-        this.multipleSelection.map((item) => {
-          ids.push(item.id);
-        });
-
-      const res = await systemMenuDeleteBatch({ ids: ids.join(",") });
-      if (res.code == 200) {
-        this.$message({
-          type: "success",
-          message: "删除成功",
-        });
-        //if (this.tableData.length == ids.length) {
-        //  this.page--;
-        //}
-        this.deleteVisible = false;
-        this.getTableData();
-      }
-    },
-    async edit(row) {
-      const res = await systemMenuOne({ id: row.id });
-      this.type = "update";
-      if (res.data.code == 200) {
-        this.formData = res.data.data.item;
-        this.dialogFormVisible = true;
-      }
-      //加载父级
-      await this.getParent(1, 200);
-    },
-    closeDialog() {
-      this.$refs.form.resetFields();
-      this.formData = Object.assign({}, defaultForm);
-      this.dialogFormVisible = false;
-    },
-    async remove(row) {
-      this.$confirm("此操作将永久删除所有角色下该api, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(async () => {
-          const res = await systemMenuDelete({ id: row.id });
-          if (res.data.code == 200) {
-            this.$message({
-              type: "success",
-              message: "删除成功!",
-            });
-            //if (this.tableData.length == 1) {
-            //  this.page--;
-            //}
-            this.getTableData();
+const menuOption = ref([
+  {
+    ID: '0',
+    title: t('menu.rootMenu')
+  }
+])
+const setOptions = () => {
+  menuOption.value = [
+    {
+      ID: '0',
+      title: t('menu.rootDirctory')
+    }
+  ]
+  setMenuOptions(tableData.value, menuOption.value, false)
+}
+const setMenuOptions = (menuData, optionsData, disabled) => {
+  menuData &&
+        menuData.forEach(item => {
+          if (item.children && item.children.length) {
+            const option = {
+              title: item.meta.title,
+              ID: String(item.ID),
+              disabled: disabled || item.ID === form.value.ID,
+              children: []
+            }
+            setMenuOptions(
+              item.children,
+              option.children,
+              disabled || item.ID === form.value.ID
+            )
+            optionsData.push(option)
+          } else {
+            const option = {
+              title: item.meta.title,
+              ID: String(item.ID),
+              disabled: disabled || item.ID === form.value.ID
+            }
+            optionsData.push(option)
           }
         })
-        .catch(() => {
-          console.log("已取消删除");
-          /*
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-          */
-        });
-    },
-    async enterDialog() {
-      this.$refs.form.validate(async (valid) => {
-        if (valid) {
-          let res;
-          this.formData.parent_id = parseInt(this.formData.parent_id);
-          this.formData.hidden = parseInt(this.formData.hidden);
-          this.formData.sort = parseInt(this.formData.sort);
-          switch (this.type) {
-            case "create":
-              this.formData.id = 0;
-              res = await systemMenuAdd(this.formData);
-              break;
-            case "update":
-              res = await systemMenuUpdate(this.formData);
-              break;
-            default:
-              res = await systemMenuAdd(this.formData);
-              break;
-          }
-          if (res.data.code == 200) {
-            this.$message({
-              type: "success",
-              // message: "创建/更改成功",
-              message: res.data.message,
-            });
-            this.closeDialog();
-            this.getTableData();
-          }
-        }
-      });
-    },
-    async openDialog() {
-      this.type = "create";
-      this.dialogFormVisible = true;
-      //加载父级
-      await this.getParent(1, 200);
-    },
-  },
-};
+}
+
+// 添加菜单方法，id为 0则为添加根菜单
+const isEdit = ref(false)
+const dialogTitle = ref(t('menu.addMenu'))
+const addMenu = (id) => {
+  dialogTitle.value = t('menu.addMenu')
+  form.value.parentId = String(id)
+  isEdit.value = false
+  setOptions()
+  dialogFormVisible.value = true
+}
+// 修改菜单方法
+// const editMenu = async(id) => {
+//   dialogTitle.value = t('menu.editMenu')
+//   const res = await getBaseMenuById({ id })
+//   form.value = res.data.menu
+//   isEdit.value = true
+//   setOptions()
+//   dialogFormVisible.value = true
+// }
+
 </script>
 
-<style>
+<script>
+export default {
+  name: 'Menus',
+}
+</script>
+
+<style scoped lang="scss">
+.warning {
+  color: #dc143c;
+}
+.icon-column{
+  display: flex;
+  align-items: center;
+  .el-icon{
+    margin-right: 8px;
+  }
+}
 </style>

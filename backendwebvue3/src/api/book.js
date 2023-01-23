@@ -34,7 +34,7 @@ export function bookOne(data) {
 
 
 
-export function bookAdd(data) {
+export function bookAdd_odd(data) {
     return request({
         url: '/book/add',
         method: 'post',
@@ -42,10 +42,30 @@ export function bookAdd(data) {
     })
 }
 
-export function bookUpdate(data) {
+export const bookAdd = (data) => {
+    return request({
+        url: '/book/add',
+        method: 'post',
+        donNotShowLoading: true,
+        headers: { 'Content-Type': 'multipart/form-data' },
+        data
+    })
+}
+
+export function bookUpdate_old(data) {
     return request({
         url: '/book/update',
         method: 'put',
+        data
+    })
+}
+
+export const bookUpdate = (data) => {
+    return request({
+        url: '/book/update',
+        method: 'put',
+        donNotShowLoading: true,
+        headers: { 'Content-Type': 'multipart/form-data' },
         data
     })
 }

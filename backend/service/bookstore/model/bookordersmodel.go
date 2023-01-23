@@ -145,9 +145,10 @@ func (m *defaultBookOrdersModel) List(req utils.ListReq) ([]*BookOrders, int, er
 
 	// 条件处理
 	whereCondition := "where " + softDeleteFlag
-	if req.Keyword != "" {
-		whereCondition += "and `name` like '%" + req.Keyword + "%'"
-	}
+	// todo:分别查询用户名/图书标题
+	//if req.Keyword != "" {
+	//	whereCondition += "and `name` like '%" + req.Keyword + "%'"
+	//}
 
 	orderBy := "order by id desc"
 	items := make([]*BookOrders, 0)

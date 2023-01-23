@@ -47,7 +47,9 @@ service.interceptors.request.use(
     return config
   },
   error => {
-    closeLoading()
+    if (!error.config.donNotShowLoading) {
+      closeLoading()
+    }
     ElMessage({
       showClose: true,
       message: error,
@@ -61,15 +63,24 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   response => {
     const userStore = useUserStore()
-    closeLoading()
+    if (!response.config.donNotShowLoading) {
+      closeLoading()
+    }
     if (response.headers['new-token']) {
       userStore.setToken(response.headers['new-token'])
     }
-    if (response.data.code === 200) {
-      return response
+    if (response.data.code === 200 || response.headers.success === 'true') {
+      if (response.headers.message) {
+        response.data.message = decodeURI(response.headers.message)
+      }
+      return response.data
     } else {
-      ElMessage({showClose: true,message: response.data.message || decodeURI(response.headers.msg),type: 'error'})      
-      if ((response.data.data && response.data.data.reload) || response.data.code === 401) {
+      ElMessage({
+        showClose: true,
+        message: response.data.message || decodeURI(response.headers.message),
+        type: 'error'
+      })
+      if (response.data.code === 401 || (response.data.data && response.data.data.reload)) {
         userStore.token = ''
         localStorage.clear()
         router.push({ name: 'Login', replace: true })
@@ -78,19 +89,21 @@ service.interceptors.response.use(
     }
   },
   error => {
-    closeLoading()
+    if (!error.config.donNotShowLoading) {
+      closeLoading()
+    }
 
-    if(!error.response){
+    if (!error.response) {
       ElMessageBox.confirm(`
         <p>检测到请求错误</p>
         <p>${error}</p>
         `, '请求报错', {
-          dangerouslyUseHTMLString: true,
-          distinguishCancelAndClose: true,
-          confirmButtonText: '稍后重试',
-          cancelButtonText: '取消'
-        })
-        return
+        dangerouslyUseHTMLString: true,
+        distinguishCancelAndClose: true,
+        confirmButtonText: '稍后重试',
+        cancelButtonText: '取消'
+      })
+      return
     }
 
     switch (error.response.status) {
