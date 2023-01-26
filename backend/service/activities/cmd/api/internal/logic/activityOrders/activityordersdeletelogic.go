@@ -1,7 +1,10 @@
 package activityOrders
 
 import (
+	"backend/common/errorx"
+	"backend/service/activityorders/cmd/rpc/pb"
 	"context"
+	"fmt"
 
 	"backend/service/activities/cmd/api/internal/svc"
 	"backend/service/activities/cmd/api/internal/types"
@@ -24,7 +27,12 @@ func NewActivityOrdersDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContex
 }
 
 func (l *ActivityOrdersDeleteLogic) ActivityOrdersDelete(req *types.ActivityOrdersDelReq) (resp *types.ActivityOrdersReply, err error) {
-	// todo: add your logic here and delete this line
+	_, err = l.svcCtx.ActivityOrderRPC.ActivityOrdersDel(l.ctx, &pb.DelActivityOrdersReq{
+		Id: req.Id,
+	})
+	if err != nil {
+		return nil, errorx.NewCodeError(201, fmt.Sprintf("%v", err), "")
+	}
 
-	return
+	return nil, errorx.NewCodeError(200, fmt.Sprintf("编号[%d]删除成功", req.Id), "")
 }

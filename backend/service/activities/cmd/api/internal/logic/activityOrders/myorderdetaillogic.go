@@ -1,7 +1,10 @@
 package activityOrders
 
 import (
+	"backend/common/errorx"
+	"backend/service/activityorders/cmd/rpc/pb"
 	"context"
+	"fmt"
 
 	"backend/service/activities/cmd/api/internal/svc"
 	"backend/service/activities/cmd/api/internal/types"
@@ -24,7 +27,12 @@ func NewMyOrderDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MyO
 }
 
 func (l *MyOrderDetailLogic) MyOrderDetail(req *types.ActivityOrdersDelReq) (resp *types.ActivityOrdersReply, err error) {
-	// todo: add your logic here and delete this line
+	res, err := l.svcCtx.ActivityOrderRPC.ActivityOrdersGetById(l.ctx, &pb.GetActivityOrdersByIdReq{
+		Id: req.Id,
+	})
+	if err != nil {
+		return nil, errorx.NewCodeError(202, fmt.Sprintf("%v", err), "")
+	}
 
-	return
+	return nil, errorx.NewCodeError(200, fmt.Sprintf("%v", "ok"), res.ActivityOrders)
 }

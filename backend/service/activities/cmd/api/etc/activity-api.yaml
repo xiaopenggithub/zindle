@@ -15,3 +15,9 @@ ActivityRpcConf:
     Hosts:
       - 127.0.0.1:2379
     Key: activitie.rpc
+
+ActivityOrderRpcConf:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: activitieorder.rpc

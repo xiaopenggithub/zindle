@@ -1,0 +1,15 @@
+Name: activitieorder.rpc
+ListenOn: 0.0.0.0:8881
+Mode: dev
+
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: activitieorder.rpc
+
+DataSource: root:123456@tcp(192.168.11.160:3306)/db_zeromicro?parseTime=true
+
+CacheRedis:
+  - Host: 192.168.11.160:6379
+    Pass: "123456"
+    Type: node

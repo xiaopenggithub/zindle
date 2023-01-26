@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+option go_package ="./pb";
+
+package pb;
+
+// ------------------------------------ 
+// Messages
+// ------------------------------------ 
+
+//--------------------------------活动订单表--------------------------------
+message ActivityOrders {
+  int64 id = 1; //ID
+  int64 member_id = 2; //用户ID
+  int64 activity_id = 3; //活动ID
+  int64 status = 4; //0报名1签到2取消3超时失约
+  int64 seat_number = 5; //座位
+}
+
+message AddActivityOrdersReq {
+  int64 member_id = 1; //用户ID
+  int64 activity_id = 2; //活动ID
+  int64 status = 3; //0报名1签到2取消3超时失约
+  int64 seat_number = 4; //座位
+}
+
+message AddActivityOrdersResp {
+  int64 id = 1; //id
+}
+
+message UpdateActivityOrdersReq {
+  int64 id = 1; //ID
+  int64 member_id = 2; //用户ID
+  int64 activity_id = 3; //活动ID
+  int64 status = 4; //0报名1签到2取消3超时失约
+  int64 seat_number = 5; //座位
+}
+
+message UpdateActivityOrdersResp {
+}
+
+message DelActivityOrdersReq {
+  int64 id = 1; //id
+}
+
+message DelActivityOrdersBatchReq {
+  string ids = 1; //id
+}
+
+message DelActivityOrdersResp {
+}
+
+message GetActivityOrdersByIdReq {
+  int64 id = 1; //id
+}
+
+message GetActivityOrdersByIdResp {
+  ActivityOrders activity_orders = 1; //activity_orders
+}
+
+message SearchActivityOrdersReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 id = 3; //ID
+  int64 member_id = 4; //用户ID
+  int64 activity_id = 5; //活动ID
+  int64 status = 6; //0报名1签到2取消3超时失约
+  int64 seat_number = 7; //座位
+}
+
+message SearchActivityOrdersResp {
+  repeated ActivityOrders activity_orders = 1; //activity_orders
+  int64 total = 2; //记录数
+}
+
+
+
+// ------------------------------------
+// Rpc Func
+// ------------------------------------
+
+service activitieOrdersvc{
+
+  //-----------------------活动订单表-----------------------
+  rpc ActivityOrdersAdd(AddActivityOrdersReq) returns (AddActivityOrdersResp);
+  rpc ActivityOrdersUpdate(UpdateActivityOrdersReq) returns (UpdateActivityOrdersResp);
+  rpc ActivityOrdersDel(DelActivityOrdersReq) returns (DelActivityOrdersResp);
+  rpc ActivityOrdersDelBatch(DelActivityOrdersBatchReq) returns (DelActivityOrdersResp);
+  rpc ActivityOrdersGetById(GetActivityOrdersByIdReq) returns (GetActivityOrdersByIdResp);
+  rpc ActivityOrdersSearch(SearchActivityOrdersReq) returns (SearchActivityOrdersResp);
+
+}

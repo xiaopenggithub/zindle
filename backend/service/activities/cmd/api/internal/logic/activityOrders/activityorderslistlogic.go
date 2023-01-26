@@ -1,7 +1,10 @@
 package activityOrders
 
 import (
+	"backend/common/errorx"
+	"backend/service/activityorders/cmd/rpc/pb"
 	"context"
+	"fmt"
 
 	"backend/service/activities/cmd/api/internal/svc"
 	"backend/service/activities/cmd/api/internal/types"
@@ -24,7 +27,16 @@ func NewActivityOrdersListLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *ActivityOrdersListLogic) ActivityOrdersList(req *types.ActivityOrdersListReq) (resp *types.ActivityOrdersReply, err error) {
-	// todo: add your logic here and delete this line
+	res, err := l.svcCtx.ActivityOrderRPC.ActivityOrdersSearch(l.ctx, &pb.SearchActivityOrdersReq{
+		Page:  req.Page,
+		Limit: req.PageSize,
+	})
+	if err != nil {
+		return nil, errorx.NewCodeError(202, fmt.Sprintf("%v", err), "")
+	}
+	data := make(map[string]interface{})
+	data["total"] = res.Total
+	data["list"] = res.ActivityOrders
 
-	return
+	return nil, errorx.NewCodeError(200, "ok", data)
 }

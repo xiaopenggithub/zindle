@@ -14,5 +14,6 @@ type Config struct {
 	Mysql struct {
 		DataSource string
 	}
-	ActivityRpcConf zrpc.RpcClientConf
+	ActivityRpcConf      zrpc.RpcClientConf
+	ActivityOrderRpcConf zrpc.RpcClientConf
 }

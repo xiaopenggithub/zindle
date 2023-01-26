@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-// 活动预订信息
+// 订单详情
 export function activityOrdersList(data) {
     return request({
         url: '/activityOrders/list',
@@ -49,9 +49,3 @@ export function activityOrdersUpdate(data) {
         data
     })
 }
-
-
-
-
-
-

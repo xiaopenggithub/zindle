@@ -34,7 +34,7 @@ Content-Type: application/json
 authorization: {{authorization}}
 
 {
-  "id": 6,
+  "id": 10,
   "activity_id": 1,
   "seat_number": 111,
   "status": 9
