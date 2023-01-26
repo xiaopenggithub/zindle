@@ -1,0 +1,127 @@
+syntax = "proto3";
+
+option go_package ="./pb";
+
+package pb;
+
+// ------------------------------------ 
+// Messages
+// ------------------------------------ 
+
+//--------------------------------活动信息表--------------------------------
+message Activities {
+  int64 id = 1; //ID
+  string title = 2; //标题
+  string address = 3; //活动地址
+  int64 timeStart = 4; //开始时间
+  int64 timeEnd = 5; //结束时间
+  string description = 6; //简介
+  int64 quantity = 7; //数量
+  string cover = 8; //封面
+  int64 sort = 9; //排序
+  string createBy = 10; //创建者
+  string updateBy = 11; //更新者
+  int64 createdAt = 12; //创建时间
+  int64 updatedAt = 13; //更新时间
+  int64 deletedAt = 14; //删除时间
+}
+
+message AddActivitiesReq {
+  string title = 1; //标题
+  string address = 2; //活动地址
+  int64 timeStart = 3; //开始时间
+  int64 timeEnd = 4; //结束时间
+  string description = 5; //简介
+  int64 quantity = 6; //数量
+  string cover = 7; //封面
+  int64 sort = 8; //排序
+  string createBy = 9; //创建者
+  string updateBy = 10; //更新者
+  int64 createdAt = 11; //创建时间
+  int64 updatedAt = 12; //更新时间
+  int64 deletedAt = 13; //删除时间
+}
+
+message AddActivitiesResp {
+  int64 id=1;
+}
+
+message UpdateActivitiesReq {
+  int64 id = 1; //ID
+  string title = 2; //标题
+  string address = 3; //活动地址
+  int64 timeStart = 4; //开始时间
+  int64 timeEnd = 5; //结束时间
+  string description = 6; //简介
+  int64 quantity = 7; //数量
+  string cover = 8; //封面
+  int64 sort = 9; //排序
+  string createBy = 10; //创建者
+  string updateBy = 11; //更新者
+  int64 createdAt = 12; //创建时间
+  int64 updatedAt = 13; //更新时间
+  int64 deletedAt = 14; //删除时间
+}
+
+message UpdateActivitiesResp {
+}
+
+message DelActivitiesBatchReq {
+  string ids = 1; //id
+}
+message DelActivitiesReq {
+  int64 id = 1; //id
+}
+
+message DelActivitiesResp {
+}
+
+message GetActivitiesByIdReq {
+  int64 id = 1; //id
+}
+
+message GetActivitiesByIdResp {
+  Activities activities = 1; //activities
+}
+
+message SearchActivitiesReq {
+  int64 page = 1; //page
+  int64 limit = 2; //limit
+  int64 id = 3; //ID
+  string title = 4; //标题
+  string address = 5; //活动地址
+  int64 timeStart = 6; //开始时间
+  int64 timeEnd = 7; //结束时间
+  string description = 8; //简介
+  int64 quantity = 9; //数量
+  string cover = 10; //封面
+  int64 sort = 11; //排序
+  string createBy = 12; //创建者
+  string updateBy = 13; //更新者
+  int64 createdAt = 14; //创建时间
+  int64 updatedAt = 15; //更新时间
+  int64 deletedAt = 16; //删除时间
+}
+
+message SearchActivitiesResp {
+  repeated Activities activities = 1; //activities
+  int64 total = 2; //total
+}
+
+
+
+// ------------------------------------ 
+// Rpc Func
+// ------------------------------------ 
+
+service activitysrv{ 
+
+	 //-----------------------活动信息表----------------------- 
+	 rpc AddActivities(AddActivitiesReq) returns (AddActivitiesResp); 
+	 rpc UpdateActivities(UpdateActivitiesReq) returns (UpdateActivitiesResp); 
+	 rpc DelActivities(DelActivitiesReq) returns (DelActivitiesResp); 
+	 rpc DelActivitiesBatch(DelActivitiesBatchReq) returns (DelActivitiesResp);
+	 rpc GetActivitiesById(GetActivitiesByIdReq) returns (GetActivitiesByIdResp);
+	 rpc SearchActivities(SearchActivitiesReq) returns (SearchActivitiesResp); 
+
+}

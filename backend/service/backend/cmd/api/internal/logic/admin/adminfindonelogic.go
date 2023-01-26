@@ -31,6 +31,7 @@ func (l *AdminFindOneLogic) AdminFindOne(req types.AdminDelReq) (*types.AdminRep
 		return nil, errorx.NewCodeError(201, fmt.Sprintf("%v", err), "")
 	}
 	data := make(map[string]interface{})
+	one.Password = ""
 	data["item"] = one
 
 	return nil, errorx.NewCodeError(200, fmt.Sprintf("%s", "获取成功"), data)

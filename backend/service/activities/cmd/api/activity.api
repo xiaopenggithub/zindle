@@ -9,17 +9,17 @@ info(
 import "activityOrders.api"
 type (
 	ActivityPostReq {
-		Address     string `db:"address" json:"address,default="`                          // 活动地址
-		Cover       string `db:"cover" json:"cover,default="`                              // 封面
-		CreateBy    string `db:"create_by" json:"create_by,default="`                      // 创建者
-		Description string `db:"description" json:"description,default="`                  // 简介
-		Id          int64  `db:"id" json:"id,optional"`                                    // ID
-		Quantity    int64  `db:"quantity" json:"quantity,default=0"`                       // 数量
-		Sort        int64  `db:"sort" json:"sort,default=0"`                               // 排序
-		TimeEnd     string `db:"time_end" json:"time_end,default=2006-01-02 15:04:05"`     // 结束时间
-		TimeStart   string `db:"time_start" json:"time_start,default=2006-01-02 15:04:05"` // 开始时间
-		Title       string `db:"title" json:"title,default="`                              // 标题
-		UpdateBy    string `db:"update_by" json:"update_by,default="`                      // 更新者
+		Address     string `db:"address" json:"address,optional,default="`         // 活动地址
+		Cover       string `db:"cover" json:"cover,optional,default="`             // 封面
+		CreateBy    string `db:"create_by" json:"create_by,optional,default="`     // 创建者
+		Description string `db:"description" json:"description,optional,default="` // 简介
+		Id          int64  `db:"id" json:"id,optional"`                            // ID
+		Quantity    int64  `db:"quantity" json:"quantity,optional,default=0"`      // 数量
+		Sort        int64  `db:"sort" json:"sort,optional,default=0"`              // 排序
+		TimeEnd     int64  `db:"time_end" json:"time_end,optional,default=0"`      // 结束时间
+		TimeStart   int64  `db:"time_start" json:"time_start,optional,default=0"`  // 开始时间
+		Title       string `db:"title" json:"title,optional,default="`             // 标题
+		UpdateBy    string `db:"update_by" json:"update_by,optional,default="`     // 更新者
 
 	}
 	ActivityReply {

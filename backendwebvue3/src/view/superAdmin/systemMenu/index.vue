@@ -17,11 +17,16 @@
       </div>
 
       <!-- 由于此处菜单跟左侧列表一一对应所以不需要分页 pageSize默认999 -->
-      <el-table :data="tableData" row-key="ID">
+      <el-table :data="tableData" 
+        row-key="id"
+        default-expand-all
+        :tree-props="{children:'children'}"
+      >
         <el-table-column align="left" label="ID" min-width="100" prop="id" />
         <el-table-column align="left" :label="t('menu.displayName')" min-width="120" prop="authorityName">
           <template #default="scope">
-            <span>{{ scope.row.title }}</span>
+            <span style="color:burlywood;font-weight:bold;" v-if="scope.row.parent_id==0">{{ scope.row.title }}</span>
+            <span v-else>&nbsp;&nbsp;&nbsp;&nbsp;{{ scope.row.title }}</span>
           </template>
         </el-table-column>
         <el-table-column align="left" :label="t('menu.icon')" min-width="140" prop="authorityName">
@@ -41,7 +46,7 @@
             <span>{{ scope.row.hidden? t('menu.hide') : t('menu.show') }}</span>
           </template>
         </el-table-column>
-        <el-table-column align="left" :label="t('menu.parent')" min-width="90" prop="parentId" />
+        <el-table-column align="left" :label="t('menu.parent')" min-width="90" prop="parent_id" />
         <el-table-column align="left" :label="t('menu.sort')" min-width="70" prop="sort" />
         <el-table-column align="left" :label="t('menu.filePath')" min-width="360" prop="component" />
         <el-table-column align="left" fixed="right" :label="t('general.operations')" width="200">
@@ -192,7 +197,7 @@ const onReset = () => {
 // 搜索
 const onSubmit = () => {
   page.value = 1
-  pageSize.value = 10
+  pageSize.value = 999
   getTableData()
 }
 
@@ -260,7 +265,21 @@ const searchInfo = ref({})
 const getTableData = async() => {
   const table = await systemMenuList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
   if (table.code === 200) {
-    tableData.value = table.data.list
+    let menu_data=[]
+    for(let m of table.data.list){
+      if(m.parent_id==0){
+        m.children=[]
+        menu_data.push(m)
+      }
+    }
+    for(let p of menu_data){
+      for(let m of table.data.list){
+        if(m.parent_id==p.id){
+          p.children.push(m)
+        }
+      }
+    }
+    tableData.value = menu_data
     total.value = table.data.total
     page.value = table.data.page
     pageSize.value = table.data.pageSize

@@ -1,11 +1,11 @@
-package logic
+package activityOrders
 
 import (
-	"backend/common/errorx"
+	"context"
+
 	"backend/service/activities/cmd/api/internal/svc"
 	"backend/service/activities/cmd/api/internal/types"
-	"context"
-	"fmt"
+
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -15,20 +15,16 @@ type ActivityOrdersDeleteLogic struct {
 	svcCtx *svc.ServiceContext
 }
 
-// 活动预订信息 delete
-func NewActivityOrdersDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) ActivityOrdersDeleteLogic {
-	return ActivityOrdersDeleteLogic{
+func NewActivityOrdersDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ActivityOrdersDeleteLogic {
+	return &ActivityOrdersDeleteLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *ActivityOrdersDeleteLogic) ActivityOrdersDelete(req types.ActivityOrdersDelReq) (*types.ActivityOrdersReply, error) {
-	err := l.svcCtx.ActivityOrderssModel.Delete(req.Id)
-	if err != nil {
-		return nil, errorx.NewCodeError(201, fmt.Sprintf("%v", err), "")
-	}
+func (l *ActivityOrdersDeleteLogic) ActivityOrdersDelete(req *types.ActivityOrdersDelReq) (resp *types.ActivityOrdersReply, err error) {
+	// todo: add your logic here and delete this line
 
-	return nil, errorx.NewCodeError(200, fmt.Sprintf("编号[%d]删除成功", req.Id), "")
+	return
 }

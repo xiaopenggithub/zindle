@@ -9,6 +9,7 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/util"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -77,6 +78,10 @@ func check(sub, obj, act string, dataSource string) (bool, error) {
 		return false, errors.New("model-err")
 	}
 	db, err := sqlx.Connect("mysql", dataSource)
+	if err != nil {
+		logx.Infof("error: model: %s", err)
+		return false, err
+	}
 	db.SetMaxIdleConns(20)
 	db.SetMaxIdleConns(10)
 	runtime.SetFinalizer(db, finalizer)

@@ -1,10 +1,7 @@
-package logic
+package activityOrders
 
 import (
-	"backend/common/errorx"
 	"context"
-	"encoding/json"
-	"fmt"
 
 	"backend/service/activities/cmd/api/internal/svc"
 	"backend/service/activities/cmd/api/internal/types"
@@ -27,17 +24,7 @@ func NewMyOrderDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *MyO
 }
 
 func (l *MyOrderDetailLogic) MyOrderDetail(req *types.ActivityOrdersDelReq) (resp *types.ActivityOrdersReply, err error) {
-	idNumber := json.Number(fmt.Sprintf("%v", l.ctx.Value("readerId")))
-	id, err := idNumber.Int64()
-	if err != nil {
-		return nil, errorx.NewCodeError(401, "请重新登录再操作", "")
-	}
-	one, err := l.svcCtx.ActivityOrderssModel.FindOneOrder(req.Id, id)
-	if err != nil {
-		return nil, errorx.NewCodeError(201, fmt.Sprintf("%v", err), "")
-	}
-	data := make(map[string]interface{})
-	data["item"] = one
+	// todo: add your logic here and delete this line
 
-	return nil, errorx.NewCodeError(200, fmt.Sprintf("%s", "获取成功"), data)
+	return
 }

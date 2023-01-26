@@ -1,448 +1,378 @@
 <template>
   <div>
-    <div class="search-term">
-      <el-form :inline="true" :model="searchInfo" class="demo-form-inline">
+    <div class="gva-search-box">
+      <el-form ref="searchForm" :inline="true" :model="searchInfo">
         <el-form-item label="搜索关键词">
-          <el-input
-            v-model="searchInfo.keyword"
-            placeholder="输入搜索关键词"
-            size="mini"
-          />
+          <el-input v-model="searchInfo.keyword" placeholder="输入搜索关键词" clearable/>
         </el-form-item>
         <el-form-item>
-          <el-button
-            type="primary"
-            size="mini"
-            icon="el-icon-search"
-            @click="search"
-            >查询</el-button
-          >
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            size="mini"
-            icon="el-icon-plus"
-            @click="openDialog"
-            >新增</el-button
-          >
-        </el-form-item>
-        <el-form-item>
-          <el-popover v-model="deleteVisible" placement="top" width="160">
-            <p>确定要删除吗？</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="deleteVisible = false"
-                >取消</el-button
-              >
-              <el-button size="mini" type="primary" @click="deleteBatch"
-                >确定</el-button
-              >
-            </div>
-            <el-button
-              slot="reference"
-              icon="el-icon-delete"
-              size="mini"
-              type="danger"
-              >批量删除</el-button
-            >
-          </el-popover>
+          <el-button size="small" type="primary" icon="search" @click="onSubmit">{{ t('general.search') }}</el-button>
+          <el-button size="small" icon="refresh" @click="onReset">{{ t('general.reset') }}</el-button>
         </el-form-item>
       </el-form>
     </div>
-    <el-table
-      ref="multipleTable"
-      :data="tableData"
-      border
-      stripe
-      style="width: 100%"
-      tooltip-effect="dark"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column type="selection" width="55" fixed="left" />
-      <el-table-column label="ID" prop="id" width="70" />
-
-      <el-table-column label="活动" prop="title" />
-      <el-table-column label="人数" prop="quantity" width="80" />
-      <el-table-column label="开始时间" width="160">
-        <template #default="scope">
-          {{ formatTime(scope.row.time_start) }}
-        </template>
-      </el-table-column>
-      <el-table-column label="结束时间" width="160">
-        <template #default="scope">
-          {{ formatTime(scope.row.time_end) }}
-        </template>
-      </el-table-column>
-
-      <el-table-column label="创建时间" width="160">
-        <template #default="scope">
-          {{ formatTime(scope.row.created_at) }}
-        </template>
-      </el-table-column>
-
-      <el-table-column label="操作" fixed="right" width="220" align="center">
-        <template #default="scope">
-          <el-button
-            class="table-button"
-            size="mini"
-            type="primary"
-            icon="el-icon-edit"
-            @click="edit(scope.row)"
-            >修改</el-button
-          >
-          <el-button
-            @click="remove(scope.row)"
-            size="mini"
-            type="danger"
-            icon="el-icon-delete"
-            >删除</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <el-pagination
-      :current-page="page"
-      :page-size="pageSize"
-      :page-sizes="[10, 30, 50, 100]"
-      :style="{ float: 'right', padding: '20px' }"
-      :total="total"
-      layout="total, sizes, prev, pager, next, jumper"
-      @current-change="handleCurrentChange"
-      @size-change="handleSizeChange"
-    />
-
-    <el-dialog
-      :before-close="closeDialog"
-      v-model="dialogFormVisible"
-      :title="type == 'create' ? '新增记录' : '编辑记录'"
-    >
-      <el-form
-        :model="formData"
-        label-position="right"
-        label-width="100px"
-        ref="form"
-        :rules="rules"
-      >
-        <!--
-        <el-form-item label="活动地址:" prop="address">
-          <el-input
-            v-model="formData.address"
-            clearable
-            placeholder="请输入活动地址"
-          />
-        </el-form-item>
-
-        
-        <el-form-item label="封面:" prop="cover">
-          <el-input
-            v-model="formData.cover"
-            clearable
-            placeholder="请输入封面"
-          />
-        </el-form-item>
-        
-
-        <el-form-item label="创建者:" prop="create_by">
-          <el-input
-            v-model="formData.create_by"
-            clearable
-            placeholder="请输入创建者"
-          />
-        </el-form-item>
-
-        <el-form-item label="简介:" prop="description">
-          <el-input
-            v-model="formData.description"
-            clearable
-            placeholder="请输入简介"
-          />
-        </el-form-item>
-
-        
-        <el-form-item label="ID:" prop="id">
-          <el-input v-model="formData.id" clearable placeholder="请输入ID" />
-        </el-form-item>
-
-        <el-form-item label="排序:" prop="sort">
-          <el-input
-            v-model="formData.sort"
-            clearable
-            placeholder="请输入排序"
-          />
-        </el-form-item>
-        <el-form-item label="更新者:" prop="update_by">
-          <el-input
-            v-model="formData.update_by"
-            clearable
-            placeholder="请输入更新者"
-          />
-        </el-form-item>
-        -->
-        <el-form-item label="标题:" prop="title">
-          <el-input
-            v-model="formData.title"
-            clearable
-            placeholder="请输入标题"
-          />
-        </el-form-item>
-        <el-form-item label="数量:" prop="quantity">
-          <el-input
-            v-model="formData.quantity"
-            clearable
-            placeholder="请输入数量"
-          />
-        </el-form-item>
-
-        <el-form-item label="开始时间:" prop="time_start">
-          <!--
-          <el-input
-            v-model="formData.time_start"
-            clearable
-            placeholder="请输入开始时间"
-          />
-          -->
-          <el-date-picker
-            v-model="formData.time_start"
-            type="datetime"
-            placeholder="请输入开始时间"
-          />
-        </el-form-item>
-
-        <el-form-item label="结束时间:" prop="time_end">
-          <!--
-          <el-input
-            v-model="formData.time_end"
-            clearable
-            placeholder="请输入结束时间"
-          />
-          -->
-          <el-date-picker
-            v-model="formData.time_end"
-            type="datetime"
-            placeholder="请输入结束时间"
-          />
-        </el-form-item>
-
-        
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="closeDialog">取 消</el-button>
-        <el-button type="primary" @click="enterDialog">确 定</el-button>
+    <div class="gva-table-box">
+      <div class="gva-btn-list">
+        <el-button size="small" type="primary" icon="plus" @click="openDialog('add')">{{ t('general.add') }}</el-button>
+        <el-popover v-model="deleteVisible" placement="top" width="160">
+          <p>{{ t('general.deleteConfirm') }}</p>
+          <div style="text-align: right; margin-top: 8px;">
+            <el-button size="small" type="primary" link @click="deleteVisible = false">{{ t('general.cancel') }}</el-button>
+            <el-button size="small" type="primary" @click="deleteBatchFunc">{{ t('general.confirm') }}</el-button>
+          </div>
+          <template #reference>
+            <el-button icon="delete" size="small" :disabled="!selectedData.length" style="margin-left: 10px;" @click="deleteVisible = true">{{ t('general.delete') }}</el-button>
+          </template>
+        </el-popover>
       </div>
+      <el-table :data="tableData" @sort-change="sortChange" @selection-change="handleSelectionChange">
+        <el-table-column
+          type="selection"
+          width="55"
+        />
+        <el-table-column align="left" label="ID" min-width="60" prop="id" sortable="custom" />
+        <el-table-column align="left" label="活动名称" min-width="150" prop="title" sortable="custom" />
+        <el-table-column align="left" label="活动地址" min-width="150" prop="address" sortable="custom" />
+        <el-table-column align="left" label="开始时间" min-width="150" prop="time_start" sortable="custom" />
+        <el-table-column align="left" label="结束时间" min-width="150" prop="time_end" sortable="custom" />
+        <el-table-column align="left" label="简介" min-width="150" prop="description" sortable="custom" />
+        <el-table-column align="left" label="数量" min-width="150" prop="quantity" sortable="custom" />
+        <el-table-column align="left" label="封面" min-width="150" prop="cover" sortable="custom" />  
+        <el-table-column align="left" label="排序" min-width="150" prop="sort" sortable="custom" />
+        <el-table-column align="left" fixed="right" :label="t('general.operations')" width="200">
+          <template #default="scope">
+            <el-button
+              icon="edit"
+              size="small"
+              type="primary"
+              link
+              @click="editFunc(scope.row)"
+            >{{ t('general.edit') }}</el-button>
+            <el-button
+              icon="delete"
+              size="small"
+              type="primary"
+              link
+              @click="deleteFunc(scope.row)"
+            >{{ t('general.delete') }}</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="gva-pagination">
+        <el-pagination
+          :current-page="page"
+          :page-size="pageSize"
+          :page-sizes="[10, 30, 50, 100]"
+          :total="total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
+
+    </div>
+
+    <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle">        
+      <el-form ref="editForm" :model="form" :rules="rules" label-width="120px">                    
+          <el-form-item label="活动名称:" prop="title">
+          <el-input
+              v-model="form.title"
+              clearable
+              placeholder="请输入活动名称"
+          />
+          </el-form-item>
+
+          <el-form-item label="活动地址:" prop="address">
+          <el-input
+              v-model="form.address"
+              clearable
+              placeholder="请输入活动地址"
+          />
+          </el-form-item>
+
+          <el-form-item label="简介:" prop="description">
+          <el-input
+              v-model="form.description"
+              clearable
+              placeholder="请输入简介"
+          />
+          </el-form-item>
+
+          <el-form-item label="封面:" prop="cover">
+          <el-input
+              v-model="form.cover"
+              clearable
+              placeholder="请输入封面"
+          />
+          </el-form-item>
+
+
+          <el-form-item label="开始时间:" prop="time_start">
+          <el-input
+              type="number"
+              v-model.number="form.time_start"
+              clearable
+              placeholder="请输入开始时间"
+          />
+          </el-form-item>
+
+          <el-form-item label="结束时间:" prop="time_end">
+          <el-input
+              type="number"
+              v-model.number="form.time_end"
+              clearable
+              placeholder="请输入结束时间"
+          />
+          </el-form-item>
+          
+          <el-form-item label="数量:" prop="quantity">
+          <el-input
+              type="number"
+              v-model.number="form.quantity"
+              clearable
+              placeholder="请输入数量"
+          />
+          </el-form-item>
+
+          <el-form-item label="排序:" prop="sort">
+          <el-input
+              type="number"
+              v-model.number="form.sort"
+              clearable
+              placeholder="请输入排序"
+          />
+          </el-form-item>
+
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button size="small" @click="closeDialog">{{ t('general.close') }}</el-button>
+          <el-button size="small" type="primary" @click="enterDialog">{{ t('general.confirm') }}</el-button>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>
+<script setup>
+  import { ref } from 'vue'  
+  import {
+    activityList,
+    activityDelete,
+    activityDeleteBatch,
+    activityOne,
+    activityAdd,
+    activityUpdate,
+  } from "@/api/activity";
 
-<script>
-import {
-  activityList,
-  activityDelete,
-  activityDeleteBatch,
-  activityOne,
-  activityAdd,
-  activityUpdate,
-} from "@/api/activity"; //  此处请自行替换地址
-import moment from "moment"; //导入模块
-moment.locale("zh-cn"); //设置语言 或 moment.lang('zh-cn');
-import { formatTimeToStr } from "@/utils/date";
-import infoList from "@/mixins/infoList";
-let defaultForm = {
-  address: "",
-  cover: "",
-  create_by: "",
-  description: "",
-  id: 0,
-  quantity: 10,
-  sort: 0,
-  time_end: "",
-  time_start: "",
-  title: "龙南佳苑自习室开放",
-  update_by: "",
-};
-export default {
-  name: "SystemUser",
-  filters: {
-    formatDate: function (time) {
-      if (time != null && time != "") {
-        var date = new Date(time);
-        return formatTimeToStr(date, "yyyy-MM-dd hh:mm:ss");
-      } else {
-        return "";
-      }
-    },
-    formatBoolean: function (bool) {
-      if (bool != null) {
-        return bool ? "是" : "否";
-      } else {
-        return "";
-      }
-    },
-  },
-  mixins: [infoList],
-  data() {
-    return {
-      listApi: activityList,
-      dialogFormVisible: false,
-      visible: false,
-      type: "",
-      deleteVisible: false,
-      multipleSelection: [],
-      formData: Object.assign({}, defaultForm),
-      rules: {
-        address: [
-          { required: true, message: "请输入活动地址", trigger: "blur" },
-        ],
-        cover: [{ required: true, message: "请输入封面", trigger: "blur" }],
-        create_by: [
-          { required: true, message: "请输入创建者", trigger: "blur" },
-        ],
-        description: [
-          { required: true, message: "请输入简介", trigger: "blur" },
-        ],
-        id: [{ required: true, message: "请输入ID", trigger: "blur" }],
-        quantity: [{ required: true, message: "请输入数量", trigger: "blur" }],
-        sort: [{ required: true, message: "请输入排序", trigger: "blur" }],
-        time_end: [
-          { required: true, message: "请输入结束时间", trigger: "blur" },
-        ],
-        time_start: [
-          { required: true, message: "请输入开始时间", trigger: "blur" },
-        ],
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
-        update_by: [
-          { required: true, message: "请输入更新者", trigger: "blur" },
-        ],
-      },
-    };
-  },
-  async created() {
-    await this.getTableData();
-  },
-  methods: {
-    formatTime(v) {
-      return moment(v).format("YYYY-MM-DD HH:mm:ss");
-    },
-    // 条件搜索前端看此方法
-    search() {
-      this.page = 1;
-      this.pageSize = 10;
-      this.getTableData();
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    async deleteBatch() {
-      const ids = [];
-      if (this.multipleSelection.length == 0) {
-        this.$message({
-          type: "warning",
-          message: "请选择要删除的数据",
-        });
-        return;
-      }
-      this.multipleSelection &&
-        this.multipleSelection.map((item) => {
-          ids.push(item.id);
-        });
+  import { ElMessage, ElMessageBox } from 'element-plus'
+  
+  import { useI18n } from 'vue-i18n'
+  const { t } = useI18n()
 
-      const res = await activityDeleteBatch({ ids: ids.join(",") });
-      if (res.data.code == 200) {
-        this.$message({
-          type: "success",
-          message: "删除成功",
-        });
-        //if (this.tableData.length == ids.length) {
-        //  this.page--;
-        //}
-        this.deleteVisible = false;
-        this.getTableData();
+
+  const page = ref(1)
+  const total = ref(0)
+  const pageSize = ref(10)
+  const tableData = ref([])
+  const searchInfo = ref({})
+
+  const actionType = ref('')
+  
+  const selectedData = ref([])
+  const form = ref({
+    id: 0,
+    create_by: "",
+    update_by: "",
+    sort: 0,
+    cover: "",
+    quantity: 0,
+    description: "",        
+    title: "",
+    address: "",
+    time_start: 0,
+    time_end: 0,  
+  })
+
+
+  const onReset = () => {
+    searchInfo.value = {}
+  }
+  // 搜索
+  
+  const onSubmit = () => {
+    page.value = 1
+    pageSize.value = 10
+    getTableData()
+  }
+  
+  // 分页
+  const handleSizeChange = (val) => {
+    pageSize.value = val
+    getTableData()
+  }
+  
+  const handleCurrentChange = (val) => {
+    page.value = val
+    getTableData()
+  }
+  
+  // 排序
+  const sortChange = ({ prop, order }) => {
+    if (prop) {
+      if (prop === 'ID') {
+        prop = 'id'
       }
-    },
-    async edit(row) {
-      const res = await activityOne({ id: row.id });
-      this.type = "update";
-      if (res.data.code == 200) {
-        this.formData = res.data.data.item;
-        this.dialogFormVisible = true;
-      }
-    },
-    closeDialog() {
-      this.$refs.form.resetFields();
-      this.formData = Object.assign({}, defaultForm);
-      this.dialogFormVisible = false;
-    },
-    async remove(row) {
-      this.$confirm("此操作将永久删除所有角色下该api, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      searchInfo.value.orderKey = toSQLLine(prop)
+      searchInfo.value.desc = order === 'descending'
+    }
+    getTableData()
+  }
+  
+  // 查询
+  const getTableData = async() => {    
+    const table = await activityList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
+    if (table.code === 200) {
+      tableData.value = table.data.list
+      total.value = table.data.total
+      // page.value = table.data.page
+      // pageSize.value = table.data.pageSize
+    }
+  }
+  // 批量操作
+  const handleSelectionChange = (val) => {
+    selectedData.value = val
+  }
+  getTableData()
+
+  const deleteVisible = ref(false)
+  const deleteBatchFunc = async() => {
+    const ids = selectedData.value.map(item => item.id)
+    const res = await activityDeleteBatch({ ids:ids.join(",") })
+    if (res.code === 200) {
+      ElMessage({
+        type: 'success',
+        message: res.message
       })
-        .then(async () => {
-          const res = await activityDelete({ id: row.id });
-          if (res.data.code == 200) {
-            this.$message({
-              type: "success",
-              message: "删除成功!",
-            });
-            //if (this.tableData.length == 1) {
-            //  this.page--;
-            //}
-            this.getTableData();
-          }
-        })
-        .catch(() => {
-          console.log("已取消删除");
-          /*
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-          */
-        });
-    },
-    async enterDialog() {
-      this.$refs.form.validate(async (valid) => {
-        if (valid) {
-          let res;
-          this.formData.quantity = parseInt(this.formData.quantity);
-          this.formData.sort = parseInt(this.formData.sort);
+      if (tableData.value.length === ids.length && page.value > 1) {
+        page.value--
+      }
+      deleteVisible.value = false
+      getTableData()
+    }
+  }
 
-          this.formData.time_end = this.formatTime(this.formData.time_end);
-          this.formData.time_start = this.formatTime(this.formData.time_start);
-          
-            
-          switch (this.type) {
-            case "create":
-              this.formData.id = 0;
-              res = await activityAdd(this.formData);
-              break;
-            case "update":
-              res = await activityUpdate(this.formData);
-              break;
-            default:
-              res = await activityAdd(this.formData);
-              break;
-          }
-          if (res.data.code == 200) {
-            this.$message({
-              type: "success",
-              // message: "创建/更改成功",
-              message: res.data.message,
-            });
-            this.closeDialog();
-            this.getTableData();
-          }
+  // 弹窗相关
+  const editForm = ref(null)
+  const initForm = () => {
+    editForm.value.resetFields()
+    form.value = {        
+      id: 0,
+      create_by: "",
+      update_by: "",
+      sort: 0,
+      cover: "",
+      quantity: 0,
+      description: "",        
+      title: "",
+      address: "",
+      time_start: 0,
+      time_end: 0,        
+    }
+  }
+
+  const dialogTitle = ref('新增Api')
+  const dialogFormVisible = ref(false)
+  const openDialog = (key) => {
+    switch (key) {
+      case 'add':
+        dialogTitle.value = '新增'
+        break
+      case 'edit':
+        dialogTitle.value = '编辑'
+        break
+      default:
+        break
+    }
+    actionType.value = key
+    dialogFormVisible.value = true
+  }
+  const closeDialog = () => {
+    initForm()
+    dialogFormVisible.value = false
+  }
+  const editFunc = async(row) => {    
+    const res = await activityOne({ id: row.id })
+    console.log(res)    
+    form.value = res.data
+    openDialog('edit')
+  }
+  
+  const enterDialog = async() => {
+    editForm.value.validate(async valid => {
+      if (valid) {
+        switch (actionType.value) {
+          case 'add':
+            {
+              const res = await activityAdd(form.value)
+              if (res.code === 200) {
+                ElMessage({
+                  type: 'success',
+                  message: t('general.addSuccess'),
+                  showClose: true
+                })
+              }
+              getTableData()
+              closeDialog()
+            }
+  
+            break
+          case 'edit':
+            {
+              const res = await activityUpdate(form.value)
+              if (res.code === 200) {
+                ElMessage({
+                  type: 'success',
+                  message: t('general.editSuccess'),
+                  showClose: true
+                })
+              }
+              getTableData()
+              closeDialog()
+            }
+            break
+          default:
+            // eslint-disable-next-line no-lone-blocks
+            {
+              ElMessage({
+                type: 'error',
+                message: t('view.api.unknownOperation'),
+                showClose: true
+              })
+            }
+            break
         }
-      });
-    },
-    openDialog() {
-      this.type = "create";
-      this.dialogFormVisible = true;
-    },
-  },
-};
+      }
+    })
+  }
+  
+  const deleteFunc = async(row) => {
+    ElMessageBox.confirm(t('view.api.deleteApiConfirm'), t('general.hint'), {
+      confirmButtonText: t('general.confirm'),
+      cancelButtonText: t('general.cancel'),
+      type: 'warning'
+    })
+      .then(async() => {
+        const res = await activityDelete(row)
+        if (res.code === 200) {
+          ElMessage({
+            type: 'success',
+            message: t('general.deleteSuccess')
+          })
+          if (tableData.value.length === 1 && page.value > 1) {
+            page.value--
+          }
+          getTableData()
+        }
+      })
+  }
 </script>
-
-<style>
-</style>

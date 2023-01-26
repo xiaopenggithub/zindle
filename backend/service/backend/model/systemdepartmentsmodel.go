@@ -108,7 +108,6 @@ func (m *defaultSystemDepartmentsModel) Delete(id int64) error {
 
 func (m *defaultSystemDepartmentsModel) List(req utils.ListReq) ([]*SystemDepartments, int, error) {
 	total := 0
-
 	// 条件处理
 	whereCondition := "where " + softDeleteFlag
 	if req.Keyword != "" {

@@ -1,5 +1,6 @@
 Name: systemuserget.rpc
 ListenOn: 0.0.0.0:8891
+Mode: dev
 Etcd:
   Hosts:
   - 127.0.0.1:2379

@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/rest"
+	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type Config struct {
@@ -14,13 +14,5 @@ type Config struct {
 	Mysql struct {
 		DataSource string
 	}
-	CacheRedis cache.CacheConf
-	Email      struct {
-		From     string
-		Nickname string
-		Secret   string
-		Host     string
-		Port     int64
-		IsSSL    bool
-	}
+	ActivityRpcConf zrpc.RpcClientConf
 }

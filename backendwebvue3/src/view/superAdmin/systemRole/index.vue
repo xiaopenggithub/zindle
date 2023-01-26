@@ -10,7 +10,7 @@
         row-key="id"
         style="width: 100%"
       >
-        <el-table-column :label="t('authority.roleID')" width="70" prop="id" />
+        <el-table-column :label="t('authority.roleID')" width="80" prop="id" />
         <el-table-column align="left" :label="t('authority.roleName')" prop="name" />
         <el-table-column label="父级ID" prop="parent_id" width="70" />
         <el-table-column label="排序" prop="sort" width="70" />

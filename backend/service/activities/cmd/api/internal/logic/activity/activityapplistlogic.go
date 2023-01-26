@@ -1,8 +1,8 @@
-package logic
+package activity
 
 import (
 	"backend/common/errorx"
-	"backend/common/utils"
+	"backend/service/activities/cmd/rpc/pb"
 	"context"
 	"fmt"
 
@@ -27,20 +27,17 @@ func NewActivityAppListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *A
 }
 
 func (l *ActivityAppListLogic) ActivityAppList(req *types.ActivityListReq) (resp *types.ActivityReply, err error) {
-	reqParam := utils.ListReq{}
-	reqParam.Page = req.Page
-	reqParam.PageSize = req.PageSize
-	reqParam.Keyword = req.Keyword
-
-	list, i, err := l.svcCtx.ActivitysModel.List(reqParam)
+	res, err := l.svcCtx.ActivityRPC.SearchActivities(l.ctx, &pb.SearchActivitiesReq{
+		Title: req.Keyword,
+		Page:  req.Page,
+		Limit: req.PageSize,
+	})
 	if err != nil {
-		return nil, errorx.NewCodeError(201, fmt.Sprintf("%v", err), "")
+		return nil, errorx.NewCodeError(202, fmt.Sprintf("%v", err), "")
 	}
 	data := make(map[string]interface{})
-	data["page"] = req.Page
-	data["pageSize"] = req.PageSize
-	data["total"] = i
-	data["list"] = list
+	data["total"] = res.Total
+	data["list"] = res.Activities
 
 	return nil, errorx.NewCodeError(200, "ok", data)
 }

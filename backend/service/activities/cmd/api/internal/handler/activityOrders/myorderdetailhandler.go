@@ -1,11 +1,11 @@
-package handler
+package activityOrders
 
 import (
 	"backend/common/errorx"
-	logic "backend/service/activities/cmd/api/internal/logic/activityOrders"
 	"fmt"
 	"net/http"
 
+	"backend/service/activities/cmd/api/internal/logic/activityOrders"
 	"backend/service/activities/cmd/api/internal/svc"
 	"backend/service/activities/cmd/api/internal/types"
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -19,7 +19,7 @@ func MyOrderDetailHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := logic.NewMyOrderDetailLogic(r.Context(), svcCtx)
+		l := activityOrders.NewMyOrderDetailLogic(r.Context(), svcCtx)
 		resp, err := l.MyOrderDetail(&req)
 		if err != nil {
 			httpx.Error(w, err)

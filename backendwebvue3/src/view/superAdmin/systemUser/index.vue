@@ -78,7 +78,7 @@
 
         <el-table-column label="最后登录IP" prop="login_ip" width="120" />
 
-        <el-table-column label="备注" prop="remark" width="120" />
+        <el-table-column label="备注" prop="remark"/>
 
         <el-table-column label="最后登录时间" width="160">
           <template #default="scope">
@@ -94,6 +94,7 @@
                 type="primary"
                 link
                 @click="editFunc(scope.row)"
+                v-if="scope.row.user_name!='admin'"
               >{{ t('general.edit') }}</el-button>
               <el-button
                 icon="delete"
@@ -101,6 +102,7 @@
                 type="primary"
                 link
                 @click="deleteFunc(scope.row)"
+                v-if="scope.row.user_name!='admin'"
               >{{ t('general.delete') }}</el-button>
             </template>
           </el-table-column>
