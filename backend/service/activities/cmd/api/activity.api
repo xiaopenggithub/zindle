@@ -49,23 +49,23 @@ service activity-api {
 	//	列表
 	@handler ActivityList
 	post /activity/list(ActivityListReq) returns (ActivityReply)
-	
+
 	//	删除
 	@handler ActivityDelete
 	delete /activity/delete(ActivityDelReq) returns (ActivityReply)
-	
+
 	//	删除批量
 	@handler ActivityDeleteBatch
 	delete /activity/deleteBatch(ActivityDelBatchReq) returns (ActivityReply)
-	
+
 	//	查询数据
 	@handler ActivityFindOne
 	post /activity/find(ActivityDelReq) returns (ActivityReply)
-	
+
 	// 添加
 	@handler ActivityAdd
 	post /activity/add (ActivityPostReq) returns (ActivityReply)
-	
+
 	// 更新
 	@handler ActivityUpdate
 	put /activity/update (ActivityPostReq) returns (ActivityReply)
@@ -78,7 +78,7 @@ service activity-api {
 	//	app活动列表
 	@handler ActivityAppList
 	post /activity/appList(ActivityListReq) returns (ActivityReply)
-	
+
 	//	app活动详情
 	@handler ActivityAppFindOne
 	post /activity/appFind(ActivityDelReq) returns (ActivityReply)

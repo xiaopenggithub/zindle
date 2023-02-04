@@ -1,0 +1,9 @@
+### 发送消息
+#POST http://127.0.0.1:8892/reader/list
+POST http://127.0.0.1:8894//chat/sendMessageToUid
+Content-Type: application/json
+
+{
+    "message": "{\"to_user\":12,\"recive_user\":11,\"message\":\"吃了吗\"}",
+    "cid": "21eb117e-d359-49b3-8067-64a369c0091c"
+}

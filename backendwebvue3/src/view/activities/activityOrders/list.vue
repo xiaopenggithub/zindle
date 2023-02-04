@@ -30,11 +30,15 @@
           type="selection"
           width="55"
         />
-        <el-table-column align="left" label="ID" min-width="150" prop="id" sortable="custom" />
-<el-table-column align="left" label="用户ID" min-width="150" prop="member_id" sortable="custom" />
-<el-table-column align="left" label="活动ID" min-width="150" prop="activity_id" sortable="custom" />
-<el-table-column align="left" label="0报名1签到2取消3超时失约" min-width="150" prop="status" sortable="custom" />
-<el-table-column align="left" label="座位" min-width="150" prop="seat_number" sortable="custom" />
+        <el-table-column align="left" label="ID" min-width="150" prop="id"/>
+<el-table-column align="left" label="用户ID" min-width="150" prop="member_id"/>
+<el-table-column align="left" label="活动ID" min-width="150" prop="activity.title"/>
+<el-table-column label="状态" width="80" align="center">
+          <template #default="scope">
+            {{ formatStatus(scope.row.status)}}
+          </template>
+        </el-table-column>
+<el-table-column align="left" label="座位" min-width="150" prop="seat_number"/>
 
         <el-table-column align="left" fixed="right" :label="t('general.operations')" width="200">
           <template #default="scope">
@@ -70,34 +74,32 @@
     </div>
 
     <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialogTitle">
-      <el-form ref="editForm" :model="form" :rules="rules" label-width="120px">
-          <el-form-item label="ID:" prop="id">
-										  <el-input
-											v-model="form.id"
-											clearable
-											placeholder="请输入ID"/> 
-										</el-form-item>
+      <el-form ref="editForm" :model="form" :rules="rules" label-width="120px">      
 
 <el-form-item label="用户ID:" prop="member_id">
 										  <el-input
-											v-model="form.member_id"
+											v-model.number="form.member_id"
 											clearable
 											placeholder="请输入用户ID"/> 
 										</el-form-item>
 
 <el-form-item label="活动ID:" prop="activity_id">
 										  <el-input
-											v-model="form.activity_id"
+											v-model.number="form.activity_id"
 											clearable
 											placeholder="请输入活动ID"/> 
 										</el-form-item>
 
-<el-form-item label="0报名1签到2取消3超时失约:" prop="status">
-										  <el-input
-											v-model="form.status"
-											clearable
-											placeholder="请输入0报名1签到2取消3超时失约"/> 
+<el-form-item label="状态:" prop="status">
+                      <el-radio-group v-model="form.status">
+                        <el-radio :label="0" name="status">报名</el-radio>
+                        <el-radio :label="1" name="status">签到</el-radio>
+                        <el-radio :label="2" name="status">取消</el-radio>
+                        <el-radio :label="3" name="status">超时失约</el-radio>
+                      </el-radio-group>
 										</el-form-item>
+
+                    
 
 <el-form-item label="座位:" prop="seat_number">
 										  <el-input
@@ -118,6 +120,7 @@
   </div>
 </template>
 <script setup>
+  import * as _ from 'lodash'
   import { ref } from 'vue'
   import {
     activityOrdersList,
@@ -191,7 +194,9 @@ seat_number: 1,
   const getTableData = async() => {
     const table = await activityOrdersList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 200) {
-      tableData.value = table.data.list
+      tableData.value = _.sortBy(table.data.list,item=>{        
+        return -item.id
+      })
       total.value = table.data.total
     }
   }
@@ -326,5 +331,21 @@ seat_number: 1,
           getTableData()
         }
       })
+  }
+
+  const formatStatus=(v)=>{
+    if (v == 0) {
+      return "报名";
+    }
+    if (v == 1) {
+      return "签到";
+    }
+    if (v == 2) {
+      return "取消";
+    }
+    if (v == 3) {
+      return "超时失约";
+    }
+    return "报名";
   }
 </script>

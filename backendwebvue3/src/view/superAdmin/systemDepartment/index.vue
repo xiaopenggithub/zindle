@@ -30,20 +30,20 @@
             type="selection"
             width="55"
           />
-          <el-table-column align="left" label="ID" min-width="60" prop="id" sortable="custom" />
-          <el-table-column align="left" label="部门名称" min-width="150" prop="name" sortable="custom" />
-          <el-table-column align="left" label="负责人" min-width="150" prop="leader" sortable="custom" />
-          <el-table-column align="left" label="邮箱" min-width="150" prop="email" sortable="custom" />
-          <el-table-column align="left" label="联系电话" min-width="150" prop="phone" sortable="custom" />
-          <el-table-column align="left" label="父级ID" min-width="150" prop="parent_id" sortable="custom" />
-          <el-table-column align="left" label="祖级列表" min-width="150" prop="ancestors" sortable="custom" />
-          <el-table-column align="left" label="部门状态" min-width="150" prop="description" sortable="custom" />
+          <el-table-column align="left" label="ID" min-width="60" prop="id"/>
+          <el-table-column align="left" label="部门名称" min-width="150" prop="name"/>
+          <el-table-column align="left" label="负责人" min-width="150" prop="leader"/>
+          <el-table-column align="left" label="邮箱" min-width="150" prop="email"/>
+          <el-table-column align="left" label="联系电话" min-width="150" prop="phone"/>
+          <el-table-column align="left" label="父级ID" min-width="150" prop="parent_id"/>
+          <el-table-column align="left" label="祖级列表" min-width="150" prop="ancestors"/>
+          <el-table-column align="left" label="部门状态" min-width="150" prop="description"/>
           <el-table-column label="部门状态" width="80">
                 <template #default="scope">
                 {{ formatBoolean(scope.row.status)}}
                 </template>
             </el-table-column>
-          <el-table-column align="left" label="排序" min-width="150" prop="sort" sortable="custom" />
+          <el-table-column align="left" label="排序" min-width="150" prop="sort"/>
           
   
           <el-table-column align="left" fixed="right" :label="t('general.operations')" width="200">

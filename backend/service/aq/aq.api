@@ -1,0 +1,22 @@
+syntax = "v1"
+
+info(
+	title: "cron"
+	desc: "cron"
+	author: "qin"
+	email: "361018729@qq.com"
+)
+type (
+	Req {
+		Id string `db:"id" json:"id"` // id
+	}
+	Reply {
+		Code int64 `json:"code"`
+	}
+)
+
+service aq-api {
+	//	发送消息
+	@handler DoTask
+	post /chat/doTask(Req) returns (Reply)
+}

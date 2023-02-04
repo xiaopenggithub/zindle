@@ -17,6 +17,7 @@
         "element-plus": "2.2.16",
         "highlight.js": "^10.6.0",
         "js-cookie": "^3.0.1",
+        "lodash": "^4.17.21",
         "marked": "^4.1.0",
         "mitt": "^3.0.0",
         "moment": "^2.29.4",

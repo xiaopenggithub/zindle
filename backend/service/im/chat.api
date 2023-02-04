@@ -1,0 +1,23 @@
+syntax = "v1"
+
+info(
+	title: "websocket"
+	desc: "websocket"
+	author: "qin"
+	email: "361018729@qq.com"
+)
+type (
+	MessageReq {
+		Message string `db:"message" json:"message"` // json string
+		Cid     string `db:"cid" json:"cid"`         // client id
+	}
+	MessageReply {
+		Code int64 `json:"code"`
+	}
+)
+
+service chat-api {
+	//	发送消息
+	@handler SendMessageToUid
+	post /chat/sendMessageToUid(MessageReq) returns (MessageReply)
+}

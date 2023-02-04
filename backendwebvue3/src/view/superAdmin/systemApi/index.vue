@@ -30,10 +30,10 @@
           type="selection"
           width="55"
         />
-        <el-table-column align="left" label="ID" min-width="60" prop="id" sortable="custom" />
-        <el-table-column align="left" :label="t('view.api.apiPath')" min-width="150" prop="path" sortable="custom" />
-        <el-table-column align="left" :label="t('view.api.apiGrouping')" min-width="150" prop="api_group" sortable="custom" />
-        <el-table-column align="left" :label="t('view.api.apiDescrpition')" min-width="150" prop="description" sortable="custom" />
+        <el-table-column align="left" label="ID" min-width="60" prop="id"/>
+        <el-table-column align="left" :label="t('view.api.apiPath')" min-width="150" prop="path"/>
+        <el-table-column align="left" :label="t('view.api.apiGrouping')" min-width="150" prop="api_group"/>
+        <el-table-column align="left" :label="t('view.api.apiDescrpition')" min-width="150" prop="description"/>
         <el-table-column align="left" :label="t('general.request')" min-width="150" prop="method" sortable="custom">
           <template #default="scope">
             <div>

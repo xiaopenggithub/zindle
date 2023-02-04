@@ -1,0 +1,15 @@
+Name: aq-api
+Host: 0.0.0.0
+Port: 8889
+  
+Redis:
+  Host: 192.168.11.160:6379
+  Type: node
+  DB: 9
+  Pass: "123456"
+
+ActivityRpcConf:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: activitie.rpc

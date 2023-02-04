@@ -30,15 +30,23 @@
           type="selection"
           width="55"
         />
-        <el-table-column align="left" label="ID" min-width="60" prop="id" sortable="custom" />
-        <el-table-column align="left" label="活动名称" min-width="150" prop="title" sortable="custom" />
-        <el-table-column align="left" label="活动地址" min-width="150" prop="address" sortable="custom" />
-        <el-table-column align="left" label="开始时间" min-width="150" prop="time_start" sortable="custom" />
-        <el-table-column align="left" label="结束时间" min-width="150" prop="time_end" sortable="custom" />
-        <el-table-column align="left" label="简介" min-width="150" prop="description" sortable="custom" />
-        <el-table-column align="left" label="数量" min-width="150" prop="quantity" sortable="custom" />
-        <el-table-column align="left" label="封面" min-width="150" prop="cover" sortable="custom" />  
-        <el-table-column align="left" label="排序" min-width="150" prop="sort" sortable="custom" />
+        <el-table-column align="left" label="ID" min-width="60" prop="id"/>
+        <el-table-column align="left" label="活动名称" min-width="150" prop="title"/>
+        <el-table-column align="left" label="活动地址" min-width="150" prop="address"/>
+        <el-table-column label="开始时间" width="160">
+          <template #default="scope">
+            {{ formatDate(scope.row.time_start) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="结束时间" width="160">
+          <template #default="scope">
+            {{ formatDate(scope.row.time_end) }}
+          </template>
+        </el-table-column>
+        <el-table-column align="left" label="简介" min-width="150" prop="description"/>
+        <el-table-column align="left" label="数量" min-width="150" prop="quantity"/>
+        <el-table-column align="left" label="封面" min-width="150" prop="cover"/>  
+        <el-table-column align="left" label="排序" min-width="150" prop="sort"/>
         <el-table-column align="left" fixed="right" :label="t('general.operations')" width="200">
           <template #default="scope">
             <el-button
@@ -107,22 +115,26 @@
           </el-form-item>
 
 
-          <el-form-item label="开始时间:" prop="time_start">
-          <el-input
-              type="number"
-              v-model.number="form.time_start"
-              clearable
-              placeholder="请输入开始时间"
-          />
+          <el-form-item label="开始时间:" prop="time_start">          
+            <el-date-picker
+              v-model="form.time_start"
+              type="datetime"
+              placeholder="选择开始时间"
+              align="right"
+              format="YYYY-MM-DD HH:mm:ss"            
+            >
+            </el-date-picker>
           </el-form-item>
 
           <el-form-item label="结束时间:" prop="time_end">
-          <el-input
-              type="number"
-              v-model.number="form.time_end"
-              clearable
-              placeholder="请输入结束时间"
-          />
+            <el-date-picker
+                v-model="form.time_end"
+                type="datetime"
+                placeholder="请输入结束时间"
+                align="right"
+                format="YYYY-MM-DD HH:mm:ss"            
+              >
+            </el-date-picker>
           </el-form-item>
           
           <el-form-item label="数量:" prop="quantity">
@@ -163,6 +175,8 @@
     activityAdd,
     activityUpdate,
   } from "@/api/activity";
+  import moment from "moment"; //导入模块
+  
 
   import { ElMessage, ElMessageBox } from 'element-plus'
   
@@ -307,9 +321,23 @@
     openDialog('edit')
   }
   
+  const formatDate=(time)=>{
+    if (time != null && time != "" && time>100000000) {
+      return moment(time).format("yyyy-MM-DD HH:mm:ss")
+    }
+    return time;
+    
+  }
+
   const enterDialog = async() => {
     editForm.value.validate(async valid => {
       if (valid) {
+        if(form.value.time_start){
+          form.value.time_start=parseInt(moment(form.value.time_start).format('x'))
+        }
+        if(form.value.time_end){
+          form.value.time_end=parseInt(moment(form.value.time_end).format('x'))
+        }
         switch (actionType.value) {
           case 'add':
             {

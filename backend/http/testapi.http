@@ -1,6 +1,6 @@
 ###
 http://127.0.0.1:8888/admin/getUserInfo
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjA5MDMwMjcsImlhdCI6MTY2MDgzMTAyNywicm9sZUlkIjo3LCJ1c2VySWQiOjF9.lhaeqIxEvrF1QxO6lWD3XEehWTXecWXZ1LLc1eqDxc0
+authorization: {{authorization}}
 
 
 ###

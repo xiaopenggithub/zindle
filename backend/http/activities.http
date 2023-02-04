@@ -2,8 +2,7 @@
 #POST http://127.0.0.1:8892/reader/list
 POST http://127.0.0.1:8893/activity/list
 Content-Type: application/json
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzQ2OTMzNzMsImlhdCI6MTY3NDYyMTM3Mywicm9sZUlkIjo3LCJ1c2VySWQiOjF9.S1g0-KHuy4wgSTE99l5pLmD158_LdP2KTNPZ4pF52NA
-#authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjExMzMzODAsImlhdCI6MTY2MTA2MTM4MCwicm9sZUlkIjo3LCJ1c2VySWQiOjF9.hZ3wodXKnbTzSsH0m_64ufStZHE6dbb_acUom2Xwjio
+authorization: {{authorization}}
 
 {
     "page": 1,
@@ -13,7 +12,7 @@ authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzQ2OTMzNzMsImlh
 ### 获取一个记录
 POST http://127.0.0.1:8893/activity/find
 Content-Type: application/json
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzQ2OTMzNzMsImlhdCI6MTY3NDYyMTM3Mywicm9sZUlkIjo3LCJ1c2VySWQiOjF9.S1g0-KHuy4wgSTE99l5pLmD158_LdP2KTNPZ4pF52NA
+authorization: {{authorization}}
 
 {
   "id": 5
@@ -23,7 +22,7 @@ authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzQ2OTMzNzMsImlh
 ### 删除一个记录
 DELETE http://127.0.0.1:8893/activity/delete
 Content-Type: application/json
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzQ2OTMzNzMsImlhdCI6MTY3NDYyMTM3Mywicm9sZUlkIjo3LCJ1c2VySWQiOjF9.S1g0-KHuy4wgSTE99l5pLmD158_LdP2KTNPZ4pF52NA
+authorization: {{authorization}}
 
 {
   "id": 6
@@ -32,7 +31,7 @@ authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzQ2OTMzNzMsImlh
 ### 删除多个记录
 DELETE http://127.0.0.1:8893/activity/deleteBatch
 Content-Type: application/json
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzQ2OTMzNzMsImlhdCI6MTY3NDYyMTM3Mywicm9sZUlkIjo3LCJ1c2VySWQiOjF9.S1g0-KHuy4wgSTE99l5pLmD158_LdP2KTNPZ4pF52NA
+authorization: {{authorization}}
 
 {
   "ids": "6,3,4"
@@ -41,7 +40,7 @@ authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzQ2OTMzNzMsImlh
 ### 添加一个记录
 POST http://127.0.0.1:8893/activity/add
 Content-Type: application/json
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzQ2OTMzNzMsImlhdCI6MTY3NDYyMTM3Mywicm9sZUlkIjo3LCJ1c2VySWQiOjF9.S1g0-KHuy4wgSTE99l5pLmD158_LdP2KTNPZ4pF52NA
+authorization: {{authorization}}
 
 {
   "title": "title",
@@ -59,7 +58,7 @@ authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzQ2OTMzNzMsImlh
 ### 修改一个记录
 PUT http://127.0.0.1:8893/activity/update
 Content-Type: application/json
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzQ2OTMzNzMsImlhdCI6MTY3NDYyMTM3Mywicm9sZUlkIjo3LCJ1c2VySWQiOjF9.S1g0-KHuy4wgSTE99l5pLmD158_LdP2KTNPZ4pF52NA
+authorization: {{authorization}}
 
 {
   "id": 5,
