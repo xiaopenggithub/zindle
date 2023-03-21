@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>下载App</title>
+    <style type="text/css">
+         *{margin: 0;padding: 0;}
+        body,html{width: 100%;}
+        a{text-decoration: none;}
+        .t-bg-2{width: 100%;height: 130px;background: #2698ff;}
+        @media (min-width: 1700px){
+          .container {
+            width: 1700px;
+          }
+        }   // 适应不同的页面
+        @media (min-width: 1170px){
+         .container {
+            padding-left: 0;
+            padding-right: 0;
+          }
+        }//适应不同的页面
+        .template-2 .content {
+            margin-top: -90px;
+        }
+        .content {
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+        .template-common .t-icon {
+            background-color: #fff;
+            width: 170px;
+            height: 170px;
+            border-radius: 25px;
+            box-shadow: 0 0 10px rgba(0,0,0,.2);
+            display: flex;  //弹性和布局，适应手机端页面,同时适应pc端页面
+            align-items: center;
+            margin: 0 auto;
+        }
+        .template-common .t-icon img {
+            width: 120px;
+            height: 120px;
+            border-radius: 30px;
+            border: 1px solid #e5e5e5;
+            margin: 0 auto;
+        }
+        .template-common .t-icon1{
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            margin: 0 auto;
+        }
+        .template-common .t-icon1 img{
+            margin: 0 auto;
+            width:140px;
+            height: 140px;
+            border: 1px solid #e5e5e5;
+        }
+        .template-common .t-name {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+        .template-common .t-name .tit {
+            font-size: 20px;
+            margin-bottom: 5px;
+            margin-top: 10px;
+        }
+        .template-common .t-name .name-info{
+          margin-bottom: 20px;
+          margin-top: 10px;
+        }
+        .template-common .t-name .name-info span {
+            margin-right: 10px;
+            color: #666;
+            font-size: 13px;
+        }
+        .template-common .template-btn-wrap {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .template-common .template-btn {
+            color: #fff;
+            background-color: #157df1;
+            height: 40px;
+            padding: 0 38px;
+            line-height: 40px;
+            font-size: 18px;
+            display: inline-block;
+            border-radius: 30px;
+        }
+        .fl {
+            float: left;
+            _display: inline;
+            *zoom: 1;
+        }
+        img{
+	        max-width: 100%; 
+	        height: auto;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="template-2  template-wrap">
+        <div class="t-bg-2"></div>
+        <div class="container">
+            <div class="content">
+                <div class="template-common">
+                    <div class="t-icon">
+                        <img src="这里面可填写相对路径，可填写服务器端路径">
+                    </div>
+                    <div class="t-name">
+                        <div class="tit">这里填写apk的名字</div>
+                        <div class="name-info pc-pwd">
+                            <span>填写apk的版本号</span>
+                            <span>填写apk的大小</span>
+                        </div>
+                    </div>
+                    <div class="template-btn-wrap">
+                        <a href="填写apk的下载链接地址"
+                        link="填写apk的下载链接地址"
+                        class="ms-btn template-btn clearfix pc-pwd down_load">
+                            <span clsss="f1">下载安装</span>
+                        </a>
+                    </div>
+                    <div class="t-name">
+                        <div class="name-info pc-pwd">
+                            <span>(微信扫码后，请点击右上角选择在浏览器中打开)</span>
+                            <span></span>
+                        </div>
+                    </div> <!-- 这一段可出现，可不出现，看个人习惯-->
+                    <div class="t-icon1 t-icon-img">
+                        <img src="这里面可填写相对路径，可填写服务器端路径">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
