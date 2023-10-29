@@ -31,6 +31,20 @@
               </template>
             </el-input>
           </el-form-item>
+          <el-form-item prop="phone">
+            <el-input
+              v-model="loginFormData.phone"
+              :placeholder="t('login.phone')"
+            >
+              <template #suffix>
+                <span class="input-icon">
+                  <el-icon>
+                    <user />
+                  </el-icon>
+                </span>
+              </template>
+            </el-input>
+          </el-form-item>
           <el-form-item prop="password">
             <el-input
               v-model="loginFormData.password"
@@ -48,7 +62,7 @@
                 </span>
               </template>
             </el-input>
-          </el-form-item>
+          </el-form-item>          
           <el-form-item>
             <el-button
               type="primary"
@@ -193,5 +207,9 @@ html.is-rtl * {
 
 html.is-ltr * {
     direction: ltr;
+}
+body{
+  padding:0px;
+  margin:0px;
 }
 </style>
