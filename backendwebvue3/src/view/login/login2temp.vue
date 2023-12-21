@@ -62,6 +62,24 @@
                 </span>
               </template>
             </el-input>
+          </el-form-item>
+          <el-form-item prop="wechat">
+            <el-input
+              v-model="loginFormData.wechat"
+              :type="lock === 'lock' ? 'password' : 'text'"
+              :placeholder="t('login.entPassword')"
+            >
+              <template #suffix>
+                <span class="input-icon">
+                  <el-icon>
+                    <component
+                      :is="lock"
+                      @click="changeLock"
+                    />
+                  </el-icon>
+                </span>
+              </template>
+            </el-input>
           </el-form-item>          
           <el-form-item>
             <el-button
@@ -129,6 +147,7 @@ const loginFormData = reactive({
   password: '123456',
   captcha: '',
   captchaId: '',
+  wechat:'',
 })
 
 const rules = reactive({
@@ -185,7 +204,7 @@ const handleSetLanguage = (lang) => {
 
 img {
   padding-right: 20px;
-  width: 20px;
+  width: 40px;
   height: 20px;
 }
 
