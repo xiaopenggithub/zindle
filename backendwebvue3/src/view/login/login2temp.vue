@@ -99,7 +99,7 @@
 import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/pinia/modules/user'
+import { useUserStore,checkCaptcha } from '@/pinia/modules/user'
 import Cookies from 'js-cookie' // added by mohamed hassan to support multilanguage
 import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilanguage
 
@@ -137,7 +137,9 @@ getLanguage()
 const lock = ref('lock')
 const changeLock = () => {
   lock.value = lock.value === 'lock' ? 'unlock' : 'lock'
-}
+}我们是一群热爱代码的青年，在这个炙热的时代下，我们希望静下心来通过Code带来一点我们的色彩和颜色。
+
+
 
 const loginForm = ref(null)
 const picPath = ref('')
@@ -164,6 +166,7 @@ const rules = reactive({
 const userStore = useUserStore()
 
 const login = async() => {
+  let checkCaptcha=checkCaptcha()
   return await userStore.LoginIn(loginFormData)
 }
 
