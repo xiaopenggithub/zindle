@@ -6,10 +6,13 @@ import (
 	"backend/service/backend/cmd/api/internal/svc"
 	"backend/service/backend/cmd/api/internal/types"
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/zeromicro/go-zero/core/logx"
 	"io"
+	"log"
 	"mime/multipart"
 	"os"
 	"path"
@@ -22,6 +25,15 @@ type ChangeAvatarLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
+
+// 连接到 MinIO 服务器
+var endpoint = "127.0.0.1:9000" // MinIO 服务器地址
+var accessKey = "minioadmin"    // MinIO 访问密钥
+var secretKey = "minioadmin"    // MinIO 访问密钥密钥
+var useSSL = false              // 是否使用 SSL 连接
+
+var bucketName = "avatar"    // 存储桶名称
+var location = "sh-20240220" // 存储桶的地理位置
 
 func NewChangeAvatarLogic(ctx context.Context, svcCtx *svc.ServiceContext) ChangeAvatarLogic {
 	return ChangeAvatarLogic{
@@ -110,4 +122,88 @@ func (l *ChangeAvatarLogic) ChangeAvatar(req types.AdminChangeAvatarReq, file *m
 	}
 	return nil, errorx.NewCodeError(200, fmt.Sprintf("%v", "上传完成"), "/"+dst)
 
+}
+
+func MD5V(str string) string {
+	h := md5.New()
+	h.Write([]byte(str))
+	return hex.EncodeToString(h.Sum(nil))
+}
+func MinIOUpload(objectName string, file multipart.File, header *multipart.FileHeader) {
+	// 连接到 MinIO 服务器
+	//endpoint := "127.0.0.1:9000" // MinIO 服务器地址
+	//accessKey := "minioadmin"    // MinIO 访问密钥
+	//secretKey := "minioadmin"    // MinIO 访问密钥密钥
+	//useSSL := false              // 是否使用 SSL 连接
+
+	// 初始化 MinIO 客户端对象
+	minioClient, err := minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
+		Secure: useSSL,
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// 创建一个新的存储桶
+	//bucketName := "mybucket" // 存储桶名称
+	//location := "us-east-1"  // 存储桶的地理位置
+	err = minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{Region: location})
+	if err != nil {
+		// 如果存储桶已经存在，则会报错，可以忽略该错误
+		exists, errBucketExists := minioClient.BucketExists(context.Background(), bucketName)
+		if errBucketExists == nil && exists {
+			log.Printf("Bucket '%s' already exists\n", bucketName)
+		} else {
+			log.Fatalln(err)
+		}
+	} else {
+		log.Printf("Successfully created bucket '%s'\n", bucketName)
+	}
+
+	// 将文件上传到 MinIO
+	//n, err := minioClient.PutObject(context.Background(), bucketName, objectName, bytes.NewReader(fileData), int64(len(fileData)), minio.PutObjectOptions{})
+	n, err := minioClient.PutObject(context.Background(), bucketName, objectName, file, header.Size, minio.PutObjectOptions{})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Printf("Successfully uploaded %s of size %d\n", objectName, n)
+}
+
+func MinIORemove(objectName string) {
+	// 连接到 MinIO 服务器
+	//endpoint := "127.0.0.1:9000" // MinIO 服务器地址
+	//accessKey := "minioadmin"    // MinIO 访问密钥
+	//secretKey := "minioadmin"    // MinIO 访问密钥密钥
+	//useSSL := false              // 是否使用 SSL 连接
+
+	// 初始化 MinIO 客户端对象
+	minioClient, err := minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
+		Secure: useSSL,
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	// 创建一个新的存储桶
+	//bucketName := "mybucket" // 存储桶名称
+	//location := "us-east-1"  // 存储桶的地理位置
+	err = minioClient.MakeBucket(context.Background(), bucketName, minio.MakeBucketOptions{Region: location})
+	if err != nil {
+		// 如果存储桶已经存在，则会报错，可以忽略该错误
+		exists, errBucketExists := minioClient.BucketExists(context.Background(), bucketName)
+		if errBucketExists == nil && exists {
+			log.Printf("Bucket '%s' already exists\n", bucketName)
+		} else {
+			log.Fatalln(err)
+		}
+	} else {
+		log.Printf("Successfully created bucket '%s'\n", bucketName)
+	}
+	//// 删除文件
+	err = minioClient.RemoveObject(context.Background(), bucketName, objectName, minio.RemoveObjectOptions{})
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
