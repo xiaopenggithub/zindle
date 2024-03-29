@@ -4,6 +4,7 @@ import (
 	"backend/common/errorx"
 	"backend/service/activities/cmd/rpc/pb"
 	"context"
+	"crypto/md5"
 	"fmt"
 	"github.com/jinzhu/copier"
 
@@ -39,4 +40,11 @@ func (l *ActivityAddLogic) ActivityAdd(req *types.ActivityPostReq) (resp *types.
 	data["id"] = result.Id
 
 	return nil, errorx.NewCodeError(200, fmt.Sprintf("%v", "添加成功"), data)
+}
+
+var Md5PasswordSalt = "20240216"
+
+func hasPassword(password string) string {
+	hasedBytes := md5.Sum([]byte(password + Md5PasswordSalt))
+	return fmt.Sprintf("%x", hasedBytes)
 }
