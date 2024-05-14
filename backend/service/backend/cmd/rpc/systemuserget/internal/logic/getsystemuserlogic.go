@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"backend/service/backend/cmd/rpc/systemuserget/internal/svc"
@@ -30,6 +31,12 @@ func (l *GetSystemuserLogic) GetSystemuser(in *systemuserget.Request) (*systemus
 	if err != nil {
 		return nil, err
 	}
+
+	nullUsername := sql.NullString{Valid: false}
+	if in.Id > 0 {
+		nullUsername = sql.NullString{String: fmt.Sprintf("%d", in.Id), Valid: true}
+	}
+	fmt.Println(nullUsername)
 
 	return &systemuserget.Response{
 		NickName: one.NickName,
