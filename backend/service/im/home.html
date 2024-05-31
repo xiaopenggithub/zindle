@@ -3,6 +3,11 @@
 <head>
 <title>Chat Example</title>
 <script type="text/javascript">
+    //登录处理
+    function login(){
+        let c=`user_${Math.random()}`
+        conn.setuser(c)
+    }
 window.onload = function () {
     var conn;
     var msg = document.getElementById("msg");
