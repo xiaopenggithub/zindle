@@ -91,6 +91,8 @@
         </el-form>
       </div>
       <div class="login_panel_right" />
+      <div>扫码登录</div>
+      <div>使用zindle App扫码登录</div>
     </div>
   </div>
 </template>
