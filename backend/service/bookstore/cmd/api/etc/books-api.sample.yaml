@@ -11,9 +11,9 @@ Auth:
   AccessExpire: 72000
 # email config
 Email:
-  From: service@xiaopeng.info
-  Nickname: service
-  Secret: NMNAdRWPh6NJEMxs
-  Host: smtp.exmail.qq.com
-  Port: 465
+  From: your@email.com
+  Nickname: your_nickname
+  Secret: your_secret
+  Host: your.smtp.host.com
+  Port: your_port
   IsSSL: true
