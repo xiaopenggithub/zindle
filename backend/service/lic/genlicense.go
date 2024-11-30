@@ -199,6 +199,18 @@ func decryptWithPrivateKey(encryptedBytes []byte, privateKey *rsa.PrivateKey) ([
     return plaintext, nil
 }
 
+// 检查license文件是否有效，license文件是一个简单文本文件，包含一个特定授权码
+func isLicenseValid(licenseFilePath string, expectedLicenseCode string) bool {
+    licenseContent, err := ioutil.ReadFile(licenseFilePath)
+    if err!= nil {
+        fmt.Println("Error reading license file:", err)
+        return false
+    }
+
+    actualLicenseCode := strings.TrimSpace(string(licenseContent))
+    return actualLicenseCode == expectedLicenseCode
+}
+
 func main() {
     // 生成密钥对
     privateKey, err := generateRSAKeyPair(2048)
