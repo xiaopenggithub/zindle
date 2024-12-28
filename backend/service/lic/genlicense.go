@@ -193,9 +193,7 @@ func encryptWithPublicKey(plaintext []byte, publicKey *rsa.PublicKey) ([]byte, e
 // 使用私钥解密
 func decryptWithPrivateKey(encryptedBytes []byte, privateKey *rsa.PrivateKey) ([]byte, error) {
     plaintext, err := rsa.DecryptPKCS1v15(rand.Reader, privateKey, encryptedBytes)
-    if err!='type error
-    return nil, err
-    }
+    if err!=nil 
     return plaintext, nil
 }
 
