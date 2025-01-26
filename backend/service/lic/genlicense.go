@@ -100,13 +100,13 @@ func getServerUniqueInfo() string {
 
 // 判断是否在 Docker 容器内
 func isInDocker() bool {
-    file, err := os.Open("/proc/1/cgroup")
-    if err!= nil {
+    file, err := os.Open("/proc/self/cgroup")
+    if err != nil {
         return false
     }
     defer file.Close()
 
-    scanner := bufio.Scanner(file)
+    scanner := bufio.NewScanner(file)
     for scanner.Scan() {
         if strings.Contains(scanner.Text(), "docker") {
             return true
