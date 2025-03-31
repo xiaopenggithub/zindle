@@ -76,11 +76,11 @@
         :show-trigger="false"
       >
         <a-menu
-          :default-selected-keys="['1']"
+          :selected-keys="[selectedKey]"
           :style="{ width: '100%' }"
           :collapsed="collapsed"
           accordion
-          :default-open-keys="openKeys"
+          :open-keys="openKeys"
           v-model:open-keys="openKeys"
           @menu-item-click="handleMenuItemClick"
         >
@@ -156,8 +156,8 @@ const isDarkTheme = ref(store.theme === 'dark')
 const currentMenu = ref(null)
 const currentSubmenu = ref(null)
 const currentLanguage = ref(localStorage.getItem('locale') || 'zh-CN')
-const openKeys = ref([])
-const selectedKey = ref('1')
+const openKeys = ref(JSON.parse(localStorage.getItem('menuOpenKeys') || '[]'))
+const selectedKey = ref(localStorage.getItem('selectedMenuKey') || '1')
 
 const userAvatar = computed(() => {
   return store.user?.avatar || 'https://avatars.githubusercontent.com/u/1?v=4'
@@ -219,6 +219,8 @@ const handleCollapse = (val) => {
 const handleMenuItemClick = (key) => {
   const menu = findMenuByKey(key)
   if (menu) {
+    selectedKey.value = key
+    localStorage.setItem('selectedMenuKey', key)
     router.push(menu.path)
   }
 }
@@ -269,6 +271,7 @@ const setCurrentMenu = (path) => {
   for (const menu of menus.value) {
     if (menu.path === path) {
       selectedKey.value = menu.key
+      localStorage.setItem('selectedMenuKey', menu.key)
       return
     }
     if (menu.children) {
@@ -276,6 +279,8 @@ const setCurrentMenu = (path) => {
       if (child) {
         selectedKey.value = child.key
         openKeys.value = [menu.key]
+        localStorage.setItem('selectedMenuKey', child.key)
+        localStorage.setItem('menuOpenKeys', JSON.stringify([menu.key]))
         return
       }
     }
@@ -321,6 +326,11 @@ watch(() => route.path, (newPath) => {
   setCurrentMenu(newPath)
 }, { immediate: true })
 
+// 监听展开的菜单keys变化
+watch(() => openKeys.value, (newKeys) => {
+  localStorage.setItem('menuOpenKeys', JSON.stringify(newKeys))
+}, { deep: true })
+
 onMounted(() => {
   // 初始化语言
   const savedLocale = localStorage.getItem('locale')
@@ -332,6 +342,9 @@ onMounted(() => {
   // 初始化主题
   isDarkTheme.value = store.theme === 'dark'
   store.setTheme(store.theme)
+
+  // 根据当前路径设置菜单状态
+  setCurrentMenu(route.path)
 })
 </script>
 
