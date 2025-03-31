@@ -1,0 +1,24 @@
+{
+  "name": "Zindle-AdminUI",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@arco-design/web-vue": "^2.57.0",
+    "axios": "^1.8.4",
+    "pinia": "^3.0.1",
+    "vue": "^3.5.13",
+    "vue-i18n": "^11.1.2",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",    
+    "vite": "^6.2.0",
+    "vite-plugin-mock": "^3.0.2"
+  }
+}
