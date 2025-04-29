@@ -38,19 +38,11 @@
             </div>
           </template>
         </a-dropdown>
-        <a-switch
-          v-model="isDarkTheme"
-          :default-checked="false"
-          @change="handleThemeChange"
-          checked-color="#17171a" unchecked-color="#373739"
-        >
-          <template #checked>
-            <icon-moon-fill />
-          </template>
-          <template #unchecked>
-            <icon-sun-fill style="color: orangered;"/>
-          </template>
-        </a-switch>
+        <!-- 主题切换图标 -->
+        <div class="theme-switch" @click="handleThemeChange">
+          <icon-moon-fill v-if="isDarkTheme" style="color: #fff; font-size: 20px; cursor: pointer;" />
+          <icon-sun-fill v-else style="color: #ffa940; font-size: 20px; cursor: pointer;" />
+        </div>
         <a-dropdown>
           <a-avatar :size="32" style="cursor: pointer">
             <img alt="avatar" :src="userAvatar" />
@@ -225,10 +217,9 @@ const handleMenuItemClick = (key) => {
   }
 }
 
-const handleThemeChange = (checked) => {
-  const theme = checked ? 'dark' : 'light'
-  store.setTheme(theme)
-  isDarkTheme.value = checked
+const handleThemeChange = () => {
+  isDarkTheme.value = !isDarkTheme.value
+  store.setTheme(isDarkTheme.value ? 'dark' : 'light')
 }
 
 const handleProfile = () => {
@@ -480,5 +471,17 @@ onMounted(() => {
 
 :deep(.arco-dropdown-option:hover) {
   background-color: var(--color-fill-2);
+}
+
+.theme-switch {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.theme-switch:hover {
+  background: var(--color-fill-2);
 }
 </style> 
