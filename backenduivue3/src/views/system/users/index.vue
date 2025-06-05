@@ -5,25 +5,39 @@
       <div class="search-form-wrapper">
         <a-form layout="inline" class="search-form" :model="searchForm">
           <div class="search-form-left">
-            <a-form-item field="searchQuery">
+            <a-form-item field="username">
               <a-input-search
-                v-model="searchForm.searchQuery"
+                v-model="searchForm.username"
                 :placeholder="t('users.placeholder.search')"
-                search-button
                 @search="handleSearch"
+                allow-clear
               />
             </a-form-item>
-            <a-form-item field="roleFilter">
+            <a-form-item field="role_id">
               <a-select
-                v-model="searchForm.roleFilter"
+                v-model="searchForm.role_id"
                 :placeholder="t('users.filterByRole')"
                 :style="{ width: '180px' }"
                 allow-clear
                 @change="handleRoleChange"
               >
-                <a-option value="admin">{{ t('users.roles.admin') }}</a-option>
-                <a-option value="user">{{ t('users.roles.user') }}</a-option>
-                <a-option value="guest">{{ t('users.roles.guest') }}</a-option>
+                <a-option v-for="role in rolesList" :key="role.id" :value="role.id">
+                  {{ role.name }}
+                </a-option>
+              </a-select>
+            </a-form-item>
+            <!-- 状态 -->
+            <a-form-item field="status">
+              <a-select
+                v-model="searchForm.status"
+                placeholder="按状态筛选"
+                :style="{ width: '180px' }"
+                allow-clear
+                @change="handleStatusChange"
+              >
+                <a-option :value="0">全部</a-option>
+                <a-option :value="1">正常</a-option>
+                <a-option :value="2">禁用</a-option>
               </a-select>
             </a-form-item>
           </div>
@@ -51,20 +65,21 @@
       >
         <template #columns>
           <a-table-column :title="t('users.username')" data-index="username" />
-          <a-table-column :title="t('users.email')" data-index="email" />
-          <a-table-column :title="t('users.role')" data-index="role">
+          <a-table-column :title="t('users.nickname')" data-index="nickname" />
+          <a-table-column :title="t('users.role')" data-index="role_id">
             <template #cell="{ record }">
-              <a-tag>{{ t(`users.roles.${record.role}`) }}</a-tag>
+              <a-tag>{{ getRoleName(record.role_id) }}</a-tag>
             </template>
           </a-table-column>
           <a-table-column :title="t('common.status')" data-index="status">
             <template #cell="{ record }">
-              <a-tag :color="record.status === 'active' ? 'green' : 'red'">
-                {{ t(`common.${record.status}`) }}
+              <a-tag :color="record.status === 1 ? 'green' : 'red'">
+                {{ getStatusText(record.status) }}
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column :title="t('users.createdAt')" data-index="createdAt" />
+          <a-table-column title="允许IP" data-index="allowed_ips" />
+          <a-table-column title="添加日期" data-index="created_at" />
           <a-table-column :title="t('common.operations')" align="right" :width="120">
             <template #cell="{ record }">
               <a-space>
@@ -97,31 +112,47 @@
         :title="t(modalType === 'add' ? 'users.addUser' : 'users.editUser')"
         :ok-text="t('common.confirm')"
         :cancel-text="t('common.cancel')"
-        @ok="handleModalOk"
+        @before-ok="handleModalOk"
         @cancel="handleModalCancel"
       >
         <a-form ref="formRef" :model="formData" :rules="rules">
           <a-form-item field="username" :label="t('users.username')" validate-trigger="blur">
             <a-input v-model="formData.username" :placeholder="t('users.placeholder.username')" />
           </a-form-item>
+          <a-form-item field="nickname" label="昵称" validate-trigger="blur">
+            <a-input v-model="formData.nickname" :placeholder="t('users.placeholder.username')" />
+          </a-form-item>
+          <!--
           <a-form-item field="email" :label="t('users.email')" validate-trigger="blur">
             <a-input v-model="formData.email" :placeholder="t('users.placeholder.email')" />
           </a-form-item>
-          <a-form-item field="role" :label="t('users.role')" validate-trigger="blur">
-            <a-select v-model="formData.role" :placeholder="t('users.placeholder.role')">
-              <a-option value="admin">{{ t('users.roles.admin') }}</a-option>
-              <a-option value="user">{{ t('users.roles.user') }}</a-option>
-              <a-option value="guest">{{ t('users.roles.guest') }}</a-option>
+          -->
+          <a-form-item field="role_id" :label="t('users.role')" validate-trigger="blur">
+            <a-select v-model="formData.role_id" :placeholder="t('users.placeholder.role')">
+              <a-option v-for="role in rolesList" :key="role.id" :value="role.id">
+                {{ role.name }}
+              </a-option>
             </a-select>
           </a-form-item>
           <a-form-item field="status" :label="t('common.status')" validate-trigger="blur">
             <a-select v-model="formData.status">
-              <a-option value="active">{{ t('common.active') }}</a-option>
-              <a-option value="inactive">{{ t('common.inactive') }}</a-option>
+              <a-option :value="1">{{ t('common.active') }}</a-option>
+              <a-option :value="2">{{ t('common.inactive') }}</a-option>
             </a-select>
           </a-form-item>
           <a-form-item v-if="modalType === 'add'" field="password" :label="t('users.password')" validate-trigger="blur">
             <a-input-password v-model="formData.password" :placeholder="t('users.placeholder.password')" />
+          </a-form-item>
+          <a-form-item v-if="modalType === 'edit'" :label="t('users.password')">
+            <a-input-password v-model="formData.password" :placeholder="t('users.placeholder.password')" />
+          </a-form-item>
+
+          <a-form-item label="IP限定" :validate-trigger="['change', 'blur']">
+            <a-textarea
+              v-model="formData.allowed_ips"
+              placeholder="输入限定IP，多个IP用逗号分隔，留空表示不限制"
+              :rows="2"
+            />
           </a-form-item>
         </a-form>
       </a-modal>
@@ -134,13 +165,16 @@ import { ref, watch, onMounted, reactive } from 'vue'
 import { IconPlus, IconEdit, IconDelete } from '@arco-design/web-vue/es/icon'
 import { Message, Modal } from '@arco-design/web-vue'
 import { useI18n } from 'vue-i18n'
-import { getUsers, deleteUser, addUser, updateUser } from '@/api/mock/user'
+// import { updateUser } from '@/api/mock/user'
+import { list,deleteUser,addUser,updateUser } from '@/api/user'
+import { getRoles } from '@/api/role'
 
 const { t } = useI18n()
 
 const searchForm = reactive({
-  searchQuery: '',
-  roleFilter: ''
+  username: '',
+  role_id: null,
+  status:0,
 })
 const loading = ref(false)
 const users = ref([])
@@ -151,23 +185,24 @@ const currentRecord = ref(null)
 
 const formData = ref({
   username: '',
-  email: '',
-  role: '',
-  status: 'active',
-  password: ''
+  nickname:'',
+  role_id:1,
+  status: 1,
+  password: '',
+  allowed_ips: '',
 })
 
 const rules = {
   username: [{ required: true, message: t('users.validation.usernameRequired') }],
-  email: [
-    { required: true, message: t('users.validation.emailRequired') },
-    { type: 'email', message: t('users.validation.emailInvalid') }
-  ],
-  role: [{ required: true, message: t('users.validation.roleRequired') }],
+  nickname: [{ required: true, message: t('users.validation.usernameRequired') }],
+  // email: [
+  //   { required: true, message: t('users.validation.emailRequired') },
+  //   { type: 'email', message: t('users.validation.emailInvalid') }
+  // ],
+  role_id: [{ required: true, message: t('users.validation.roleRequired') }],
   status: [{ required: true, message: t('users.validation.statusRequired') }],
   password: [{ required: true, message: t('users.validation.passwordRequired') }]
 }
-
 
 const pagination = ref({
   total: 0,
@@ -180,16 +215,36 @@ const pagination = ref({
   baseSize: 10
 })
 
+// 添加角色列表数据
+const rolesList = ref([])
+
+const fetchRoles = async () => {
+  try {
+    const res = await getRoles()
+    if (res.data.code === 200) {
+      rolesList.value = res.data.data.list
+    }
+  } catch (error) {
+    console.error('Failed to fetch roles:', error)
+  }
+}
+
+const getRoleName = (roleId) => {
+  const role = rolesList.value.find(r => r.id === roleId)
+  return role ? role.name : roleId
+}
+
 const fetchUsers = async (page = 1) => {
   try {
     loading.value = true
-    const res = await getUsers({
-      current: page,
-      pageSize: pagination.value.pageSize,
-      keyword: searchForm.searchQuery,
-      role: searchForm.roleFilter
+    const res = await list({
+      page: page,
+      page_size: pagination.value.pageSize,
+      username: searchForm.username,
+      role_id: searchForm.role_id,
+      status: searchForm.status
     })
-    
+
     if (res.data.code === 200) {
       users.value = res.data.data.list
       pagination.value.total = res.data.data.total
@@ -199,10 +254,18 @@ const fetchUsers = async (page = 1) => {
     }
   } catch (error) {
     console.error('Failed to fetch users:', error)
-    Message.error(t('users.fetchFailed'))
+    // Message.error(t('users.fetchFailed'))
   } finally {
     loading.value = false
   }
+}
+
+const getStatusText = (type) => {
+  const typeMap = {
+    1: t('common.active'),
+    2: t('common.inactive'),
+  }
+  return typeMap[type] || type
 }
 
 const handleSearch = () => {
@@ -217,10 +280,11 @@ const handleAdd = () => {
   modalType.value = 'add'
   formData.value = {
     username: '',
-    email: '',
-    role: '',
-    status: 'active',
-    password: ''
+    nickname:'',
+    role_id: 1,
+    status: 1,
+    password: '',
+    allowed_ips: '',
   }
   modalVisible.value = true
 }
@@ -241,7 +305,7 @@ const handleDelete = (record) => {
     hideCancel: false,
     onOk: async () => {
       try {
-        const res = await deleteUser(record.id)
+        const res = await deleteUser({ids:[record.id]})
         if (res.data.code === 200) {
           Message.success(t('users.deleteSuccess'))
           fetchUsers(pagination.value.current)
@@ -256,21 +320,28 @@ const handleDelete = (record) => {
   })
 }
 
-const handleModalOk = async () => {
+const handleModalOk = async (done) => {
   try {
-    await formRef.value.validate()
+    const validRes = await formRef.value.validate()
+    // validRes 为 undefined 时表示验证通过
+    if (validRes) {
+      // 验证失败
+      done(false)
+      return
+    }
     const api = modalType.value === 'add' ? addUser : updateUser
-    const params = modalType.value === 'add' ? [formData.value] : [currentRecord.value.id, formData.value]
-    
+    const params = modalType.value === 'add' ? [formData.value] : [formData.value, currentRecord.value.id]
     const res = await api(...params)
     if (res.data.code === 200) {
       Message.success(modalType.value === 'add' ? t('users.addSuccess') : t('users.updateSuccess'))
       modalVisible.value = false
       fetchUsers(pagination.value.current)
+      done()
     } else {
       Message.error(res.data.message || (modalType.value === 'add' ? t('users.addFailed') : t('users.updateFailed')))
     }
   } catch (error) {
+    done(false)
     console.error('Form validation failed:', error)
   }
 }
@@ -285,13 +356,14 @@ const onPageChange = (page) => {
 }
 
 // Watch for filter changes
-watch(() => [searchForm.searchQuery, searchForm.roleFilter], () => {
+watch(() => [searchForm.username, searchForm.role_id,searchForm.status], () => {
   fetchUsers(1)
 })
 
 // Initial data fetch
 onMounted(() => {
   fetchUsers()
+  fetchRoles()
 })
 </script>
 
