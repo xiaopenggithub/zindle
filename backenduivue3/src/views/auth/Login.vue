@@ -6,11 +6,13 @@
         <h2>{{ $t('login.title') }}</h2>
       </div>
       <a-form
+        ref="formRef"
         :model="form"
+        :rules="rules"
         @submit="handleSubmit"
         class="login-form"
       >
-        <a-form-item field="username" :rules="[{ required: true, message: $t('login.usernameRule') }]">
+        <a-form-item field="username" validate-trigger="blur">
           <template #label>{{ $t('login.username') }}</template>
           <a-input
             v-model="form.username"
@@ -23,7 +25,7 @@
             </template>
           </a-input>
         </a-form-item>
-        <a-form-item field="password" :rules="[{ required: true, message: $t('login.passwordRule') }]">
+        <a-form-item field="password" validate-trigger="blur">
           <template #label>{{ $t('login.password') }}</template>
           <a-input-password
             v-model="form.password"
@@ -36,7 +38,7 @@
             </template>
           </a-input-password>
         </a-form-item>
-        <a-form-item field="captcha" :rules="[{ required: true, message: $t('login.captchaRule') }]">
+        <a-form-item field="captcha" validate-trigger="blur">
           <template #label>{{ $t('login.captcha') }}</template>
           <div class="captcha-container">
             <a-input
@@ -60,7 +62,7 @@
           <router-link to="/forgotPassword">{{ $t('login.forgotPassword') }}</router-link>
         </div>
         <a-form-item>
-          <a-button type="primary" html-type="submit" size="large" long>
+          <a-button type="primary" html-type="submit" size="large" long :loading="loading">
             {{ $t('common.login') }}
           </a-button>
         </a-form-item>
@@ -79,42 +81,101 @@ import { Message } from '@arco-design/web-vue'
 import { IconUser, IconLock, IconSafe } from '@arco-design/web-vue/es/icon'
 import { useStore } from '@/store'
 import { useI18n } from 'vue-i18n'
+import { getCaptcha } from '@/api/user'
+import { getToken } from '@/utils/auth'
 
 const router = useRouter()
 const store = useStore()
 const { t } = useI18n()
+const formRef = ref(null)
+const loading = ref(false)
+
+// 检查登录状态并自动跳转
+const checkLoginStatus = async () => {
+  const token = getToken()
+  if (token) {
+    try {
+      // 获取上次访问的页面
+      const lastPath = localStorage.getItem('lastPath')
+      // 如果有上次访问的页面且不是登录相关页面，则跳转到该页面
+      if (lastPath && !['/login', '/register', '/'].includes(lastPath)) {
+        router.replace(lastPath)
+      } else {
+        router.replace('/dashboard')
+      }
+    } catch (error) {
+      console.error('Failed to get user info:', error)
+      // 登录页面刷新验证码
+      refreshCaptcha()
+    }
+  } else {
+    // 没有登录状态，刷新验证码
+    refreshCaptcha()
+  }  
+}
+
 const form = reactive({
   username: '',
   password: '',
-  captcha: ''
+  captcha: '',
+  captcha_id: ''
 })
 
-import captchaImg from '@/assets/logo.png';
-const captchaImage = ref(captchaImg);
-
-const refreshCaptcha = () => {
-  // 这里应该调用后端接口获取验证码图片
-  // 示例：captchaImage.value = await getCaptchaImage()
+const rules = {
+  username: [
+    { required: true, message: t('login.usernameRule') }
+  ],
+  password: [
+    { required: true, message: t('login.passwordRule') }
+  ],
+  captcha: [
+    { required: true, message: t('login.captchaRule') }
+  ]
 }
 
-// 在组件挂载时获取验证码
+const captchaImage = ref('')
+
+const refreshCaptcha = async () => {
+  try {
+    const res = await getCaptcha()
+    if (res.data.code === 200) {
+      captchaImage.value = res.data.data.captcha_code
+      form.captcha_id = res.data.data.captcha_id
+    } else {
+      Message.error(res.data.message || t('login.captchaError'))
+    }
+  } catch (error) {
+    Message.error(t('login.captchaError'))
+    console.error('获取验证码失败:', error)
+  }
+}
+
+// 在组件挂载时检查登录状态
 onMounted(() => {
-  refreshCaptcha()
+  checkLoginStatus()  
 })
 
-const handleSubmit = async () => {    
+const handleSubmit = async ({ values, errors }) => {
+  if (errors) {
+    return
+  }
+  
   try {
-    await store.login(form.username, form.password, form.captcha)
+    loading.value = true
+    await store.login(values)
     Message.success(t('login.loginSuccess'))
     // 获取重定向地址
     const redirect = router.currentRoute.value.query.redirect || '/'
-    // 等待一小段时间确保 token 和角色信息已保存
+    // 等待一小段时间确保 token 和角色信息已保存    
     setTimeout(() => {
       router.push(redirect)
     }, 100)
   } catch (error) {
-    Message.error(error.message)
+    // Message.error(error.message)
+    console.log('登录失败:', error.message)
     refreshCaptcha() // 登录失败时刷新验证码
+  } finally {
+    loading.value = false
   }
 }
 </script>
