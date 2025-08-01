@@ -12,6 +12,14 @@
                 </template>
               </a-input>
             </a-form-item>
+            <!-- 新增：创建时间范围选择 -->
+            <a-form-item field="createdAt" :label="$t('product.category.createdAt')" hide-label>
+              <a-range-picker
+                v-model="searchForm.createdAt"
+                :placeholder="[$t('common.startDate'), $t('common.endDate')]"
+                style="width: 240px"
+              />
+            </a-form-item>
             <a-form-item>
               <a-space>
                 <a-button type="primary" @click="handleSearch">
@@ -119,7 +127,8 @@ const categoryList = ref([])
 const currentId = ref(null)
 
 const searchForm = reactive({
-  name: ''
+  name: '',
+  createdAt: []      // 新增：用于存放日期范围
 })
 
 const pagination = reactive({
@@ -152,11 +161,18 @@ const rules = {
 const fetchCategoryList = async () => {
   loading.value = true
   try {
-    const res = await getCategories({
+    const params = {
       current: pagination.current,
       pageSize: pagination.pageSize,
       name: searchForm.name
-    })
+    }
+    // 新增：如果有选择日期范围，则加入参数
+    if (searchForm.createdAt && searchForm.createdAt.length === 2) {
+      params.startDate = searchForm.createdAt[0]
+      params.endDate   = searchForm.createdAt[1]
+    }
+
+    const res = await getCategories(params)
     
     if (res.data.code === 200) {
       categoryList.value = res.data.data.list
@@ -181,6 +197,7 @@ const handleSearch = () => {
 // 重置搜索
 const handleReset = () => {
   searchForm.name = ''
+  searchForm.createdAt = []   // 新增：清空日期
   handleSearch()
 }
 
