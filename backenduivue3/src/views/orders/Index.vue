@@ -166,7 +166,8 @@ const memberDetail = ref(null)
 const searchForm = reactive({
   status: 'all',
   dateRange: [],
-  keyword: ''
+  keyword: '',
+  orderNo: ''   // 新增：订单号
 })
 
 const pagination = reactive({
@@ -276,6 +277,7 @@ const fetchOrders = async () => {
       pageSize: pagination.pageSize,
       status: searchForm.status,
       keyword: searchForm.keyword,
+      orderNo: searchForm.orderNo,  // 新增：传入订单号
       startTime: searchForm.dateRange?.[0]?.toISOString(),
       endTime: searchForm.dateRange?.[1]?.toISOString()
     })
@@ -383,6 +385,7 @@ const resetFilters = () => {
   searchForm.status = 'all'
   searchForm.dateRange = []
   searchForm.keyword = ''
+  searchForm.orderNo = ''   // 新增：清空订单号
   pagination.current = 1
   fetchOrders()
 }
